@@ -2,6 +2,7 @@
 // config providers here
 
 
+import { RainbowProvider } from "./context/RainbowProvider"; 
 import { AppConfigProvider } from "./context/AppConfigProvider";
 
 type ProvidersProps = {
