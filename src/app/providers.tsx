@@ -2,19 +2,18 @@
 
 // config providers here
 
-
-import { RainbowProvider } from "./context/RainbowProvider"; 
+import { RainbowProvider } from "./context/RainbowProvider";
 import { AppConfigProvider } from "./context/AppConfigProvider";
-
-type ProvidersProps = {
-
-} ;
+import ThemeConfigProvider from "./context/ThemeProvider";
+type ProvidersProps = {};
 
 export const Providers: FCC<ProvidersProps> = (props) => {
     return (
         <RainbowProvider>
             <AppConfigProvider>
-                {props.children}
+                <ThemeConfigProvider>
+                    {props.children}
+                </ThemeConfigProvider>
             </AppConfigProvider>
         </RainbowProvider>
     );
