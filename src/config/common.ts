@@ -7,9 +7,10 @@ import { zkFair, arbitrumOne } from "./chains";
 export const IS_LOCAL = process.env.NODE_ENV === 'development';
 
 // 
-export const IS_PROD = IS_LOCAL ? process.env.NODE_ENV : !['feature', 'localhost'].some(v => location.origin.includes(v));
+// export const IS_PROD = IS_LOCAL ? process.env.NODE_ENV : !['feature', 'localhost'].some(v => window.location.origin.includes(v));
 
 
+export const IS_PROD = false;
 
 // config chainid with name
 export enum CHAINS_ID {

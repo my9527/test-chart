@@ -2,6 +2,7 @@
 import { memo, createContext, useContext, useMemo } from "react";
 import BigNumber from "bignumber.js";
 import { defineChain } from "viem";
+import { useChainId } from "wagmi"
 
 
 
@@ -49,13 +50,12 @@ const AppConfigOnChain: Record<number, AppConfigType> = {
       
           // config api
           api: {
-            baseUrl: "https://api.hyperionx.xyz/",
+            http: "https://api.hyperionx.xyz/",
             wss: "wss://api.hyperionx.xyz/",
           },
       
           executionFee: '2500000000000000000',
       
-          isTest: false,
     },
     [CHAINS_ID.arbitrum]: {
         chain: arbitrumOne,
@@ -74,32 +74,35 @@ const AppConfigOnChain: Record<number, AppConfigType> = {
     
         // config api
         api: {
-          baseUrl: "https://api.substancex.io/",
+          http: "https://api.substancex.io/",
           wss: "wss://api.substancex.io/",
         },
     
         executionFee: '2500000000000000000',
     
-        isTest: false,
       },
 };
 
 
 // config app config on default chain id, if chain changes, then the provider should update
-export const AppConfig = createContext(AppConfigOnChain[DEFAULT_CHAIN_ID]);
+export const AppConfigContext = createContext(AppConfigOnChain[DEFAULT_CHAIN_ID]);
 
 
-export const AppConfigProvider: FCC<{ chainId: number }> = memo(({ children, chainId }) => {
+export const AppConfigProvider: FCC<{  }> = memo(({ children }) => {
+
+  
+  const chainId = useChainId();
+
+  const config = useMemo(() => {
+      return AppConfigOnChain[chainId] || AppConfigOnChain[DEFAULT_CHAIN_ID];
+  }, [chainId]);
 
 
-    const config = useMemo(() => {
-        return AppConfigOnChain[chainId] || AppConfigOnChain[DEFAULT_CHAIN_ID];
-    }, [chainId]);
-
-
-    return (
-        <AppConfig.Provider value={config}>
-            {children}
-        </AppConfig.Provider>
-    );
+  return (
+      <AppConfigContext.Provider value={config}>
+          {children}
+      </AppConfigContext.Provider>
+  );
 });
+
+AppConfigProvider.displayName = 'AppConfigProvider';

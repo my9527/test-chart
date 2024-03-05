@@ -1,3 +1,4 @@
+'use client';
 
 // config providers here
 
@@ -10,11 +11,11 @@ type ProvidersProps = {
 } ;
 
 export const Providers: FCC<ProvidersProps> = (props) => {
-
-
     return (
-        <AppConfigProvider chainId={1}>
-            {props.children}
-        </AppConfigProvider>
+        <RainbowProvider>
+            <AppConfigProvider>
+                {props.children}
+            </AppConfigProvider>
+        </RainbowProvider>
     );
 }
