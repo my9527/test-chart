@@ -20,7 +20,7 @@ import {
 import {
   arbitrumOne,
   zkFair
-} from "../../../config/chains";
+} from "../../config/chains";
 
 
 

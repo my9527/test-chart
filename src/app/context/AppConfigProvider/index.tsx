@@ -6,8 +6,8 @@ import { useChainId } from "wagmi"
 
 
 
-import { CHAINS_ID, DEFAULT_CHAIN_ID } from "@/config/common";
-import { arbitrumOne, zkFair } from "@/config/chains";
+import { CHAINS_ID, DEFAULT_CHAIN_ID } from "@/app/config/common";
+import { arbitrumOne, zkFair } from "@/app/config/chains";
 
 
 export type AppConfigType = {

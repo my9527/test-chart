@@ -1,8 +1,16 @@
 "use client";
 import Image from "next/image";
 import styles from "./page.module.css";
-
+import { useMessage } from "@/app/components/Message";
+import { useEffect } from "react";
 export default function Home() {
+  const msg = useMessage();
+  useEffect(() => {
+    // setTimeout(() => {
+    //   msg({ content: "test",delay:1000 });
+    //   msg({ content: "test", delay:2000,position: "bottom" });
+    // }, 1000);
+  }, []);
   return (
     <main className={styles.main}>
       <div className={styles.description}>

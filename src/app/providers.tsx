@@ -5,7 +5,7 @@
 import { RainbowProvider } from "./context/RainbowProvider";
 import { AppConfigProvider } from "./context/AppConfigProvider";
 import ThemeConfigProvider from "./context/ThemeProvider";
-import GlobalMessage from "@/components/Message";
+import GlobalMessage from "@/app/components/Message";
 import { RecoilRoot } from "recoil";
 type ProvidersProps = {};
 
