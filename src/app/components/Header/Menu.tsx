@@ -21,9 +21,9 @@ const Item = styled.div`
     }
   }
   .label {
-    color: #fafafa;
+    color: ${(props) => props.theme.colors.text1};
     font-family: Arial;
-    font-size: 14px;
+    font-size: ${(props) => props.theme.fontSize.medium};
     font-style: normal;
     font-weight: 400;
     line-height: 100%; /* 14px */

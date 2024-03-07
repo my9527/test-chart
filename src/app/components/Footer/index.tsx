@@ -6,7 +6,7 @@ import NetworkIcon from "@/app/assets/footer/network.svg";
 import { useRouter } from "next/navigation";
 
 const Wrapper = styled.div`
-  background: #121212;
+  background: ${(props) => props.theme.colors.fill1};
   width: 100%;
   height: 40px;
   display: flex;
@@ -42,18 +42,18 @@ const Trade = styled.div`
   gap: 20px;
 
   .token {
-    color: #fafafa;
+    color: ${(props) => props.theme.colors.text1};
     font-family: "HarmonyOS Sans";
-    font-size: 12px;
+    font-size: ${(props) => props.theme.fontSize.small};
     font-style: normal;
     font-weight: 500;
     line-height: 120%;
   }
   .change,
   .price {
-    color: #3ff9af;
+    color: ${(props) => props.theme.colors.text2};
     font-family: "HarmonyOS Sans";
-    font-size: 12px;
+    font-size: ${(props) => props.theme.fontSize.small};
     font-style: normal;
     font-weight: 500;
     line-height: 120%; /* 14.4px */
@@ -62,46 +62,32 @@ const Trade = styled.div`
 const Line = styled.div`
   width: 1px;
   height: 10px;
-  background: rgba(255, 255, 255, 0.5);
+  background: ${(props) => props.theme.colors.text4};
 `;
 const Right = styled.div`
   display: flex;
   align-items: center;
   gap: 20px;
   padding-right: 15px;
-`;
-const Copyright = styled.div`
-  color: rgba(255, 255, 255, 0.5);
+  color: ${(props) => props.theme.colors.text4};
   font-family: Arial;
-  font-size: 12px;
+  font-size: ${(props) => props.theme.fontSize.small};
   font-style: normal;
   font-weight: 400;
-  line-height: 14px;
-`;
-const Menu = styled.div`
-  color: rgba(255, 255, 255, 0.5);
-  font-family: Arial;
-  font-size: 12px;
-  font-style: normal;
-  font-weight: 400;
-  line-height: 14px;
+  line-height: 120%;
   text-decoration-line: underline;
+`;
+const Copyright = styled.div``;
+const Menu = styled.div`
   cursor: pointer;
 `;
 const NetworkStatus = styled.div`
   display: flex;
   align-items: center;
   gap: 10px;
-  color: rgba(255, 255, 255, 0.5);
-  font-family: Arial;
-  font-size: 12px;
-  font-style: normal;
-  font-weight: 400;
-  line-height: 14px;
 `;
 const Footer = () => {
   const router = useRouter();
-  const [left, setLeft] = useState(0);
   const tokenList = [
     {
       token: "BTC/USDT",

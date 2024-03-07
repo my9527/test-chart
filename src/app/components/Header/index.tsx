@@ -6,7 +6,7 @@ import Image from "next/image";
 import Menu from "./Menu";
 
 const Wrapper = styled.div`
-  background: #121212;
+  background: ${(props) => props.theme.colors.fill1};
   width: 100%;
   height: 50px;
   display: flex;
