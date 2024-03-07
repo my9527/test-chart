@@ -2,13 +2,14 @@
 import "./globals.css";
 import "@rainbow-me/rainbowkit/styles.css";
 import type { Metadata } from "next";
+import dynamic from 'next/dynamic';
+
 import { Inter } from "next/font/google";
 // import { Providers } from "./providers";
 import Header from "./components/Header";
 
 
 // import { Providers } from "./providers";
-import dynamic from 'next/dynamic';
 
 
 const Providers = dynamic(() => import("./providers"), {
