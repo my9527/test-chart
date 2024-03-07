@@ -9,6 +9,8 @@ import PerpetualOrders from "../components/Perpetual/PerpetualOrders";
 import PerpetualPanels from "../components/Perpetual/PerpetualPanels";
 import PerpetualTrdes from "../components/Perpetual/PerpetualTrdes";
 import Account from "../components/Perpetual/Account";
+// import { recoilPanelSide } from "@/app/model";
+
 const ReactGridLayout = WidthProvider(RGL);
 
 const LAYOUT_LEFT_LIST: Layout[] = [
