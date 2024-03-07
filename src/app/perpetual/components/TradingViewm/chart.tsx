@@ -20,7 +20,7 @@ import timezone from 'dayjs/plugin/timezone';
 import UTC from 'dayjs/plugin/utc';
 import DataFeed from "./datafeed";
 
-import { tokens } from "@/config/tokens";
+import { tokens } from "@/app/config/tokens";
 import { tradingviewSocketIns } from "./socket";
 import { useParams } from "next/navigation";
 import styled from "styled-components";
