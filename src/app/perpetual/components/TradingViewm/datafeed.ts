@@ -3,15 +3,17 @@
  * tradingview 数据源
  */
 
-import { ResolveCallback,  ErrorCallback, SymbolResolveExtension } from "charting_library"
+import { ResolveCallback,  ErrorCallback, SymbolResolveExtension, LibrarySymbolInfo, ResolutionString, SubscribeBarsCallback } from "charting_library"
 import { tradingviewSocketIns } from "./socket";
-import { timeScale } from "./types";
+import { KlineSymbolType, timeScale } from "./types";
 
 
 class Datafeed {
 
     supportedResolutions: string[];
     symbols: any;
+
+    listenerGuid: any;
 
 
     constructor({ symbols }: any) {
@@ -60,9 +62,9 @@ class Datafeed {
         onErrorCallback: any,
     ) {
 
-        console.log("run getBars", symbolInfo)
 
          const nextInterval = timeScale[resolution.toString().toLowerCase()];
+
         // timeScale
 
         await tradingviewSocketIns.initHistoryKline(symbolInfo, nextInterval, fromParams.countBack, fromParams.from, fromParams.to, onHistoryCallback);
@@ -89,7 +91,6 @@ class Datafeed {
                 break;
             }
         }
-        console.log('resolveSymbol', symbolInfo);
         if (symbolInfo) {
             onSymbolResolvedCallback(symbolInfo);
         } else {
@@ -97,9 +98,42 @@ class Datafeed {
         }
     }
 
+    // subscribeBars(symbolInfo: LibrarySymbolInfo, resolution: ResolutionString, onTick: SubscribeBarsCallback, listenerGuid: string, onResetCacheNeededCallback: () => void): void;
+  // unsubscribeBars(listenerGuid: string): void;
 
-    subscribeBars() {
-        console.log("0000000000000")
+
+    subscribeBars(
+        symbolInfo: KlineSymbolType,
+        resolution: ResolutionString,
+        onTick: SubscribeBarsCallback,
+        listenerGuid: string, 
+        onResetCacheNeededCallback: () => void
+    ) {
+
+        const interval = timeScale[resolution.toString().toLowerCase()];
+        // initTimeout(subscriberUID);
+        this.listenerGuid = listenerGuid;
+
+        // cw.setOnRealtimeCallback(onRealtimeCallback);
+        tradingviewSocketIns.setOnRealtimeCallback(onTick);
+
+        (async()=>{
+            await tradingviewSocketIns.subscribe(symbolInfo, interval, 1, onTick);
+        })();
+
+        
+
+        // const intervalCallback = async () => {
+        //     initTimeout(subscriberUID);
+
+        //     await cw.subscribe(symbolInfo, timeScale[resolution.toString().toLowerCase()], 1, onRealtimeCallback);
+        //     if (!timeoutList[subscriberUID]) {
+        //         timeoutList[subscriberUID] = null;
+        //     }
+        //     timeoutList[subscriberUID] = setTimeout(intervalCallback, interval);
+        // };
+
+        // intervalCallback();
     }
 
     unsubscribeBars() {

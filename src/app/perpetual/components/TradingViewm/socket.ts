@@ -2,7 +2,7 @@
 
 import { KlineSymbolType } from "./types";
 import { getHistoryChartData } from "../../service";
-import { HistoryCallback, Bar } from "charting_library";
+import { HistoryCallback, Bar, SubscribeBarsCallback } from "charting_library";
 import { sleep } from "@/app/lib/sleep";
 import BigNumber from "bignumber.js";
 
@@ -24,6 +24,9 @@ type SubscribtionType = {
     channel: string;
 }
 
+
+const DEFAULT_INTERVAL: TradingViewInterval = '15m';
+
 class TradingViewSocket {
 
     url: string | null = null;
@@ -42,7 +45,7 @@ class TradingViewSocket {
     disconnectCbList: any[] = [];
     receiveMessageCbList: any[] = [];
     // lastSubscriptions: SubscribeInfoType[] = [];
-    curInterval: TradingViewInterval = '15m';
+    curInterval: TradingViewInterval = DEFAULT_INTERVAL;
     curSubscriptionInfo?: SubscribeInfoType;
 
     pingAble: boolean = true; // enable ping pong;
@@ -70,9 +73,6 @@ class TradingViewSocket {
             this.connection = connection;
             this.bind();
             this.data = [];
-
-            console.log("inited")
-
             resolve();
 
             if (this.curSubscriptionInfo && isReconnect) {
@@ -95,8 +95,8 @@ class TradingViewSocket {
         this.data = data_;
     }
 
-    pushData(data_: Bar) {
-        this.data.push(data_);
+    pushData(data_: Bar[]) {
+        this.data.push(...data_);
     }
 
     _formatKlineData(newData: any) {
@@ -149,7 +149,6 @@ class TradingViewSocket {
         }
 
         try {
-            console.log("send ping");
             this._send({ event: 'ping' });
         } catch (e) {
             console.log('ping error:', e);
@@ -171,7 +170,6 @@ class TradingViewSocket {
         this.inited = true;
 
         if (!this.connection) return;
-        console.log("on open");
 
         // call func on open;
         if (this.openCbList.length) {
@@ -181,10 +179,9 @@ class TradingViewSocket {
         this.ping();
     }
 
-    async _error(msg: { [x: string]: any; toString: () => string }) {
+    _error = async (msg: { [x: string]: any; toString: () => string }) => {
         this.inited = false;
 
-        console.log("on error")
         if (this.autoReconnect) {
             this.reset();
             await sleep(30 * 1000);
@@ -192,11 +189,11 @@ class TradingViewSocket {
         }
     }
 
-    async _beforeunload() {
+     _beforeunload = async () => {
 
     }
 
-    async _close(msg: { [x: string]: any; toString: () => string }) {
+    _close = async (msg: { [x: string]: any; toString: () => string }) => {
         if (msg.code === 1006) {
             this.disconnect();
             this.reset();
@@ -207,35 +204,34 @@ class TradingViewSocket {
         }
     }
 
-    async _message(msg: { [x: string]: any; toString: () => string }) {
+     _message = async (msg: Event & { data: string }) =>  {
+
         if (!this.connection) return;
+
 
         const d = JSON.parse(msg?.data);
 
+        // 处理ping/pong
         if (d.event === 'pong') {
             this.pinging = false;
             this.connected = true;
+            return;
         }
 
         if (d.type === 'candle.stick.chart') {
-            // 如果在切换interval， 此时先不接受数据,避免因为最新数据的进入导致历史数据无法渲染
-            // if (this.isSwitchInterval) {
-            //   return;
-            // }
-
-            // 11.9 修改k线返回格式
-            // let _data = d?.data?.[this.curInterval];
-            // _data = _data?.replace(/'/g, '"');
-            // _data = _data ? JSON.parse(_data) : '';
 
             let _data = d?.data;
             if (_data) {
                 this.initSubV2Kline([_data]);
             }
         } else {
-            if (this.receiveMessageCbList?.length) {
-                this.receiveMessageCbList.map((i) => i?.(d));
-            }
+
+            this.receiveMessageCbList.forEach(func => {
+                func(d);
+            });
+            // if (this.receiveMessageCbList?.length) {
+            //     this.receiveMessageCbList.map((i) => i?.(d));
+            // }
         }
     }
 
@@ -270,14 +266,16 @@ class TradingViewSocket {
 
     async subscribe(
         symbolInfo: KlineSymbolType,
-        interval: TradingViewInterval = '15m',
+        interval: TradingViewInterval = DEFAULT_INTERVAL,
         limit = 1,
         onRealtimeCallback: AnyFunc,
     ) {
 
-        if (!this.connection || this.inited) {
+
+        if (!this.connection || !this.inited) {
             return;
         }
+
 
         // unsubscribe if symbol or interval changed
 
@@ -286,13 +284,25 @@ class TradingViewSocket {
         if (!ifChanged) return;
 
 
-        // unsubscribe last subscribtion
-        this._send({
-            event: 'unsubscribe',
-            symbol: this.curSubscriptionInfo?.symbolInfo?.symbol,
-            channel: 'kline',
-            param: this.curSubscriptionInfo?.interval
-        });
+       
+
+
+        if(this.curSubscriptionInfo) {
+            // unsubscribe last subscribtion
+            this._send({
+                event: 'unsubscribe',
+                symbol: this.curSubscriptionInfo?.symbolInfo?.symbol,
+                channel: 'kline',
+                param: this.curSubscriptionInfo?.interval
+            });
+            // 取消订阅之后再清理数据
+            await sleep(1000);
+             // clear d
+            this.data = [];
+        }
+
+
+        
 
 
         // subscribe new kline
@@ -323,13 +333,16 @@ class TradingViewSocket {
         this.inited = false;
         this.connection = null;
     }
+    setOnRealtimeCallback(onRealtimeCallback: SubscribeBarsCallback) {
+        this.onRealtimeCallback = onRealtimeCallback;
+    }
 
 
     // symbolInfo: LibrarySymbolInfo, resolution: ResolutionString, periodParams: PeriodParams, onResult: HistoryCallback, onError: ErrorCallback
 
     async initHistoryKline(
         symbolInfo: KlineSymbolType,
-        interval: TradingViewInterval = '15m',
+        interval: TradingViewInterval = DEFAULT_INTERVAL,
         limit: number = 1,
         from: number,
         to: number,
@@ -344,7 +357,6 @@ class TradingViewSocket {
             interval,
         });
 
-        console.log("init kline his", result);
 
 
         if (!result?.data?.data?.length) {
@@ -373,6 +385,7 @@ class TradingViewSocket {
         const originData = [...this.getData()];
         const originLastData = JSON.parse(JSON.stringify(originData.slice(-1)[0]));
         const tempData = JSON.parse(JSON.stringify(newData));
+
 
         // 优化k线连接价格
         // todo 优化时间戳
@@ -411,7 +424,6 @@ class TradingViewSocket {
 
     _send(msg: any) {
         // { event: 'subscribe', symbol: symbolInfo?.symbol, channel: 'kline', param: interval }
-        console.log("send msg", msg);
         this.connection?.send(JSON.stringify(msg));
     }
 

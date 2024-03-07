@@ -3,8 +3,8 @@
 import styled from "styled-components";
 
 import { CmptTradingView } from "../components/TradingViewm/chart";
-import { useParams, redirect, RedirectType } from "next/navigation";
-import { memo } from "react";
+import { useParams, redirect, RedirectType, useRouter } from "next/navigation";
+import { memo, useCallback, useEffect } from "react";
 
 
 const Wrapper = styled.div`
@@ -21,25 +21,32 @@ const PagePerpetual = memo(() => {
 
     const params = useParams<{ symbol: string }>();
 
-    
-    console.log("asdfasdfasdf")
-
+    const router = useRouter();
 
     if(!params?.symbol) {
         redirect('/perpetual/ETH', RedirectType.replace);
         return;
     }
 
+    const changeSymbol = useCallback((nextSymbol: string) => {
+        // redirect(`/perpetual/${nextSymbol}`, RedirectType.push);
+        router.push(`/perpetual/${nextSymbol}`);
+    }, []);
+
     return (
         <Wrapper>
             {params?.symbol}
-            <CmptTradingView symbol={params?.symbol as string} />
+            <div>
+                <span onClick={() => changeSymbol('KAS')}>KAS</span> &nbsp;&nbsp;&nbsp;&nbsp;
+                <span onClick={() => changeSymbol('PIXEL')}>PIXEL</span>
+            </div>
+            <CmptTradingView />
             
         </Wrapper>
     );
 });
 
-// PagePerpetual.displayName = 'PagePerpetual';
+PagePerpetual.displayName = 'PagePerpetual';
 
 
 export default PagePerpetual;
