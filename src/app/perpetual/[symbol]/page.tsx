@@ -4,6 +4,7 @@ import styled from "styled-components";
 
 import { CmptTradingView } from "../components/TradingViewm/chart";
 import { useParams, redirect, RedirectType } from "next/navigation";
+import { memo } from "react";
 
 
 const Wrapper = styled.div`
@@ -16,7 +17,7 @@ const Wrapper = styled.div`
 
 
 
-const PagePerpetual: FCC<{}> = () => {
+const PagePerpetual = memo(() => {
 
     const params = useParams<{ symbol: string }>();
 
@@ -36,9 +37,9 @@ const PagePerpetual: FCC<{}> = () => {
             
         </Wrapper>
     );
-}
+});
 
-PagePerpetual.displayName = 'PagePerpetual';
+// PagePerpetual.displayName = 'PagePerpetual';
 
 
 export default PagePerpetual;

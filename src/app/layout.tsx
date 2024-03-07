@@ -1,9 +1,20 @@
+
 import "./globals.css";
 import "@rainbow-me/rainbowkit/styles.css";
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
-import { Providers } from "./providers";
+// import { Providers } from "./providers";
 import Header from "./components/Header";
+
+
+// import { Providers } from "./providers";
+import dynamic from 'next/dynamic';
+
+
+const Providers = dynamic(() => import("./providers"), {
+  ssr: false
+});
+
 
 const inter = Inter({ subsets: ["latin"] });
 

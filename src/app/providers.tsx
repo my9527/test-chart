@@ -1,4 +1,4 @@
-"use client";
+'use client'
 
 // config providers here
 
@@ -7,6 +7,8 @@ import { AppConfigProvider } from "./context/AppConfigProvider";
 import ThemeConfigProvider from "./context/ThemeProvider";
 import GlobalMessage from "@/app/components/Message";
 import { RecoilRoot } from "recoil";
+import dynamic from 'next/dynamic';
+// import GlobalMessaged 
 type ProvidersProps = {};
 
 export const Providers: FCC<ProvidersProps> = (props) => {
@@ -23,3 +25,5 @@ export const Providers: FCC<ProvidersProps> = (props) => {
     </RecoilRoot>
   );
 };
+
+export default Providers;
