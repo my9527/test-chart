@@ -6,9 +6,11 @@ import axios from "axios";
 // config axios global
 
 export const request = axios.create({
-    baseURL: 'https://some-domain.com/api/',
+    baseURL: 'https://api-testnet.substancex.io/',
     timeout: 1000,
-    headers: {'X-Custom-Header': 'foobar'}
+    headers: {
+        
+    }
 });
 
 // config authoracation here

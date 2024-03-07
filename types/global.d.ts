@@ -12,13 +12,25 @@ declare global {
     type AnyFunc = (...args: any[]) => any
 
 
+    interface Window {
+        ethereum: any;
     
-}
+        // okx wallet injected provider
+        okxwallet?: any;
+    
+        configurationData:(args0: {
+            exchanges: never[],
+            symbolsTypes: never[],
+            supported_resolutions: any,
+            supports_marks: boolean,
+            supports_search: boolean,
+            supports_time: boolean,
+            supports_timescale_marks: boolean,
+            has_no_volume: boolean,
+        }) => void;
+    
+    }
 
 
-interface Window {
-    ethereum: any;
-
-    // okx wallet injected provider
-    okxwallet?: any;
+    
 }

@@ -1,5 +1,5 @@
-type stringKey = Record<string, object>;
-export const theme: stringKey = {
+type ThemeType = Record<string, object>;
+export const theme: ThemeType = {
   light: {
     colors: {
       primary: {

@@ -1,0 +1,10 @@
+.theme-dark:root {
+  --tv-color-pane-background: #000000;
+  --tv-color-platform-background: #0c0707;
+  --tv-color-toolbar-button-text-active: #1e68f6;
+  --tv-color-toolbar-button-text-active-hover: #1e68f6;
+}
+
+.dateRangeWrapper-BXXUwft2 {
+  display: none;
+}
