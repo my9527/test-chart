@@ -6,12 +6,16 @@ import NetworkIcon from "@/app/assets/footer/network.svg";
 import { useRouter } from "next/navigation";
 
 const Wrapper = styled.div`
-  background: ${(props) => props.theme.colors.fill1};
+  background: ${(props) => props.theme.colors.fill2};
   width: 100%;
   height: 40px;
   display: flex;
   align-items: center;
   justify-content: space-between;
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
 `;
 const Left = styled.div`
   padding-left: 30px;

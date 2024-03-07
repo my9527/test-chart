@@ -4,23 +4,27 @@ import * as React from "react";
 import RGL, { WidthProvider, Layout } from "react-grid-layout";
 import { useRecoilState, useRecoilValue } from "recoil";
 import { recoilPanelSide } from "@/app/model";
-
+import PerpetualCharts from "../components/Perpetual/PerpetualCharts";
+import PerpetualOrders from "../components/Perpetual/PerpetualOrders";
+import PerpetualPanels from "../components/Perpetual/PerpetualPanels";
+import PerpetualTrdes from "../components/Perpetual/PerpetualTrdes";
+import Account from "../components/Perpetual/Account";
 const ReactGridLayout = WidthProvider(RGL);
 
 const LAYOUT_LEFT_LIST: Layout[] = [
   { i: "charts", x: 0, y: 0, w: 12, h: 15, minW: 8 },
   { i: "trades", x: 12, y: 0, w: 4, h: 15, minW: 4 },
-  // { i: 'gainers', x: 0, y: 1, w: 4, h: 9, minW: 4 },
-  { i: "orders", x: 0, y: 1, w: 16, h: 9, minW: 12 },
-  { i: "panels", x: 16, y: 0, w: 4, h: 24, minW: 4 },
+  { i: "orders", x: 0, y: 1, w: 16, h: 8, minW: 12 },
+  { i: "panels", x: 16, y: 0, w: 4, h: 15, minW: 4 },
+  { i: "account", x: 16, y: 1, w: 4, h: 8, minW: 4 },
 ];
 
 const LAYOUT_RIGHT_LIST: Layout[] = [
-  { i: "panels", x: 0, y: 0, w: 4, h: 24, minW: 4 },
+  { i: "panels", x: 0, y: 0, w: 4, h: 15, minW: 4 },
   { i: "charts", x: 4, y: 0, w: 12, h: 15, minW: 8 },
-  { i: "orders", x: 4, y: 1, w: 16, h: 9, minW: 8 },
+  { i: "orders", x: 4, y: 1, w: 16, h: 8, minW: 8 },
   { i: "trades", x: 16, y: 0, w: 4, h: 15, minW: 4 },
-  // { i: 'gainers', x: 16, y: 1, w: 4, h: 9, minW: 4 },
+  { i: "account", x: 0, y: 1, w: 4, h: 8, minW: 4 },
 ];
 
 const Perpetual = () => {
@@ -41,23 +45,26 @@ const Perpetual = () => {
         draggableHandle=".components-draggable"
         margin={[4, 4]}
         cols={20}
-        rowHeight={40}
+        rowHeight={35}
         layout={layout}
         onLayoutChange={onLayoutChange}
         isBounded
       >
         <div key="trades">
-          <p>trades</p>
+          <PerpetualTrdes />
         </div>
 
         <div key="charts">
-          <p>charts</p>
+          <PerpetualCharts />
         </div>
         <div key="orders">
-          <p>orders</p>
+          <PerpetualOrders />
         </div>
         <div key="panels">
-          <p>panels</p>
+          <PerpetualPanels />
+        </div>
+        <div key="account">
+          <Account />
         </div>
       </ReactGridLayout>
     </div>
