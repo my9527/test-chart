@@ -1,5 +1,5 @@
 "use client";
-import Footer from "../components/Footer";
+import Footer from "../../components/Footer";
 import styled from "styled-components";
 
 const Wrapper = styled.div`

@@ -1,45 +1,77 @@
-'use client';
-
+"use client";
 import styled from "styled-components";
+import * as React from "react";
+import RGL, { WidthProvider, Layout } from "react-grid-layout";
+import { useRecoilState, useRecoilValue } from "recoil";
+import { recoilPanelSide } from "@/app/model";
+import PerpetualCharts from "../components/PerpetualCharts";
+import PerpetualOrders from "../components/PerpetualOrders";
+import PerpetualPanels from "../components/PerpetualPanels";
+import PerpetualTrdes from "../components/PerpetualTrdes";
+import Account from "../components/Account";
+import PerpetualDetail from "../components/PerpetualDetail";
 
-import { CmptTradingView } from "../components/TradingViewm/chart";
-import { useParams, redirect, RedirectType } from "next/navigation";
-import { memo } from "react";
+// import { recoilPanelSide } from "@/app/model";
 
+const ReactGridLayout = WidthProvider(RGL);
 
-const Wrapper = styled.div`
+const LAYOUT_LEFT_LIST: Layout[] = [
+  { i: "charts", x: 0, y: 0, w: 12, h: 15, minW: 8 },
+  { i: "trades", x: 12, y: 0, w: 4, h: 15, minW: 4 },
+  { i: "orders", x: 0, y: 1, w: 16, h: 8, minW: 12 },
+  { i: "panels", x: 16, y: 0, w: 4, h: 15, minW: 4 },
+  { i: "account", x: 16, y: 1, w: 4, h: 8, minW: 4 },
+];
 
-.test{
-    color: red;
-}
+const LAYOUT_RIGHT_LIST: Layout[] = [
+  { i: "panels", x: 0, y: 0, w: 4, h: 15, minW: 4 },
+  { i: "charts", x: 4, y: 0, w: 12, h: 15, minW: 8 },
+  { i: "orders", x: 4, y: 1, w: 16, h: 8, minW: 8 },
+  { i: "trades", x: 16, y: 0, w: 4, h: 15, minW: 4 },
+  { i: "account", x: 0, y: 1, w: 4, h: 8, minW: 4 },
+];
 
-`;
+const Perpetual = () => {
+  //   const panelSide = useRecoilValue(recoilPanelSide);
+  const panelSide = "left";
+  const [layout, setLayout] = React.useState<Layout[]>(
+    panelSide === "left" ? LAYOUT_LEFT_LIST : LAYOUT_RIGHT_LIST
+  );
 
+  const onLayoutChange = (layout: Layout[]) => {
+    setLayout([...layout]);
+  };
 
+  return (
+    <>
+      <PerpetualDetail />
+      <ReactGridLayout
+        draggableHandle=".components-draggable"
+        margin={[4, 4]}
+        cols={20}
+        rowHeight={35}
+        layout={layout}
+        onLayoutChange={onLayoutChange}
+        isBounded
+      >
+        <div key="trades">
+          <PerpetualTrdes />
+        </div>
 
-const PagePerpetual = memo(() => {
-
-    const params = useParams<{ symbol: string }>();
-
-    
-    console.log("asdfasdfasdf")
-
-
-    if(!params?.symbol) {
-        redirect('/perpetual/ETH', RedirectType.replace);
-        return;
-    }
-
-    return (
-        <Wrapper>
-            {params?.symbol}
-            <CmptTradingView symbol={params?.symbol as string} />
-            
-        </Wrapper>
-    );
-});
-
-// PagePerpetual.displayName = 'PagePerpetual';
-
-
-export default PagePerpetual;
+        <div key="charts">
+          <PerpetualCharts />
+        </div>
+        <div key="orders">
+          <PerpetualOrders />
+        </div>
+        <div key="panels">
+          <PerpetualPanels />
+        </div>
+        <div key="account">
+          <Account />
+        </div>
+      </ReactGridLayout>
+    </>
+  );
+};
+export default Perpetual;
