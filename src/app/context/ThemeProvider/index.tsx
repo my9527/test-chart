@@ -1,6 +1,6 @@
 "use client";
 import { ThemeProvider } from "styled-components";
-import { theme, themeMode } from "@/config/theme";
+import { theme, themeMode } from "@/app/config/theme";
 
 const ThemeConfigProvider: FCC<{ currentTheme?: string }> = ({
   children,

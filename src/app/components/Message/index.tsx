@@ -1,10 +1,10 @@
 "use client";
-import { useEffect, useMemo, useRef } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import styled from "styled-components";
 import { motion } from "framer-motion";
 import { useRecoilState } from "recoil";
-import { recoilGlobalMessage } from "@/model";
+import { recoilGlobalMessage } from "@/app/model";
 
 const MessageWrapper = styled(motion.div)`
   position: fixed;
@@ -211,9 +211,15 @@ const GlobalMessage = () => {
   const [msgs, updateMsgState] = useRecoilState(recoilGlobalMessage);
 
   const msgsRef = useRef(msgs);
-
+  const [showMsg, setShowMsg] = useState(false);
   useEffect(() => {
     msgsRef.current = msgs;
+    const keys = Object.keys(msgs);
+    const arr = keys.filter((key) => {
+      return msgs[key].length > 0;
+    });
+
+    setShowMsg(arr.length > 0);
   }, [msgs]);
 
   useEffect(() => {
@@ -238,7 +244,7 @@ const GlobalMessage = () => {
 
   return (
     <div>
-      {msgs &&
+      {showMsg &&
         createPortal(
           <>
             {(Object.keys(msgs) as PotralProps["position"][]).map((key) => {
