@@ -10,6 +10,7 @@ import {
     Timezone,
     widget,
     ChartingLibraryFeatureset,
+    
 } from "charting_library";
 
 import { overrides } from "./overrides";
@@ -98,6 +99,9 @@ export const CmptTradingView: FCC<{
             datafeed: new DataFeed({
               symbols,
             }),
+            favorites: {
+                intervals: ["1", "15", "30", "60", "120", "4h", "1D"] as ResolutionString[],
+            },
             container: TRADINGVIEW_CONTAINER_ID,
             locale: 'en',
             custom_css_url: './custom.css',
@@ -119,6 +123,7 @@ export const CmptTradingView: FCC<{
               'show_dom_first_time',
               'iframe_loading_compatibility_mode',
             ],
+            // IntervalWidget.quicks
         });
     }, []);
 

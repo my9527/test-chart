@@ -1,6 +1,6 @@
 "use client";
 import styled from "styled-components";
-import * as React from "react";
+import { FC, useCallback, useEffect, useState } from "react";
 import RGL, { WidthProvider, Layout } from "react-grid-layout";
 import { useRecoilState, useRecoilValue } from "recoil";
 
@@ -31,16 +31,16 @@ const LAYOUT_RIGHT_LIST: Layout[] = [
   { i: "account", x: 0, y: 1, w: 4, h: 8, minW: 4 },
 ];
 
-const Perpetual = () => {
+const Perpetual: FC = () => {
   //   const panelSide = useRecoilValue(recoilPanelSide);
   const panelSide = "left";
-  const [layout, setLayout] = React.useState<Layout[]>(
+  const [layout, setLayout] = useState<Layout[]>(
     panelSide === "left" ? LAYOUT_LEFT_LIST : LAYOUT_RIGHT_LIST
   );
 
-  const onLayoutChange = (layout: Layout[]) => {
+  const onLayoutChange = useCallback((layout: Layout[]) => {
     setLayout([...layout]);
-  };
+  }, []);
 
   return (
     <>

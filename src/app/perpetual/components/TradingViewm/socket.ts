@@ -46,7 +46,7 @@ class TradingViewSocket {
     receiveMessageCbList: any[] = [];
     // lastSubscriptions: SubscribeInfoType[] = [];
     curInterval: TradingViewInterval = DEFAULT_INTERVAL;
-    curSubscriptionInfo?: SubscribeInfoType;
+    curSubscriptionInfo?: SubscribeInfoType | null;
 
     pingAble: boolean = true; // enable ping pong;
     pinging: boolean = false; // is now waiting ping response
@@ -295,10 +295,10 @@ class TradingViewSocket {
                 channel: 'kline',
                 param: this.curSubscriptionInfo?.interval
             });
-            // 取消订阅之后再清理数据
-            await sleep(1000);
-             // clear d
-            this.data = [];
+            // // 取消订阅之后再清理数据
+            // await sleep(1000);
+            //  // clear d
+            // this.data = [];
         }
 
 
@@ -323,6 +323,21 @@ class TradingViewSocket {
 
     }
 
+    async unsubscribeLast() {
+        if(this.curSubscriptionInfo) {
+            // unsubscribe last subscribtion
+            this._send({
+                event: 'unsubscribe',
+                symbol: this.curSubscriptionInfo?.symbolInfo?.symbol,
+                channel: 'kline',
+                param: this.curSubscriptionInfo?.interval
+            });
+            this.curSubscriptionInfo = undefined;
+
+            await sleep(1000);
+        }
+    }
+
     disconnect() {
         if (!this.connection) return;
         if (this.timerId) {
@@ -335,6 +350,10 @@ class TradingViewSocket {
     }
     setOnRealtimeCallback(onRealtimeCallback: SubscribeBarsCallback) {
         this.onRealtimeCallback = onRealtimeCallback;
+    }
+
+    clearData() {
+        this.data = []
     }
 
 
@@ -383,7 +402,7 @@ class TradingViewSocket {
 
     initSubV2Kline(newData: any) {
         const originData = [...this.getData()];
-        const originLastData = JSON.parse(JSON.stringify(originData.slice(-1)[0]));
+        const originLastData = JSON.parse(JSON.stringify(originData.slice(-1)[0] || {}));
         const tempData = JSON.parse(JSON.stringify(newData));
 
 

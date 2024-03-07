@@ -63,11 +63,20 @@ class Datafeed {
     ) {
 
 
-         const nextInterval = timeScale[resolution.toString().toLowerCase()];
+        console.log("resolution", resolution);
+
+
+        const nextInterval = timeScale[resolution.toString().toLowerCase()];
+        // 
+        // if(resolution !== tradingviewSocketIns.curInterval || symbolInfo.symbol !== tradingviewSocketIns.curSubscriptionInfo?.symbolInfo.symbol) {
+        //     await tradingviewSocketIns.unsubscribeLast();
+        //     tradingviewSocketIns.clearData();
+        // }
 
         // timeScale
-
         await tradingviewSocketIns.initHistoryKline(symbolInfo, nextInterval, fromParams.countBack, fromParams.from, fromParams.to, onHistoryCallback);
+        // await tradingviewSocketIns.subscribe();
+        
     }
 
 
@@ -118,6 +127,8 @@ class Datafeed {
         tradingviewSocketIns.setOnRealtimeCallback(onTick);
 
         (async()=>{
+            await tradingviewSocketIns.unsubscribeLast();
+            // tradingviewSocketIns.clearData();
             await tradingviewSocketIns.subscribe(symbolInfo, interval, 1, onTick);
         })();
 
@@ -139,6 +150,12 @@ class Datafeed {
     unsubscribeBars() {
 
     }
+
+    // unsubscribeBars(
+    //     symbolInfo: LibrarySymbolInfo, resolution: ResolutionString, onTick: SubscribeBarsCallback, listenerGuid: string, onResetCacheNeededCallback: () => void
+    // ) {
+    //     console.log("unsub", symbolInfo);
+    // }
 
 
 
