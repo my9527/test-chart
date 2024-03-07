@@ -23,6 +23,7 @@ import DataFeed from "./datafeed";
 import { tokens } from "@/config/tokens";
 import { tradingviewSocketIns } from "./socket";
 import { useParams } from "next/navigation";
+import styled from "styled-components";
 
 
 
@@ -33,6 +34,12 @@ dayjs.extend(UTC);
 const TRADINGVIEW_CONTAINER_ID = 'trading-view';
 
 const TRADINGVIEW_STORAGE_PREFIX = 'tv.setting';
+
+
+const WrapperTradingView = styled.div`
+    height: 100%;
+    width: 100%;
+`;
 
 
 
@@ -158,7 +165,7 @@ export const CmptTradingView: FCC<{
     
 
     return (
-        <div id="trading-view"></div>
+        <WrapperTradingView id="trading-view"></WrapperTradingView>
     );
 });
 
