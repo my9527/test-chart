@@ -44,4 +44,21 @@ export const tokens: Token[] = [{
     fundingFeeBaseRate: 0.0008,
     fundingFeeLinearRate: 0.08,
     maxliquidityLockRatio: 0.3,
-}];
+}, {
+    symbolName: 'PIXEL',
+    decimal: 6,
+    tag: ['GameFi', 'New'],
+    futureLongId: 70,
+    futureShortId: 70,
+    pars: 1,
+    displayDecimal: 4,
+    maxProfitRatio: 10,
+    maxLeverage: 50,
+    borrowingFeeRatio: 0.0,
+    maintainMarginRatio: 0.005,
+    fundingFeeRatio: 0.025,
+    priceTickSize: 0.0001,
+    fundingFeeBaseRate: 0.0008,
+    fundingFeeLinearRate: 0.08,
+    maxliquidityLockRatio: 0.2,
+  }];

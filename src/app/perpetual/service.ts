@@ -16,7 +16,6 @@ export const getHistoryChartData = ({
     to?: number;
     interval?: string;
 }) => {
-    console.log("query backend/get_candlestick_chart");
     return request.get('api/backend/get_candlestick_chart', {
         params: {
             symbol: `${symbol}/USD`,

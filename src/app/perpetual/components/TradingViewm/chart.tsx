@@ -10,6 +10,7 @@ import {
     Timezone,
     widget,
     ChartingLibraryFeatureset,
+    
 } from "charting_library";
 
 import { overrides } from "./overrides";
@@ -20,8 +21,10 @@ import timezone from 'dayjs/plugin/timezone';
 import UTC from 'dayjs/plugin/utc';
 import DataFeed from "./datafeed";
 
-import { tokens } from "@/config/tokens";
+import { tokens } from "@/app/config/tokens";
 import { tradingviewSocketIns } from "./socket";
+import { useParams } from "next/navigation";
+import styled from "styled-components";
 
 
 
@@ -34,21 +37,32 @@ const TRADINGVIEW_CONTAINER_ID = 'trading-view';
 const TRADINGVIEW_STORAGE_PREFIX = 'tv.setting';
 
 
+const WrapperTradingView = styled.div`
+    height: 100%;
+    width: 100%;
+`;
+
+
 
 
 
 export const CmptTradingView: FCC<{
-    disabled_features?: ChartingLibraryFeatureset[];
-    symbol: string;
+    // disabled_features?: ChartingLibraryFeatureset[];
+    // symbol: string;
 
-}> = memo(({ disabled_features, symbol }) => {
+}> = memo(() => {
+
+    const disabled_features: ChartingLibraryFeatureset[] = [];
+
+    const params = useParams<{ symbol: string }>();
+
+    const { symbol }= params;
+
 
 
     const _widget = useRef<null | IChartingLibraryWidget>(null);
 
-    console.log("aaaaaaaa")
-
-
+    const _symbol = useRef<string>(symbol);
 
     const initChart = useCallback((_symbol: string) => {
 
@@ -73,19 +87,21 @@ export const CmptTradingView: FCC<{
             }
         }, {});
 
-        console.log('symbols', symbols, _symbol);
 
         _widget.current = new widget({
             autosize: true,
             theme: 'Dark',
             timezone: dayjs.tz.guess() as Timezone,
-            interval: '15' as ResolutionString,
+            interval: '1' as ResolutionString,
             library_path: '/charting_library/',
             symbol,
             overrides,
             datafeed: new DataFeed({
               symbols,
             }),
+            favorites: {
+                intervals: ["1", "15", "30", "60", "120", "4h", "1D"] as ResolutionString[],
+            },
             container: TRADINGVIEW_CONTAINER_ID,
             locale: 'en',
             custom_css_url: './custom.css',
@@ -107,17 +123,35 @@ export const CmptTradingView: FCC<{
               'show_dom_first_time',
               'iframe_loading_compatibility_mode',
             ],
+            // IntervalWidget.quicks
         });
     }, []);
 
 
     useEffect(() => {
         if(symbol) {
-            console.log("symbol changed");
             initChart(symbol);
             // tradingviewSocketIns.init();
         }
     }, [symbol]);
+
+    // useEffect(() => {
+
+    //     if(_symbol.current !== symbol) {
+    //         // _widget.current.sy
+    //         _widget.current?.setSymbol(symbol, '1' as ResolutionString, () => {});
+    //         _symbol.current = symbol;
+    //     }
+
+       
+    // }, [ symbol]);
+
+    useEffect(() => {
+        return () => {
+            tradingviewSocketIns.disconnect();
+            _widget.current && _widget.current.remove();
+        }
+    }, []);
 
 
 
@@ -136,7 +170,7 @@ export const CmptTradingView: FCC<{
     
 
     return (
-        <div id="trading-view"></div>
+        <WrapperTradingView id="trading-view"></WrapperTradingView>
     );
 });
 

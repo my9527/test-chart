@@ -4,12 +4,17 @@ import { FC, PropsWithChildren } from "react";
 
 declare global {
 
+
+    // type FC<P = {}> = React.FunctionComponent<P>
     // Custom Type for a React functional component with props AND CHILDREN
-    type FCC<P={}> = FC<PropsWithChildren<P>>
+    type FCC<P = {}> = FC<PropsWithChildren<P>>
 
     type Maybe<T> = T | null
 
     type AnyFunc = (...args: any[]) => any
+
+
+    type AnyObjec = { [key: string]: any } 
 
 
     interface Window {

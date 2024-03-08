@@ -5,7 +5,7 @@
 // 覆盖tradingview 的某些配置
 export const overrides = {
     'paneProperties.backgroundType': 'solid', // or 'gradient'
-    'paneProperties.background': '#000000',
+    'paneProperties.background': '#121212',
     'paneProperties.vertGridProperties.color': '#34384C',
     'paneProperties.horzGridProperties.color': '#34384C',
     'paneProperties.crossHairProperties.color': '#fff',

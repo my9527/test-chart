@@ -2,6 +2,9 @@
 import Footer from "../../components/Footer";
 import styled from "styled-components";
 
+import { CmptMarketSocket } from "../components/SocketMarket";
+
+
 const Wrapper = styled.div`
   min-height: calc(100vh - 50px);
   display: flex;
@@ -16,6 +19,7 @@ const Content = styled.div`
 const PerpetualLayout = ({ children }: { children: React.ReactNode }) => {
   return (
     <Wrapper>
+      <CmptMarketSocket />
       <Content>{children}</Content>
       <Footer />
     </Wrapper>

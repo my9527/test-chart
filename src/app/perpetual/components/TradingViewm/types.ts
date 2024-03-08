@@ -1,6 +1,6 @@
 
 
-
+import { LibrarySymbolInfo } from "charting_library"
 
 
 // config kline symbol
@@ -10,14 +10,14 @@ export type KlineSymbolType = {
     name: string,
     description: string,
     type: string,
-    session: '24x7',
-    timezone: 'UTC',
+    session: string,
+    timezone: string,
     minmov: number, // 最小波动
     pricescale: number,
     has_intraday: boolean, // 是否提供日内分钟数据
     has_weekly_and_monthly: boolean,
     exchange: string,
-}
+} & LibrarySymbolInfo
 
 
 export const timeScale: any = {

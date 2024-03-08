@@ -1,6 +1,8 @@
 "use client";
 import styled from "styled-components";
 import DraggableIcon from "./DraggableIcon";
+
+import { CmptTradingView } from "./TradingViewm/chart";
 const Wrapper = styled.div`
   position: relative;
   width: 100%;
@@ -11,7 +13,7 @@ const Wrapper = styled.div`
 const PerpetualCharts = () => {
   return (
     <Wrapper>
-      PerpetualCharts
+      <CmptTradingView />
       <DraggableIcon />
     </Wrapper>
   );
