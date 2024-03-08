@@ -18,7 +18,6 @@ export const CmptMarketSocket: FC = () => {
     const appConfig = useAppConfig();
 
 
-    console.log("app config", appConfig);
 
     const [, updateMarkets] = useRecoilState(recoilMarkets);
 
@@ -27,7 +26,6 @@ export const CmptMarketSocket: FC = () => {
         // console.log("handleTopGainerChange", evt);
         const data = JSON.parse(evt?.data);
         if(data.type === SOCKET_MSG_TYPE.MARKET_CHANGE) {
-            console.log("market change", data.data);
         }
 
     }, []);
@@ -35,7 +33,6 @@ export const CmptMarketSocket: FC = () => {
     const handleIndexPriceAll = useCallback(( evt: Event & { data: string } ) => {
         const data = JSON.parse(evt?.data);
         if(data.type === SOCKET_MSG_TYPE.MARKET_INDEX_PRICE) {
-            console.log("index price:", data.data);
             updateMarkets(data.data);
         }
 
