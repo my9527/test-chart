@@ -63,7 +63,6 @@ class Datafeed {
     ) {
 
 
-        console.log("resolution", resolution);
 
 
         const nextInterval = timeScale[resolution.toString().toLowerCase()];
