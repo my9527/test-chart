@@ -14,6 +14,9 @@ declare global {
     type AnyFunc = (...args: any[]) => any
 
 
+    type AnyObjec = { [key: string]: any } 
+
+
     interface Window {
         ethereum: any;
     

@@ -91,8 +91,8 @@ export const AppConfigContext = createContext(AppConfigOnChain[DEFAULT_CHAIN_ID]
 export const AppConfigProvider: FCC<{  }> = memo(({ children }) => {
 
   
-  // const chainId = useChainId();
-  const chainId = 1;
+  const chainId = useChainId();
+  // const chainId = 1;
 
   const config = useMemo(() => {
       return AppConfigOnChain[chainId] || AppConfigOnChain[DEFAULT_CHAIN_ID];
