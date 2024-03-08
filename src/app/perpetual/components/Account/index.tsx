@@ -1,19 +1,19 @@
 "use client";
 import styled from "styled-components";
-import DraggableIcon from "./DraggableIcon";
+import DraggableIcon from "../DraggableIcon";
 
 const Wrapper = styled.div`
   position: relative;
-  background-color: red;
   width: 100%;
   height: 100%;
+  background-color: black;
 `;
-const PerpetualTrdes = () => {
+const Account = () => {
   return (
     <Wrapper>
-      PerpetualTrdes
+      Account
       <DraggableIcon />
     </Wrapper>
   );
 };
-export default PerpetualTrdes;
+export default Account;

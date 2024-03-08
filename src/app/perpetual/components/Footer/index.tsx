@@ -26,7 +26,7 @@ const Left = styled.div`
 const ScrollWrapper = styled.div`
   cursor: pointer;
   margin-left: 30px;
-  width: 700px;
+  width: 660px;
   overflow: hidden;
   position: relative;
   height: 100%;
@@ -104,7 +104,7 @@ const Footer = () => {
       price: "88888.99",
     },
     {
-      token: "DOT/USDT",
+      token: "IOTX/USDT",
       change: "20%",
       price: "88888.99",
     },
@@ -113,11 +113,11 @@ const Footer = () => {
       change: "20%",
       price: "88888.99",
     },
-    {
-      token: "LUNC/USDT",
-      change: "20%",
-      price: "88888.99",
-    },
+    // {
+    //   token: "LUNC/USDT",
+    //   change: "20%",
+    //   price: "88888.99",
+    // },
   ];
 
   let timer: NodeJS.Timeout | number;
@@ -127,10 +127,14 @@ const Footer = () => {
     const trades = document.getElementById("trades") as HTMLElement;
     const trades_copy = document.getElementById("trades_copy") as HTMLElement;
     trades_copy.innerHTML = trades?.innerHTML;
-    if (trades_copy?.scrollWidth - wrapper?.scrollLeft <= 0) {
-      wrapper.scrollLeft -= trades?.scrollWidth;
+    if (tokenList.length === 3) {
+      clearInterval(timer);
     } else {
-      wrapper.scrollLeft++;
+      if (trades_copy?.scrollWidth - wrapper?.scrollLeft <= 0) {
+        wrapper.scrollLeft -= trades?.scrollWidth;
+      } else {
+        wrapper.scrollLeft++;
+      }
     }
   };
   useEffect(() => {
@@ -153,7 +157,7 @@ const Footer = () => {
                   <p className="token">{item.token}</p>
                   <p className="change">{item.change}</p>
                   <p className="price">{item.price}</p>
-                  {index !== tokenList.length - 1 && <Line />}
+                  <Line />
                 </Trade>
               );
             })}

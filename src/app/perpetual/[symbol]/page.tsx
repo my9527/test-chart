@@ -7,9 +7,11 @@ import { useRecoilState, useRecoilValue } from "recoil";
 import PerpetualCharts from "../components/PerpetualCharts";
 import PerpetualOrders from "../components/PerpetualOrders";
 import PerpetualPanels from "../components/PerpetualPanels";
-import PerpetualTrdes from "../components/PerpetualTrdes";
+import PerpetualTrades from "../components/PerpetualTrades";
 import Account from "../components/Account";
 import PerpetualDetail from "../components/PerpetualDetail";
+import 'react-grid-layout/css/styles.css';
+import 'react-resizable/css/styles.css';
 
 // import { recoilPanelSide } from "@/app/model";
 
@@ -47,7 +49,7 @@ const Perpetual: FC = () => {
       <PerpetualDetail />
       <ReactGridLayout
         draggableHandle=".components-draggable"
-        margin={[4, 4]}
+        margin={[2, 2]}
         cols={20}
         rowHeight={35}
         layout={layout}
@@ -55,7 +57,7 @@ const Perpetual: FC = () => {
         isBounded
       >
         <div key="trades">
-          <PerpetualTrdes />
+          <PerpetualTrades />
         </div>
 
         <div key="charts">

@@ -11,7 +11,7 @@ const Wrapper = styled.div`
   height: 50px;
   display: flex;
   align-items: center;
-  border-bottom: ${props=>`1px solid ${props.theme.colors.border1}`};
+  border-bottom: ${props=>`2px solid ${props.theme.colors.border1}`};
 `;
 const Left = styled.div`
   display: flex;

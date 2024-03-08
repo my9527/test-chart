@@ -1,8 +1,8 @@
 "use client";
 import styled from "styled-components";
-import DraggableIcon from "./DraggableIcon";
+import DraggableIcon from "../DraggableIcon";
 
-import { CmptTradingView } from "./TradingViewm/chart";
+import { CmptTradingView } from "../TradingViewm/chart";
 const Wrapper = styled.div`
   position: relative;
   width: 100%;

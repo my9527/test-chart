@@ -1,6 +1,6 @@
 "use client";
 import styled from "styled-components";
-import DraggableIcon from "./DraggableIcon";
+import DraggableIcon from "../DraggableIcon";
 
 const Wrapper = styled.div`
   position: relative;

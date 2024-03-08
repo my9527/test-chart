@@ -1,19 +1,19 @@
 "use client";
 import styled from "styled-components";
-import DraggableIcon from "./DraggableIcon";
+import DraggableIcon from "../DraggableIcon";
 
 const Wrapper = styled.div`
   position: relative;
   width: 100%;
   height: 100%;
-  background-color: black;
+  background-color: blue;
 `;
-const Account = () => {
+const PerpetualPanels = () => {
   return (
     <Wrapper>
-      Account
+      PerpetualPanels
       <DraggableIcon />
     </Wrapper>
   );
 };
-export default Account;
+export default PerpetualPanels;

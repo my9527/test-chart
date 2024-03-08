@@ -1,6 +1,6 @@
 "use client";
 import styled, { useTheme } from "styled-components";
-import DraggableIcon from "./DraggableIcon";
+import DraggableIcon from "../DraggableIcon";
 import ArrowIcon from "@/app/assets/header/arrow.svg";
 import FavoriteIcon from "@/app/assets/perpetual/favorite.svg";
 import StarIcon from "@/app/assets/perpetual/star.svg";
@@ -14,9 +14,10 @@ import ChartIcon from "@/app/assets/perpetual/chart.svg";
 
 const Wrapper = styled.div`
   width: 100%;
-  height: 50px;
+  /* height: 50px; */
+  padding:10px 0;
   background: ${(props) => props.theme.colors.fill1};
-  border-bottom: ${(props) => `1px solid ${props.theme.colors.border1}`};
+  /* border-bottom: ${(props) => `1px solid ${props.theme.colors.border1}`}; */
   padding-left: 34px;
   padding-right: 20px;
   display: flex;
@@ -49,7 +50,7 @@ const Symbol = styled(Layout)`
     line-height: 100%;
     font-weight: 700;
     .change {
-      font-size: ${(props) => props.theme.fontSize.header5};
+      font-size: ${(props) => props.theme.fontSize.small};
     }
     .price {
       font-size: ${(props) => props.theme.fontSize.header2};
@@ -67,20 +68,22 @@ const Line = styled.div`
 `;
 const InfoItem = styled.div`
   font-family: Arial;
-  font-size: ${(props) => props.theme.fontSize.min};
+
   font-style: normal;
   font-weight: 400;
-  line-height: 120%;
+  
   .label {
+    font-size: ${(props) => props.theme.fontSize.min};
     color: ${(props) => props.theme.colors.text4};
     margin-bottom: 7px;
     position: relative;
-    display: inline-block;
+    display: inline-block;line-height: 100%;
     img {
       margin-left: 5px;
     }
   }
-  .content {
+  .content {line-height: 120%;
+    font-size: ${(props) => props.theme.fontSize.small};
     display: flex;
     align-items: center;
     color: ${(props) => props.theme.colors.text1};
