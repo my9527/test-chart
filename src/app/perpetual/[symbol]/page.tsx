@@ -10,10 +10,9 @@ import PerpetualPanels from "../components/PerpetualPanels";
 import PerpetualTrades from "../components/PerpetualTrades";
 import Account from "../components/Account";
 import PerpetualDetail from "../components/PerpetualDetail";
-import 'react-grid-layout/css/styles.css';
-import 'react-resizable/css/styles.css';
-
-// import { recoilPanelSide } from "@/app/model";
+import "react-grid-layout/css/styles.css";
+import "react-resizable/css/styles.css";
+import { recoilPanelSide } from "@/app/models";
 
 const ReactGridLayout = WidthProvider(RGL);
 
@@ -34,8 +33,8 @@ const LAYOUT_RIGHT_LIST: Layout[] = [
 ];
 
 const Perpetual: FC = () => {
-  //   const panelSide = useRecoilValue(recoilPanelSide);
-  const panelSide = "left";
+  const panelSide = useRecoilValue(recoilPanelSide);
+
   const [layout, setLayout] = useState<Layout[]>(
     panelSide === "left" ? LAYOUT_LEFT_LIST : LAYOUT_RIGHT_LIST
   );
