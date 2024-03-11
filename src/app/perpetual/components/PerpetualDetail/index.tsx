@@ -126,11 +126,15 @@ const PerpetualDetail = memo((props) => {
   const params = useParams<{ symbol: string }>();
   const { symbol } = params;
 
+  const symbolName = useMemo(() => {
+    return symbol.split("USD")[0];
+  }, [symbol]);
+
   const theme = useTheme();
   const [favoriateList, setFavoriateList] = useRecoilState(recoilFavoriateList);
 
   const isFavoriate = useMemo(() => {
-    return Object.keys(favoriateList).filter((i) => i === symbol).length > 0;
+    return Object.keys(favoriateList).filter((i) => i === symbolName).length > 0;
   }, [favoriateList]);
 
   const ifZeroOI = 0,
