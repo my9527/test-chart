@@ -19,7 +19,8 @@ import {
 
 import {
   arbitrumOne,
-  zkFair
+  zkFair,
+  zkFairTestnet
 } from "../../config/chains";
 
 
@@ -38,7 +39,8 @@ const config =getDefaultConfig({
   ],
   chains: [
     // arbitrumOne,
-    zkFair,
+    zkFairTestnet,
+    zkFair
   ],
   ssr: true,
 

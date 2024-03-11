@@ -12,6 +12,7 @@ export const theme: stringKey = {
       text3: "#FFB547",
       text4: "rgba(255, 255, 255, 0.50)",
       text5: "#FF4778",
+      textFAFAFA: "#FAFAFA",
     },
 
     fontSize: {
@@ -39,6 +40,7 @@ export const theme: stringKey = {
       text3: "#FFB547",
       text4: "rgba(255, 255, 255, 0.50)",
       text5: "#FF4778",
+      textFAFAFA: "#FAFAFA",
     },
 
     fontSize: {

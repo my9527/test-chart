@@ -5,7 +5,8 @@ import { defineChain } from "viem";
 import { useChainId } from "wagmi";
 
 import { CHAINS_ID, DEFAULT_CHAIN_ID } from "@/app/config/common";
-import { arbitrumOne, zkFair } from "@/app/config/chains";
+import { arbitrumOne, zkFair, zkFairTestnet } from "@/app/config/chains";
+
 import addressMap from "@/app/config/contract_address";
 
 export type AppConfigType = {
@@ -17,7 +18,7 @@ export type AppConfigType = {
   };
   api: {
     http: string;
-    wss?: string;
+    wss: string;
   };
 
   rpc: {
@@ -25,9 +26,11 @@ export type AppConfigType = {
     wss?: string;
   };
 
-  executionFee: string | number | BigNumber;
-  contract_address: object;
-};
+    executionFee: string | number | BigNumber;
+    contract_address: object;
+
+}
+
 
 const AppConfigOnChain: Record<number, AppConfigType> = {
   [CHAINS_ID.zkfair]: {
@@ -53,6 +56,29 @@ const AppConfigOnChain: Record<number, AppConfigType> = {
 
     executionFee: "2500000000000000000",
     contract_address: addressMap[CHAINS_ID.zkfair],
+  },
+  [CHAINS_ID.zkfairtest]: {
+    chain: zkFairTestnet,
+    graph: {
+      base: 'https://gql-testnet.substancex.io/subgraphs/name/substanceexchangedevelop/zktest',
+      perpetual: 'https://gql-testnet.substancex.io/subgraphs/name/substanceexchangedevelop/zktest',
+      baseBlock: 'https://gql-testnet.substancex.io/subgraphs/name/substanceexchangedevelop/zktest-blocks',
+    },
+
+    // config rpc
+    rpc: {
+      http: "https://testnet-rpc.zkfair.io",
+      wss: "wss://rpc.hyperionx.xyz/",
+    },
+
+    // config api
+    api: {
+      http: "https://api-testnet.substancex.io/",
+      wss: "wss://api-testnet.substancex.io/",
+    },
+
+    executionFee: "2500000000000000000",
+    contract_address: addressMap[CHAINS_ID.zkfairtest],
   },
   [CHAINS_ID.arbitrum]: {
     chain: arbitrumOne,
@@ -89,6 +115,8 @@ export const AppConfigContext = createContext(
 
 export const AppConfigProvider: FCC<{}> = memo(({ children }) => {
   const chainId = useChainId();
+
+  console.log("chainId", chainId);
   // const chainId = 1;
 
   const config = useMemo(() => {

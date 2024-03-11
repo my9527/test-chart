@@ -39,3 +39,12 @@ export const recoilFavoriateList = atom<ITokenList>({
   },
   effects_UNSTABLE: [localStorageEffect<ITokenList>("LOCALE_TOKEN_LIST")],
 });
+
+
+/**
+ * open position list
+ */
+export const recoilPositions = atom<any>({
+  key: 'open_positions',
+  default: [],
+});

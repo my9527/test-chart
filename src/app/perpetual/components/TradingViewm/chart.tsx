@@ -25,6 +25,7 @@ import { tokens } from "@/app/config/tokens";
 import { tradingviewSocketIns } from "./socket";
 import { useParams } from "next/navigation";
 import styled from "styled-components";
+import { useChainId } from "wagmi";
 
 
 
@@ -58,6 +59,8 @@ export const CmptTradingView: FCC<{
 
     const { symbol }= params;
 
+    const chainId = useChainId();
+
 
 
     const _widget = useRef<null | IChartingLibraryWidget>(null);
@@ -66,7 +69,7 @@ export const CmptTradingView: FCC<{
 
     const initChart = useCallback((_symbol: string) => {
 
-        const symbols = tokens.reduce((result, token) => {
+        const symbols = (tokens[chainId] || []).reduce((result, token) => {
 
             return {
                 ...result,

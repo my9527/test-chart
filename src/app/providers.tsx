@@ -7,17 +7,24 @@ import { AppConfigProvider } from "./context/AppConfigProvider";
 import ThemeConfigProvider from "./context/ThemeProvider";
 import GlobalMessage from "@/app/components/Message";
 import { RecoilRoot } from "recoil";
-import dynamic from 'next/dynamic';
+import { OpenPostionsEffects } from "./components/OpenPositions"; 
+import { useLayoutEffect } from "react";
+
 // import GlobalMessaged 
 type ProvidersProps = {};
 
 export const Providers: FCC<ProvidersProps> = (props) => {
+
+  useLayoutEffect(() => {
+    console.log("asdfasdfas 11111");
+  }, []);
   return (
     <RecoilRoot>
       <RainbowProvider>
         <AppConfigProvider>
           <ThemeConfigProvider>
             <GlobalMessage />
+            <OpenPostionsEffects />
             {props.children}
           </ThemeConfigProvider>
         </AppConfigProvider>
