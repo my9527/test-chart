@@ -9,10 +9,11 @@ import {
   futureTrades,
 } from "@/app/graphql/future/tradeOrders";
 import BigNumber from "bignumber.js";
-import { filterPrecision } from "@/app/utils/tools";
+import { filterPrecision, getExponent } from "@/app/utils/tools";
 import dayjs from "dayjs";
 import useGraphqlFetch from "@/app/hooks/useGraphqlFetch";
-
+import { useTokenByName, useTokens } from "@/app/hooks/useTokens";
+import { useParams } from "next/navigation";
 interface TdType {
   width?: string;
   key: string;
@@ -25,6 +26,16 @@ const Wrapper = styled.div`
   width: 100%;
   height: 100%;
   cursor: pointer;
+
+  overflow-x: scroll;
+  &::-webkit-scrollbar {
+    height: 8px;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    border-radius: 999px;
+    background: #292929;
+  }
 `;
 const Tabs = styled.div`
   display: flex;
@@ -56,11 +67,12 @@ const Tabs = styled.div`
 `;
 const Table = styled.div`
   height: calc(100% - 45px);
+  min-width: 350px;
 `;
 const THeader = styled.div`
   display: flex;
   align-items: center;
-  padding: 10px 34px 10px 8px;
+  padding: 10px 22px 10px 8px;
 `;
 const BaseTd = styled.div<TdType>`
   text-align: ${(props) => props?.text_align || "left"};
@@ -70,7 +82,7 @@ const BaseTd = styled.div<TdType>`
   font-weight: 400;
   line-height: 100%;
   color: ${(props) => props.theme.colors.text1};
-
+  flex-shrink: 0;
   ${(props) => {
     return props?.width ? `width:${props?.width}` : "flex:1";
   }}
@@ -81,9 +93,11 @@ const Th = styled(BaseTd)`
 const Tbody = styled.div`
   display: flex;
   flex-direction: column;
+  padding-bottom: 8px;
   gap: 7px;
   padding: 0px 26px 0px 8px;
   height: calc(100% - 34px);
+
   overflow-y: scroll;
   &::-webkit-scrollbar {
     width: 8px;
@@ -117,6 +131,9 @@ type dataSourceType = {
 };
 
 const PerpetualTrades = () => {
+  const [activeTab, setActiveTab] = useState(0);
+
+  //获取data
   const fun = useGraphqlFetch("perpetual", futureTradesById);
   const _fun = useGraphqlFetch("perpetual", futureTrades);
   const { run, data, cancel }: any = useRequest(
@@ -129,35 +146,45 @@ const PerpetualTrades = () => {
     }
   );
 
-  const curTokenWithValue = {
-    futureLongId: 14,
-    kLineSymbol: {},
-  };
-
+  const params = useParams<{ symbol: string }>();
+  const { symbol } = params;
+  const symbolName = useMemo(() => {
+    return symbol.split("USD")[0];
+  }, [symbol]);
+  
+  //获取当前token
+  const curToken = useTokenByName(symbolName);
   useEffect(() => {
-    if (curTokenWithValue?.kLineSymbol) {
-      run({ futureId: curTokenWithValue?.futureLongId?.toString() });
+    if (curToken?.symbolName) {
+      run({ futureId: curToken?.futureLongId?.toString() });
     } else {
       cancel();
     }
     return () => {
       cancel();
     };
-  }, []);
-  const [activeTab, setActiveTab] = useState(0);
+  }, [curToken?.symbolName]);
+
   const dataSource = useMemo(
     () => data?.[activeTab]?.futureTrades || [],
     [data, activeTab]
   );
 
-  const columns: columnsType[] = [
+  const tokens = useTokens();
+  const getToken = (futureId: string) => {
+    const token =
+      tokens.filter((token_) => token_.futureLongId === +futureId)[0] || {};
+    return token;
+  };
+  const baseColumns: columnsType[] = [
     {
       key: "price",
       label: "Price",
-      width: "35%",
+      width: "30%",
       Components: (v: string, item: dataSourceType) => {
+        const token = getToken(item?.futureId);
         const _v = BigNumber(ethers?.utils.formatUnits(v, 6)).toFixed(
-          4,
+          token?.displayDecimal || 4,
           BigNumber.ROUND_DOWN
         );
         return item?.pair?.toLowerCase()?.includes("short") ? (
@@ -170,22 +197,18 @@ const PerpetualTrades = () => {
     {
       key: "size",
       label: "Size",
-      width: "35%",
+      width: "30%",
       Components: (v: string, item: dataSourceType) => {
+        const token = getToken(item?.futureId);
+
         return (
           <>
-            {filterPrecision(BigNumber(item?.size || "0").toString(), 4)}
-            {/* {filterPrecision(
-              BigNumber(item?.size || "0")
-                .multipliedBy(
-                  getPar(
-                    getTokenByIdAndContract(item?.futureId, item?.future)
-                      ?.kLineSymbol
-                  )
-                )
+            {filterPrecision(
+              BigNumber(v || "0")
+                .multipliedBy(token?.pars)
                 .toString(),
-              getTokenByIdAndContract(item?.futureId, item?.future)?.parDecimal
-            )} */}
+              getExponent(+token?.pars)
+            )}
           </>
         );
       },
@@ -194,12 +217,28 @@ const PerpetualTrades = () => {
       key: "time",
       label: "Time",
       text_align: "right",
-      Components: (v: string, item: dataSourceType) => {
-        return <>{dayjs.unix(+item?.time).format("HH:mm:ss")}</>;
+      Components: (v: string) => {
+        return <>{dayjs.unix(+v).format("HH:mm:ss")}</>;
       },
     },
   ];
 
+  const columns = useMemo(() => {
+    if (activeTab === 1) {
+      return [
+        {
+          key: "pair",
+          label: "Market",
+          width: "30%",
+          Components: (v: string) => {
+            return <>{v.split(" ")[0] + "USD"}</>;
+          },
+        },
+        ...baseColumns,
+      ];
+    }
+    return baseColumns;
+  }, [activeTab]);
   return (
     <Wrapper>
       <Tabs>
