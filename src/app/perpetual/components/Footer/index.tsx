@@ -1,11 +1,16 @@
 "use client";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState, useCallback } from "react";
 import styled from "styled-components";
 import Image from "next/image";
 import NetworkIcon from "@/app/assets/footer/network.svg";
 import { useRouter } from "next/navigation";
 import { useRecoilState } from "recoil";
 import { recoilFavoriateList } from "@/app/models";
+import { useBlockNumber } from "wagmi";
+import { useInterval } from "ahooks";
+import metaQuery from "@/app/graphql/meta/meta";
+import BigNumber from "bignumber.js";
+import useGraphqlFetch from "@/app/hooks/useGraphqlFetch";
 
 const Wrapper = styled.div`
   background: ${(props) => props.theme.colors.fill2};
@@ -92,6 +97,23 @@ const NetworkStatus = styled.div`
   align-items: center;
   gap: 10px;
 `;
+
+enum NetworkStatusMap {
+  NUL = 4,
+  FINE = 0,
+  OK = 1,
+  BAD = 2,
+  OFFLINE = 3,
+}
+
+const GraphStatusDesc = {
+  [NetworkStatusMap.FINE]: `< 30 block delay`,
+  [NetworkStatusMap.OK]: `> 30 block delay`,
+  [NetworkStatusMap.BAD]: `> 100 block delay`,
+  [NetworkStatusMap.OFFLINE]: "--",
+  [NetworkStatusMap.NUL]: "--",
+};
+
 const Footer = () => {
   const router = useRouter();
   const [favoriateList] = useRecoilState(recoilFavoriateList);
@@ -116,12 +138,63 @@ const Footer = () => {
       wrapper.scrollLeft++;
     }
   };
+  const useBlockDelay = () => {
+    const [status, updateStatus] = useState(NetworkStatusMap.NUL);
+
+    const curBlock = useRef("0");
+
+    useBlockNumber({
+      cacheTime: 1000,
+      onBlock(block: any) {
+        curBlock.current = block.toString();
+      },
+    });
+    const fun = useGraphqlFetch("base", metaQuery);
+
+    const getBlockDelay = async () => {
+      const { _meta }: any = await fun();
+      const deltaBlock = BigNumber(curBlock.current?.toString() || 0).minus(
+        _meta?.block.number
+      );
+
+      let _status = NetworkStatusMap.OFFLINE;
+      if (deltaBlock.lt(30)) {
+        _status = NetworkStatusMap.FINE;
+      } else if (deltaBlock.gt(30) && deltaBlock.lt(100)) {
+        _status = NetworkStatusMap.OK;
+      } else if (deltaBlock.gt(100)) {
+        _status = NetworkStatusMap.BAD;
+      } else {
+        _status = NetworkStatusMap.OFFLINE;
+      }
+      updateStatus(_status);
+    };
+
+    const clearInter = useInterval(
+      () => {
+        getBlockDelay();
+      },
+      30 * 1000,
+      { immediate: true }
+    );
+
+    useEffect(() => {
+      return () => {
+        clearInter && clearInter();
+      };
+    }, []);
+
+    return status;
+  };
+  const blockDelay = useBlockDelay();
+
   useEffect(() => {
     timer = setInterval(scrollFun, 50);
     return () => {
       clearInterval(timer);
     };
   }, [tokenList.length]);
+
   return (
     <Wrapper>
       <Left>
@@ -174,7 +247,7 @@ const Footer = () => {
         <Line />
         <NetworkStatus>
           <Image src={NetworkIcon} alt="" width={11} height={11} />
-          <p>{"< 10 block delay"}</p>
+          <p>{GraphStatusDesc[blockDelay]}</p>
         </NetworkStatus>
       </Right>
     </Wrapper>

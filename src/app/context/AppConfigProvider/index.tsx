@@ -6,7 +6,6 @@ import { useChainId } from "wagmi";
 
 import { CHAINS_ID, DEFAULT_CHAIN_ID } from "@/app/config/common";
 import { arbitrumOne, zkFair } from "@/app/config/chains";
-import { initGraphqlClient } from "@/app/config/getGraphqlClient";
 import addressMap from "@/app/config/contract_address";
 
 export type AppConfigType = {
@@ -95,14 +94,6 @@ export const AppConfigProvider: FCC<{}> = memo(({ children }) => {
   const config = useMemo(() => {
     return AppConfigOnChain[chainId] || AppConfigOnChain[DEFAULT_CHAIN_ID];
   }, [chainId]);
-
-  useEffect(() => {
-    initGraphqlClient(
-      config.graph.baseBlock,
-      config.graph.perpetual,
-      config.graph.base
-    );
-  }, [config]);
 
   return (
     <AppConfigContext.Provider value={config}>
