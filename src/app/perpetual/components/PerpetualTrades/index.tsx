@@ -9,10 +9,10 @@ import {
   futureTrades,
 } from "@/app/graphql/future/tradeOrders";
 import BigNumber from "bignumber.js";
-import { filterPrecision } from "@/app/utils/tools";
+import { filterPrecision, getExponent } from "@/app/utils/tools";
 import dayjs from "dayjs";
 import useGraphqlFetch from "@/app/hooks/useGraphqlFetch";
-import { tokens } from "@/app/config/tokens";
+import { useTokenByName, useTokens } from "@/app/hooks/useTokens";
 import { useParams } from "next/navigation";
 interface TdType {
   width?: string;
@@ -72,7 +72,7 @@ const Table = styled.div`
 const THeader = styled.div`
   display: flex;
   align-items: center;
-  padding: 10px 34px 10px 8px;
+  padding: 10px 22px 10px 8px;
 `;
 const BaseTd = styled.div<TdType>`
   text-align: ${(props) => props?.text_align || "left"};
@@ -131,6 +131,9 @@ type dataSourceType = {
 };
 
 const PerpetualTrades = () => {
+  const [activeTab, setActiveTab] = useState(0);
+
+  //获取data
   const fun = useGraphqlFetch("perpetual", futureTradesById);
   const _fun = useGraphqlFetch("perpetual", futureTrades);
   const { run, data, cancel }: any = useRequest(
@@ -142,17 +145,15 @@ const PerpetualTrades = () => {
       manual: true,
     }
   );
+
   const params = useParams<{ symbol: string }>();
   const { symbol } = params;
   const symbolName = useMemo(() => {
     return symbol.split("USD")[0];
   }, [symbol]);
-
-  const curToken =
-    tokens.filter((i) => {
-      return i?.symbolName === symbolName;
-    })[0] || {};
-
+  
+  //获取当前token
+  const curToken = useTokenByName(symbolName);
   useEffect(() => {
     if (curToken?.symbolName) {
       run({ futureId: curToken?.futureLongId?.toString() });
@@ -163,20 +164,27 @@ const PerpetualTrades = () => {
       cancel();
     };
   }, [curToken?.symbolName]);
-  const [activeTab, setActiveTab] = useState(0);
+
   const dataSource = useMemo(
     () => data?.[activeTab]?.futureTrades || [],
     [data, activeTab]
   );
 
+  const tokens = useTokens();
+  const getToken = (futureId: string) => {
+    const token =
+      tokens.filter((token_) => token_.futureLongId === +futureId)[0] || {};
+    return token;
+  };
   const baseColumns: columnsType[] = [
     {
       key: "price",
       label: "Price",
       width: "30%",
       Components: (v: string, item: dataSourceType) => {
+        const token = getToken(item?.futureId);
         const _v = BigNumber(ethers?.utils.formatUnits(v, 6)).toFixed(
-          curToken?.displayDecimal || 4,
+          token?.displayDecimal || 4,
           BigNumber.ROUND_DOWN
         );
         return item?.pair?.toLowerCase()?.includes("short") ? (
@@ -191,20 +199,16 @@ const PerpetualTrades = () => {
       label: "Size",
       width: "30%",
       Components: (v: string, item: dataSourceType) => {
+        const token = getToken(item?.futureId);
+
         return (
           <>
-            {filterPrecision(BigNumber(item?.size || "0").toString(), 4)}
-            {/* {filterPrecision(
-              BigNumber(item?.size || "0")
-                .multipliedBy(
-                  getPar(
-                    getTokenByIdAndContract(item?.futureId, item?.future)
-                      ?.kLineSymbol
-                  )
-                )
+            {filterPrecision(
+              BigNumber(v || "0")
+                .multipliedBy(token?.pars)
                 .toString(),
-              getTokenByIdAndContract(item?.futureId, item?.future)?.parDecimal
-            )} */}
+              getExponent(+token?.pars)
+            )}
           </>
         );
       },
@@ -218,6 +222,7 @@ const PerpetualTrades = () => {
       },
     },
   ];
+
   const columns = useMemo(() => {
     if (activeTab === 1) {
       return [
