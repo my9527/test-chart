@@ -12,7 +12,8 @@ import BigNumber from "bignumber.js";
 import { filterPrecision } from "@/app/utils/tools";
 import dayjs from "dayjs";
 import useGraphqlFetch from "@/app/hooks/useGraphqlFetch";
-
+import { tokens } from "@/app/config/tokens";
+import { useParams } from "next/navigation";
 interface TdType {
   width?: string;
   key: string;
@@ -25,6 +26,16 @@ const Wrapper = styled.div`
   width: 100%;
   height: 100%;
   cursor: pointer;
+
+  overflow-x: scroll;
+  &::-webkit-scrollbar {
+    height: 8px;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    border-radius: 999px;
+    background: #292929;
+  }
 `;
 const Tabs = styled.div`
   display: flex;
@@ -56,6 +67,7 @@ const Tabs = styled.div`
 `;
 const Table = styled.div`
   height: calc(100% - 45px);
+  min-width: 350px;
 `;
 const THeader = styled.div`
   display: flex;
@@ -70,7 +82,7 @@ const BaseTd = styled.div<TdType>`
   font-weight: 400;
   line-height: 100%;
   color: ${(props) => props.theme.colors.text1};
-
+  flex-shrink: 0;
   ${(props) => {
     return props?.width ? `width:${props?.width}` : "flex:1";
   }}
@@ -81,9 +93,11 @@ const Th = styled(BaseTd)`
 const Tbody = styled.div`
   display: flex;
   flex-direction: column;
+  padding-bottom: 8px;
   gap: 7px;
   padding: 0px 26px 0px 8px;
   height: calc(100% - 34px);
+
   overflow-y: scroll;
   &::-webkit-scrollbar {
     width: 8px;
@@ -128,36 +142,41 @@ const PerpetualTrades = () => {
       manual: true,
     }
   );
+  const params = useParams<{ symbol: string }>();
+  const { symbol } = params;
+  const symbolName = useMemo(() => {
+    return symbol.split("USD")[0];
+  }, [symbol]);
 
-  const curTokenWithValue = {
-    futureLongId: 14,
-    kLineSymbol: {},
-  };
+  const curToken =
+    tokens.filter((i) => {
+      return i?.symbolName === symbolName;
+    })[0] || {};
 
   useEffect(() => {
-    if (curTokenWithValue?.kLineSymbol) {
-      run({ futureId: curTokenWithValue?.futureLongId?.toString() });
+    if (curToken?.symbolName) {
+      run({ futureId: curToken?.futureLongId?.toString() });
     } else {
       cancel();
     }
     return () => {
       cancel();
     };
-  }, []);
+  }, [curToken?.symbolName]);
   const [activeTab, setActiveTab] = useState(0);
   const dataSource = useMemo(
     () => data?.[activeTab]?.futureTrades || [],
     [data, activeTab]
   );
 
-  const columns: columnsType[] = [
+  const baseColumns: columnsType[] = [
     {
       key: "price",
       label: "Price",
-      width: "35%",
+      width: "30%",
       Components: (v: string, item: dataSourceType) => {
         const _v = BigNumber(ethers?.utils.formatUnits(v, 6)).toFixed(
-          4,
+          curToken?.displayDecimal || 4,
           BigNumber.ROUND_DOWN
         );
         return item?.pair?.toLowerCase()?.includes("short") ? (
@@ -170,7 +189,7 @@ const PerpetualTrades = () => {
     {
       key: "size",
       label: "Size",
-      width: "35%",
+      width: "30%",
       Components: (v: string, item: dataSourceType) => {
         return (
           <>
@@ -194,12 +213,27 @@ const PerpetualTrades = () => {
       key: "time",
       label: "Time",
       text_align: "right",
-      Components: (v: string, item: dataSourceType) => {
-        return <>{dayjs.unix(+item?.time).format("HH:mm:ss")}</>;
+      Components: (v: string) => {
+        return <>{dayjs.unix(+v).format("HH:mm:ss")}</>;
       },
     },
   ];
-
+  const columns = useMemo(() => {
+    if (activeTab === 1) {
+      return [
+        {
+          key: "pair",
+          label: "Market",
+          width: "30%",
+          Components: (v: string) => {
+            return <>{v.split(" ")[0] + "USD"}</>;
+          },
+        },
+        ...baseColumns,
+      ];
+    }
+    return baseColumns;
+  }, [activeTab]);
   return (
     <Wrapper>
       <Tabs>
