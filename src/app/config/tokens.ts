@@ -3328,3 +3328,16 @@ export const tokens: Record<string, Token[]> = {
         maxliquidityLockRatio: 0.2,
     }],
 };
+
+// 获取整个token相关的map
+export const tokensMap: Record<string, Record<string, Token>> = Object.keys(tokens).reduce((result, curChain)=> {
+  return {
+    ...result,
+    [curChain]: tokens[curChain].reduce((result, token_) => {
+      return {
+        ...result,
+        [token_.symbolName]: token_,
+      }
+    }, {})
+  }
+}, {});

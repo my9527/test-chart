@@ -1,4 +1,5 @@
 import { AtomEffect, DefaultValue, atom } from "recoil";
+import { Token } from "../config/tokens";
 
 export const localStorageEffect: <T>(key: string) => AtomEffect<T> =
   (key: string) =>
@@ -48,3 +49,18 @@ export const recoilPositions = atom<any>({
   key: 'open_positions',
   default: [],
 });
+
+
+/**
+ * 所有交易对的标记价格
+ */
+export const recoilIndexPrices = atom<Record<string, any>>({
+  key: 'index_prices',
+  default: {},
+});
+
+
+export const recoilCurrentToken = atom<Token | null>({
+  key: 'current_token',
+  default: null, // use default token;
+})

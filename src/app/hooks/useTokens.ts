@@ -1,8 +1,9 @@
 
 import { useChainId } from "wagmi";
-import { tokens } from "../config/tokens";
 import { useMemo } from "react";
-import { Token } from "graphql";
+import { tokens } from "../config/tokens";
+import { useParams } from "next/navigation";
+import { DEFAULT_TOKEN_SYMBOL } from "../config/common";
 
 
 
@@ -44,7 +45,7 @@ export const useTokenByName = (tokenName: string) => {
 export const useTokenByFutureId = (futureId: number | string) => {
     const tokens = useTokens();
     const token = useMemo(() => {
-            return tokens.filter(token_ => token_.futureLongId === futureId);
+            return tokens.filter(token_ => +token_.futureLongId === +futureId);
     }, [tokens, futureId]);
 
     return token[0];
