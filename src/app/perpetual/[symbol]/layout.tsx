@@ -5,15 +5,16 @@ import styled from "styled-components";
 import { CmptMarketSocket } from "../components/SocketMarket";
 
 const Wrapper = styled.div`
-  min-height: calc(100vh - 50px);
+  height: calc(100vh - 50px);
   display: flex;
   flex-direction: column;
   justify-content: space-between;
   background-color: ${(props) => props.theme.colors.border1};
-  /* padding-bottom: 80px; */
+  padding-bottom: 40px;
 `;
 const Content = styled.div`
   flex: 1;
+ 
   .react-draggable-transparent-selection {
     user-select: none;
   }
