@@ -26,18 +26,14 @@ export const OpenPostionsEffects = memo(() => {
 
         async function _run() {
 
-
-
             const data = await getFuturesPositions({address: user_});
 
-            console.log("updatePositionList", data);
 
             if(!data) {
                 updatePositionList([]);
                 return ;
             }
 
-            
 
             const result = Object.values(data)
             ?.flat(Infinity)
