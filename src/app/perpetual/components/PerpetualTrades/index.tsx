@@ -5,12 +5,13 @@ import { useEffect, useState, useMemo } from "react";
 import { ethers } from "ethers";
 import { useRequest } from "ahooks";
 import {
-  fetchFutureTradesById,
-  fetchFutureTrades,
+  futureTradesById,
+  futureTrades,
 } from "@/app/graphql/future/tradeOrders";
 import BigNumber from "bignumber.js";
 import { filterPrecision } from "@/app/utils/tools";
 import dayjs from "dayjs";
+import useGraphqlFetch from "@/app/hooks/useGraphqlFetch";
 
 interface TdType {
   width?: string;
@@ -116,19 +117,18 @@ type dataSourceType = {
 };
 
 const PerpetualTrades = () => {
-  const [activeTab, setActiveTab] = useState(0);
+  const fun = useGraphqlFetch("perpetual", futureTradesById);
+  const _fun = useGraphqlFetch("perpetual", futureTrades);
   const { run, data, cancel }: any = useRequest(
     ({ futureId }) => {
-      return Promise.all([
-        fetchFutureTradesById(futureId),
-        fetchFutureTrades(),
-      ]);
+      return Promise.all([fun({ futureId }), _fun()]);
     },
     {
       pollingInterval: 10000,
       manual: true,
     }
   );
+
   const curTokenWithValue = {
     futureLongId: 14,
     kLineSymbol: {},
@@ -136,9 +136,7 @@ const PerpetualTrades = () => {
 
   useEffect(() => {
     if (curTokenWithValue?.kLineSymbol) {
-      setTimeout(() => {
-        run({ futureId: curTokenWithValue?.futureLongId?.toString() });
-      }, 1000);
+      run({ futureId: curTokenWithValue?.futureLongId?.toString() });
     } else {
       cancel();
     }
@@ -146,7 +144,7 @@ const PerpetualTrades = () => {
       cancel();
     };
   }, []);
-
+  const [activeTab, setActiveTab] = useState(0);
   const dataSource = useMemo(
     () => data?.[activeTab]?.futureTrades || [],
     [data, activeTab]

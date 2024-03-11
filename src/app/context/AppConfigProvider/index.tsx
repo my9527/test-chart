@@ -99,14 +99,6 @@ export const AppConfigProvider: FCC<{}> = memo(({ children }) => {
     return AppConfigOnChain[chainId] || AppConfigOnChain[DEFAULT_CHAIN_ID];
   }, [chainId]);
 
-  useEffect(() => {
-    initGraphqlClient(
-      config.graph.baseBlock,
-      config.graph.perpetual,
-      config.graph.base
-    );
-  }, [config]);
-
   return (
     <AppConfigContext.Provider value={config}>
       {children}

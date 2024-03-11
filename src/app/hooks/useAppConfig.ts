@@ -1,11 +1,9 @@
-import { useContext } from "react"
-import { AppConfigContext } from "../context/AppConfigProvider"
-
-
+import { useContext } from "react";
+import { AppConfigContext } from "../context/AppConfigProvider";
 
 export const useAppConfig = () => {
     
-    const ctx = useContext(AppConfigContext);
+  const ctx = useContext(AppConfigContext);
 
-    return ctx;
-}
+  return ctx;
+};

@@ -54,4 +54,4 @@ const fetchFutureTrades = async () => {
   return perpetualClient.request(futureTrades);
 };
 
-export { fetchFutureTradesById, fetchFutureTrades };
+export { futureTradesById, futureTrades };
