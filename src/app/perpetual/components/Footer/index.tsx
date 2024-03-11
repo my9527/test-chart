@@ -120,7 +120,7 @@ const Footer = () => {
 
   const tokenList = useMemo(() => {
     return Object.keys(favoriateList).map((i) => {
-      return { token: i + "/USDT", change: "20%", price: "88888.99" };
+      return { token: i + "USD", change: "20%", price: "88888.99" };
     });
   }, [favoriateList]);
 
