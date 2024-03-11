@@ -7,11 +7,12 @@ import { useRecoilState, useRecoilValue } from "recoil";
 import PerpetualCharts from "../components/PerpetualCharts";
 import PerpetualOrders from "../components/Orders/PerpetualOrders";
 import PerpetualPanels from "../components/PerpetualPanels";
-import PerpetualTrdes from "../components/PerpetualTrdes";
+import PerpetualTrades from "../components/PerpetualTrades";
 import Account from "../components/Account";
 import PerpetualDetail from "../components/PerpetualDetail";
-
-// import { recoilPanelSide } from "@/app/model";
+import "react-grid-layout/css/styles.css";
+import "react-resizable/css/styles.css";
+import { recoilPanelSide } from "@/app/models";
 
 const ReactGridLayout = WidthProvider(RGL);
 
@@ -32,8 +33,8 @@ const LAYOUT_RIGHT_LIST: Layout[] = [
 ];
 
 const Perpetual: FC = () => {
-  //   const panelSide = useRecoilValue(recoilPanelSide);
-  const panelSide = "left";
+  const panelSide = useRecoilValue(recoilPanelSide);
+
   const [layout, setLayout] = useState<Layout[]>(
     panelSide === "left" ? LAYOUT_LEFT_LIST : LAYOUT_RIGHT_LIST
   );
@@ -47,7 +48,7 @@ const Perpetual: FC = () => {
       <PerpetualDetail />
       <ReactGridLayout
         draggableHandle=".components-draggable"
-        margin={[4, 4]}
+        margin={[2, 2]}
         cols={20}
         rowHeight={35}
         layout={layout}
@@ -55,7 +56,7 @@ const Perpetual: FC = () => {
         isBounded
       >
         <div key="trades">
-          <PerpetualTrdes />
+          <PerpetualTrades />
         </div>
 
         <div key="charts">

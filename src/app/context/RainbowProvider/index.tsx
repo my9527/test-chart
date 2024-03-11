@@ -37,7 +37,7 @@ const config =getDefaultConfig({
     },
   ],
   chains: [
-    arbitrumOne,
+    // arbitrumOne,
     zkFair,
   ],
   ssr: true,

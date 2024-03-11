@@ -4,7 +4,7 @@ import { createPortal } from "react-dom";
 import styled from "styled-components";
 import { motion } from "framer-motion";
 import { useRecoilState } from "recoil";
-import { recoilGlobalMessage } from "@/app/model";
+import { recoilGlobalMessage } from "@/app/models";
 
 const MessageWrapper = styled(motion.div)`
   position: fixed;

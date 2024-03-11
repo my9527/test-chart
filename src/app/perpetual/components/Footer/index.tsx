@@ -4,6 +4,8 @@ import styled from "styled-components";
 import Image from "next/image";
 import NetworkIcon from "@/app/assets/footer/network.svg";
 import { useRouter } from "next/navigation";
+import { useRecoilState } from "recoil";
+import { recoilFavoriateList } from "@/app/models";
 
 const Wrapper = styled.div`
   background: ${(props) => props.theme.colors.fill2};
@@ -26,7 +28,7 @@ const Left = styled.div`
 const ScrollWrapper = styled.div`
   cursor: pointer;
   margin-left: 30px;
-  width: 700px;
+  width: 660px;
   overflow: hidden;
   position: relative;
   height: 100%;
@@ -92,33 +94,13 @@ const NetworkStatus = styled.div`
 `;
 const Footer = () => {
   const router = useRouter();
-  const tokenList = [
-    {
-      token: "BTC/USDT",
-      change: "20%",
-      price: "88888.99",
-    },
-    {
-      token: "ETH/USDT",
-      change: "20%",
-      price: "88888.99",
-    },
-    {
-      token: "DOT/USDT",
-      change: "20%",
-      price: "88888.99",
-    },
-    {
-      token: "ARB/USDT",
-      change: "20%",
-      price: "88888.99",
-    },
-    {
-      token: "LUNC/USDT",
-      change: "20%",
-      price: "88888.99",
-    },
-  ];
+  const [favoriateList] = useRecoilState(recoilFavoriateList);
+
+  const tokenList = useMemo(() => {
+    return Object.keys(favoriateList).map((i) => {
+      return { token: i + "/USDT", change: "20%", price: "88888.99" };
+    });
+  }, [favoriateList]);
 
   let timer: NodeJS.Timeout | number;
 
@@ -126,16 +108,24 @@ const Footer = () => {
     const wrapper = document.getElementById("wrapper") as HTMLElement;
     const trades = document.getElementById("trades") as HTMLElement;
     const trades_copy = document.getElementById("trades_copy") as HTMLElement;
+
+    // if (tokenList.length === 3) {
+    //   clearInterval(timer);
+    // } else {
     trades_copy.innerHTML = trades?.innerHTML;
     if (trades_copy?.scrollWidth - wrapper?.scrollLeft <= 0) {
       wrapper.scrollLeft -= trades?.scrollWidth;
     } else {
       wrapper.scrollLeft++;
     }
+    // }
   };
   useEffect(() => {
     timer = setInterval(scrollFun, 50);
-  }, []);
+    return () => {
+      clearInterval(timer);
+    };
+  }, [tokenList.length]);
   return (
     <Wrapper>
       <Left>
@@ -149,11 +139,11 @@ const Footer = () => {
           <Trades id="trades">
             {tokenList.map((item, index) => {
               return (
-                <Trade key={item.token}>
-                  <p className="token">{item.token}</p>
-                  <p className="change">{item.change}</p>
-                  <p className="price">{item.price}</p>
-                  {index !== tokenList.length - 1 && <Line />}
+                <Trade key={item?.token}>
+                  <p className="token">{item?.token}</p>
+                  <p className="change">{item?.change}</p>
+                  <p className="price">{item?.price}</p>
+                  <Line />
                 </Trade>
               );
             })}

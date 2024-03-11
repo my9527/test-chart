@@ -1,7 +1,7 @@
 "use client";
 import styled from "styled-components";
 import DraggableIcon from "../DraggableIcon";
-import { OrderHeader } from "./Header";
+import { OrderHeader } from "../Orders/Header";
 const Wrapper = styled.div`
   position: relative;
   width: 100%;
