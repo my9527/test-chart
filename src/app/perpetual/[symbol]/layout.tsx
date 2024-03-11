@@ -31,7 +31,7 @@ const Content = styled.div`
   }
 
   .react-resizable {
-    background: rgba(255, 255, 255, 0.45) !important;
+    background: ${(props) => props.theme.colors.fill1};
   }
 `;
 const PerpetualLayout = ({ children }: { children: React.ReactNode }) => {

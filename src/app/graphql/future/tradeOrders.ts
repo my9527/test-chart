@@ -43,15 +43,5 @@ const futureTrades = gql`
   }
 `;
 
-const fetchFutureTradesById = async (futureId: string) => {
-  const { perpetualClient } = getGraphqlClient();
-
-  return perpetualClient.request(futureTradesById, { futureId: futureId });
-};
-
-const fetchFutureTrades = async () => {
-  const { perpetualClient } = getGraphqlClient();
-  return perpetualClient.request(futureTrades);
-};
 
 export { futureTradesById, futureTrades };

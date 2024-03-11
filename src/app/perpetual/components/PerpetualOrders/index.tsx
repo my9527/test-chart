@@ -1,12 +1,13 @@
 "use client";
 import styled from "styled-components";
 import DraggableIcon from "../DraggableIcon";
-import { OrderHeader } from "../Orders/Header";
+import { OrderHeader } from "./Header";
+
+import { PositionList } from "./PositionList";
 const Wrapper = styled.div`
   position: relative;
   width: 100%;
   height: 100%;
-  background-color: yellow;
 `;
 
 
@@ -23,6 +24,7 @@ const PerpetualOrders = () => {
     <Wrapper>
       <DraggableIcon />
       <OrderHeader />
+      <PositionList />
       
     </Wrapper>
   );

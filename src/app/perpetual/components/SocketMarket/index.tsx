@@ -1,31 +1,28 @@
-import { FC, useCallback, useEffect, useRef } from "react";
+import { FC, memo, useCallback, useEffect, useRef } from "react";
 
 import { MarketSocket } from "./socket";
 import { SOCKET_MSG_TYPE } from "../../constant";
 import { useRecoilState } from "recoil";
 import { recoilMarkets } from "../../models/market";
 import { useAppConfig } from "@/app/hooks/useAppConfig";
+import { useParams } from "next/navigation";
 
 
 
 
 
 
-export const CmptMarketSocket: FC = () => {
+export const CmptMarketSocket: FC = memo(() => {
 
     const marketWss = useRef<MarketSocket | null>(null);
+    const routeParams = useParams<{ symbol: string }>();
 
     const appConfig = useAppConfig();
-
-    console.log("appconfig", appConfig);
-
-
 
     const [, updateMarkets] = useRecoilState(recoilMarkets);
 
 
     const handleTopGainerChange = useCallback((evt: Event & { data: string }) => {
-        // console.log("handleTopGainerChange", evt);
         const data = JSON.parse(evt?.data);
         if(data.type === SOCKET_MSG_TYPE.MARKET_CHANGE) {
         }
@@ -42,12 +39,20 @@ export const CmptMarketSocket: FC = () => {
 
     const handleCurSymbolIndexPrice = useCallback(() => {
 
-    }, []);
+    }, [routeParams.symbol]);
     
     // wsRef.current = new Wss(`${baseWssUrl}market/`);
 
     useEffect(() => {
-        marketWss.current = new MarketSocket("wss://api-testnet.substancex.io/market/", true);
+        if(marketWss.current) {
+            console.log("symbol:", routeParams.symbol);
+            // marketWss.current.unsubscribe();
+            // marketWss.current.subscribe();
+        }
+    }, [routeParams.symbol, handleCurSymbolIndexPrice, marketWss.current]);
+
+    useEffect(() => {
+        marketWss.current = new MarketSocket(appConfig.api.wss, true);
         marketWss.current.subscribe('change', {
             param: '24h',
         }, handleTopGainerChange);
@@ -60,4 +65,4 @@ export const CmptMarketSocket: FC = () => {
 
 
     return null;
-}
+});
