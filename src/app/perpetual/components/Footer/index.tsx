@@ -109,16 +109,12 @@ const Footer = () => {
     const trades = document.getElementById("trades") as HTMLElement;
     const trades_copy = document.getElementById("trades_copy") as HTMLElement;
 
-    // if (tokenList.length === 3) {
-    //   clearInterval(timer);
-    // } else {
     trades_copy.innerHTML = trades?.innerHTML;
     if (trades_copy?.scrollWidth - wrapper?.scrollLeft <= 0) {
       wrapper.scrollLeft -= trades?.scrollWidth;
     } else {
       wrapper.scrollLeft++;
     }
-    // }
   };
   useEffect(() => {
     timer = setInterval(scrollFun, 50);
