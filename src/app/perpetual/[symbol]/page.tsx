@@ -5,7 +5,7 @@ import RGL, { WidthProvider, Layout } from "react-grid-layout";
 import { useRecoilState, useRecoilValue } from "recoil";
 
 import PerpetualCharts from "../components/PerpetualCharts";
-import PerpetualOrders from "../components/PerpetualOrders";
+import PerpetualOrders from "../components/Orders/PerpetualOrders";
 import PerpetualPanels from "../components/PerpetualPanels";
 import PerpetualTrdes from "../components/PerpetualTrdes";
 import Account from "../components/Account";

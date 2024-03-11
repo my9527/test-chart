@@ -7,7 +7,7 @@ import { useChainId } from "wagmi"
 
 
 import { CHAINS_ID, DEFAULT_CHAIN_ID } from "@/app/config/common";
-import { arbitrumOne, zkFair } from "@/app/config/chains";
+import { arbitrumOne, zkFair, zkFairTestnet } from "@/app/config/chains";
 
 
 export type AppConfigType = {
@@ -80,7 +80,30 @@ const AppConfigOnChain: Record<number, AppConfigType> = {
     
         executionFee: '2500000000000000000',
     
+    },
+    [CHAINS_ID.zkfairtest]: {
+      chain: zkFairTestnet,
+
+      graph: {
+        base: 'https://gql-testnet.substancex.io/subgraphs/name/substanceexchangedevelop/zktest',
+        perpetual: 'https://gql-testnet.substancex.io/subgraphs/name/substanceexchangedevelop/zktest',
+        baseBlock: 'https://gql-testnet.substancex.io/subgraphs/name/substanceexchangedevelop/zktest-blocks',
       },
+  
+      // config rpc
+      rpc: {
+        http: "https://testnet-rpc.zkfair.io",
+        wss: "wss://rpc.hyperionx.xyz/",
+      },
+  
+      // config api
+      api: {
+        http: "https://api-zkfair-testnet.substancex.io/",
+        wss: "wss://api-testnet.substancex.io/",
+      },
+  
+      executionFee: '2500000000000000000',   // 需要根据链获取，这里不直接配置
+  },
 };
 
 

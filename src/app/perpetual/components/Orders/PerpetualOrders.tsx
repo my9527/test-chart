@@ -1,6 +1,7 @@
 "use client";
 import styled from "styled-components";
-import DraggableIcon from "./DraggableIcon";
+import DraggableIcon from "../DraggableIcon";
+import { OrderHeader } from "./Header";
 
 const Wrapper = styled.div`
   position: relative;
@@ -8,11 +9,22 @@ const Wrapper = styled.div`
   height: 100%;
   background-color: yellow;
 `;
+
+
+// 1.  通过graphql 获取已经完成的订单，
+// 2. 监听事件，获取用户新下的单，并及时更新
+
+
+
 const PerpetualOrders = () => {
+
+
+
   return (
     <Wrapper>
-      PerpetualOrders
       <DraggableIcon />
+      <OrderHeader />
+      
     </Wrapper>
   );
 };

@@ -1,6 +1,6 @@
 
 
-import { zkFair, arbitrumOne } from "./chains";
+import { zkFair, arbitrumOne, zkFairTestnet } from "./chains";
 
 
 
@@ -13,12 +13,13 @@ export const IS_PROD = IS_LOCAL ? process.env.NODE_ENV : !['feature', 'localhost
 // config chainid with name
 export enum CHAINS_ID {
     'zkfair' = zkFair.id,
-    'arbitrum' = arbitrumOne.id
+    'arbitrum' = arbitrumOne.id,
+    'zkfairtest' = zkFairTestnet.id,
 }
 
 // default chain id for app
 // different env may requires different default chain
-export const DEFAULT_CHAIN_ID = IS_PROD ? CHAINS_ID.zkfair : CHAINS_ID.arbitrum;
+export const DEFAULT_CHAIN_ID = IS_PROD ? CHAINS_ID.zkfairtest: CHAINS_ID.zkfair;
 
 
 

@@ -17,6 +17,8 @@ export const CmptMarketSocket: FC = () => {
 
     const appConfig = useAppConfig();
 
+    console.log("appconfig", appConfig);
+
 
 
     const [, updateMarkets] = useRecoilState(recoilMarkets);
