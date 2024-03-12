@@ -77,7 +77,7 @@ const THeader = styled.div`
 const BaseTd = styled.div<TdType>`
   text-align: ${(props) => props?.text_align || "left"};
   font-family: Arial;
-  font-size: ${(props) => props.theme.fontSize.medium};
+  font-size: ${(props) => props.theme.fontSize.small};
   font-style: normal;
   font-weight: 400;
   line-height: 100%;
@@ -151,7 +151,7 @@ const PerpetualTrades = () => {
   const symbolName = useMemo(() => {
     return symbol.split("USD")[0];
   }, [symbol]);
-  
+
   //获取当前token
   const curToken = useTokenByName(symbolName);
   useEffect(() => {
