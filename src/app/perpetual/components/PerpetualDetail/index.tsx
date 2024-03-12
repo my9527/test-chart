@@ -11,8 +11,8 @@ import { PieChart, Pie, Sector, Cell, ResponsiveContainer } from "recharts";
 import SearchIcon from "@/app/assets/perpetual/search.svg";
 import IntroIcon from "@/app/assets/perpetual/intro.svg";
 import ChartIcon from "@/app/assets/perpetual/chart.svg";
-import { useRecoilState } from "recoil";
-import { recoilFavoriateList } from "@/app/models";
+import { useRecoilState, useRecoilValue } from "recoil";
+import { recoilFavoriateList, recoilIndexPrices } from "@/app/models";
 import { tokens } from "@/app/config/tokens";
 
 const Wrapper = styled.div`
@@ -132,6 +132,7 @@ const PerpetualDetail = memo((props) => {
 
   const theme = useTheme();
   const [favoriateList, setFavoriateList] = useRecoilState(recoilFavoriateList);
+  const indexPrices = useRecoilValue(recoilIndexPrices);
 
   const isFavoriate = useMemo(() => {
     return Object.keys(favoriateList).filter((i) => i === symbolName).length > 0;
@@ -197,7 +198,7 @@ const PerpetualDetail = memo((props) => {
           <h3 className="label">{symbol}/USDT</h3>
           <Image src={ArrowIcon} width={11} height={6} alt="" />
           <div className="change_price">
-            <p className="price">2000.00</p>
+            <p className="price">{indexPrices[symbol]?.price || '-'}</p>
             <p className="change">+10.26%</p>
           </div>
         </Symbol>

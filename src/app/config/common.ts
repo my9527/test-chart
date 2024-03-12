@@ -22,8 +22,7 @@ export const DEFAULT_CHAIN_ID = IS_PROD ? CHAINS_ID.zkfairtest: CHAINS_ID.zkfair
 
 
 
-
-
+export const DEFAULT_TOKEN_SYMBOL = 'ETH';
 
 
 

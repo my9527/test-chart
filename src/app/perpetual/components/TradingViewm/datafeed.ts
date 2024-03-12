@@ -35,16 +35,16 @@ class Datafeed {
         setTimeout(async () => {
             await tradingviewSocketIns.init();
 
-        configurationData({
-            exchanges: [],
-            symbolsTypes: [],
-            supported_resolutions: this.supportedResolutions,
-            supports_marks: false,
-            supports_search: false,
-            supports_time: true,
-            supports_timescale_marks: false,
-            has_no_volume: true,
-        });
+            configurationData({
+                exchanges: [],
+                symbolsTypes: [],
+                supported_resolutions: this.supportedResolutions,
+                supports_marks: false,
+                supports_search: false,
+                supports_time: true,
+                supports_timescale_marks: false,
+                has_no_volume: true,
+            });
         }, 0);
     }
 

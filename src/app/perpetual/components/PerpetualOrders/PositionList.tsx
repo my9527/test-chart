@@ -1,4 +1,5 @@
 import { Row } from "@/app/components/Row";
+import { TokenById } from "@/app/components/Token";
 import { recoilPositions } from "@/app/models";
 import { useRecoilValue } from "recoil";
 import styled from "styled-components";
@@ -16,6 +17,12 @@ table{
     }
     td {
         width: 140px;
+        color: var(--white, #FAFAFA);
+        font-family: Arial;
+        font-size: 14px;
+        font-style: normal;
+        font-weight: 400;
+        line-height: 100%; /* 14px */
     }
 }
 
@@ -87,7 +94,9 @@ export const PositionList = () => {
                         openPositions.map((pos: any) => {
                             return <tr key={pos.id}>
                                 <td>
-                                    {pos.futureId}
+                                    <div>
+                                        <TokenById futureId={pos.futureId} />
+                                    </div>
                                 </td>
                                 <td>
                                     {pos.tokenSize}
