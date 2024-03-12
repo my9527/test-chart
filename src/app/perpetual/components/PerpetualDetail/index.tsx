@@ -5,7 +5,6 @@ import ArrowIcon from "@/app/assets/header/arrow.svg";
 import FavoriteIcon from "@/app/assets/perpetual/favorite.svg";
 import StarIcon from "@/app/assets/perpetual/star.svg";
 import Image from "next/image";
-import { useParams } from "next/navigation";
 import { useMemo, memo, useEffect } from "react";
 import { PieChart, Pie, Sector, Cell, ResponsiveContainer } from "recharts";
 import SearchIcon from "@/app/assets/perpetual/search.svg";
@@ -14,8 +13,8 @@ import ChartIcon from "@/app/assets/perpetual/chart.svg";
 import { useRecoilState, useRecoilValue } from "recoil";
 import { recoilFavoriateList, recoilIndexPrices } from "@/app/models";
 import { filterPrecision } from "@/app/utils/tools";
-import { useTokenByName } from "@/app/hooks/useTokens";
-import use24hChange from "@/app/perpetual/hooks/use24hChange";
+import use24hPrice from "@/app/perpetual/hooks/use24hPrice";
+import useCurToken from "@/app/perpetual/hooks/useCurToken";
 
 const Wrapper = styled.div`
   width: 100%;
@@ -125,21 +124,14 @@ const FundingRate = styled(InfoItem)`
   }
 `;
 const PerpetualDetail = memo((props) => {
-  const params = useParams<{ symbol: string }>();
-  const { symbol } = params;
-
-  const symbolName = useMemo(() => {
-    return symbol.split("USD")[0];
-  }, [symbol]);
-
-  const curToken = useTokenByName(symbolName);
+  const { curToken, symbolName } = useCurToken();
 
   const theme = useTheme();
   const [favoriateList, setFavoriateList] = useRecoilState(recoilFavoriateList);
   const indexPrices = useRecoilValue(recoilIndexPrices);
 
   //获取24h high/low
-  const { run, data } = use24hChange();
+  const { run, data } = use24hPrice();
   useEffect(() => {
     if (curToken?.symbolName) {
       run({ symbol: curToken?.symbolName });
@@ -209,10 +201,10 @@ const PerpetualDetail = memo((props) => {
     <Wrapper>
       <Layout>
         <Symbol>
-          <h3 className="label">{symbol}/USDT</h3>
+          <h3 className="label">{symbolName}/USDT</h3>
           <Image src={ArrowIcon} width={11} height={6} alt="" />
           <div className="change_price">
-            <p className="price">{indexPrices[symbol]?.price || "-"}</p>
+            <p className="price">{indexPrices[symbolName]?.price || "-"}</p>
             <p className="change">
               {/* {filterPrecision(
                 priceChange?.[curToken?.kLineSymbol || ""]?.change || 0,
@@ -226,9 +218,12 @@ const PerpetualDetail = memo((props) => {
           onClick={() => {
             let _favoriateList = { ...favoriateList };
             if (isFavoriate) {
-              delete _favoriateList[symbol];
+              delete _favoriateList[symbolName];
             } else {
-              _favoriateList[symbol] = { label: symbol, favoriate: true };
+              _favoriateList[symbolName] = {
+                label: symbolName,
+                favoriate: true,
+              };
             }
             setFavoriateList(_favoriateList);
           }}

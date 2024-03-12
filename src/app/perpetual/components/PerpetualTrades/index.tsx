@@ -12,8 +12,9 @@ import BigNumber from "bignumber.js";
 import { filterPrecision, getExponent } from "@/app/utils/tools";
 import dayjs from "dayjs";
 import useGraphqlFetch from "@/app/hooks/useGraphqlFetch";
-import { useTokenByName, useTokens } from "@/app/hooks/useTokens";
-import { useParams } from "next/navigation";
+import {  useTokens } from "@/app/hooks/useTokens";
+import useCurToken from "@/app/perpetual/hooks/useCurToken";
+
 interface TdType {
   width?: string;
   key: string;
@@ -146,14 +147,8 @@ const PerpetualTrades = () => {
     }
   );
 
-  const params = useParams<{ symbol: string }>();
-  const { symbol } = params;
-  const symbolName = useMemo(() => {
-    return symbol.split("USD")[0];
-  }, [symbol]);
-
   //获取当前token
-  const curToken = useTokenByName(symbolName);
+  const { curToken, symbolName } = useCurToken();
   useEffect(() => {
     if (curToken?.symbolName) {
       run({ futureId: curToken?.futureLongId?.toString() });
