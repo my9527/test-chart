@@ -4,12 +4,6 @@ import { useRecoilValue } from "recoil";
 import { recoilIndexPrices } from "@/app/models";
 import { filterPrecision } from "@/app/utils/tools";
 
-interface TdType {
-  width?: string;
-  key: string;
-  text_align?: string;
-}
-
 const Wrapper = styled.div<{ change: string }>`
   color: ${(props) =>
     +props.change > 0
