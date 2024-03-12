@@ -15,6 +15,7 @@ import { recoilFavoriateList, recoilIndexPrices } from "@/app/models";
 import { filterPrecision } from "@/app/utils/tools";
 import use24hPrice from "@/app/perpetual/hooks/use24hPrice";
 import useCurToken from "@/app/perpetual/hooks/useCurToken";
+import ChangPrice from "./ChangPrice";
 
 const Wrapper = styled.div`
   width: 100%;
@@ -128,7 +129,6 @@ const PerpetualDetail = memo((props) => {
 
   const theme = useTheme();
   const [favoriateList, setFavoriateList] = useRecoilState(recoilFavoriateList);
-  const indexPrices = useRecoilValue(recoilIndexPrices);
 
   //获取24h high/low
   const { run, data } = use24hPrice();
@@ -203,16 +203,7 @@ const PerpetualDetail = memo((props) => {
         <Symbol>
           <h3 className="label">{symbolName}/USDT</h3>
           <Image src={ArrowIcon} width={11} height={6} alt="" />
-          <div className="change_price">
-            <p className="price">{indexPrices[symbolName]?.price || "-"}</p>
-            <p className="change">
-              {/* {filterPrecision(
-                priceChange?.[curToken?.kLineSymbol || ""]?.change || 0,
-                2
-              )} */}
-              %
-            </p>
-          </div>
+          <ChangPrice symbolName={symbolName} />
         </Symbol>
         <Favorite
           onClick={() => {
