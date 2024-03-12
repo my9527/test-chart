@@ -1,7 +1,7 @@
 "use client";
 import styled from "styled-components";
 import DraggableIcon from "../DraggableIcon";
-import { useEffect, useState, useMemo } from "react";
+import { useEffect, useState, useMemo, useCallback } from "react";
 import { ethers } from "ethers";
 import { useRequest } from "ahooks";
 import {
@@ -12,7 +12,7 @@ import BigNumber from "bignumber.js";
 import { filterPrecision, getExponent } from "@/app/utils/tools";
 import dayjs from "dayjs";
 import useGraphqlFetch from "@/app/hooks/useGraphqlFetch";
-import {  useTokens } from "@/app/hooks/useTokens";
+import { useTokensIdMap } from "@/app/hooks/useTokens";
 import useCurToken from "@/app/perpetual/hooks/useCurToken";
 
 interface TdType {
@@ -165,19 +165,15 @@ const PerpetualTrades = () => {
     [data, activeTab]
   );
 
-  const tokens = useTokens();
-  const getToken = (futureId: string) => {
-    const token =
-      tokens.filter((token_) => token_.futureLongId === +futureId)[0] || {};
-    return token;
-  };
+  const tokens = useTokensIdMap();
+
   const baseColumns: columnsType[] = [
     {
       key: "price",
       label: "Price",
       width: "30%",
       Components: (v: string, item: dataSourceType) => {
-        const token = getToken(item?.futureId);
+        const token = tokens[item?.futureId];
         const _v = BigNumber(ethers?.utils.formatUnits(v, 6)).toFixed(
           token?.displayDecimal || 4,
           BigNumber.ROUND_DOWN
@@ -194,7 +190,7 @@ const PerpetualTrades = () => {
       label: "Size",
       width: "30%",
       Components: (v: string, item: dataSourceType) => {
-        const token = getToken(item?.futureId);
+        const token = tokens[item?.futureId];
 
         return (
           <>
@@ -233,7 +229,7 @@ const PerpetualTrades = () => {
       ];
     }
     return baseColumns;
-  }, [activeTab]);
+  }, [activeTab, baseColumns]);
   return (
     <Wrapper>
       <Tabs>
