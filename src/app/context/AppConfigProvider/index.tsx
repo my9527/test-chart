@@ -27,7 +27,7 @@ export type AppConfigType = {
   };
 
     executionFee: string | number | BigNumber;
-    contract_address: object;
+    contract_address: AnyObjec;
 
 }
 

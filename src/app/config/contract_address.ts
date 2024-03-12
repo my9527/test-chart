@@ -83,6 +83,48 @@ const addressMap = {
     HPXSwap: "0x5Cc24515A769521203aF6E843b7Fb6EFcD4cecFB",
     HPXRefund: "0x00939a0958596C468f74d66B1fEeE4b3F73F7f6c",
   },
+  [CHAINS_ID.zkfairtest]: {
+    DelegationHubImplementationAddress:
+      "0xDf68d8781d64bC934C0be4095772eA8b2114FcAa",
+    futureManager: "0x0E37b6c97fB31F0b0Db1d510D59CdCCDe793EB9F",
+    stSLPAddress: "0x20e1d19fE3d89668de946e9fd6e25dcD269aD059",
+    stSEXAddress: "",
+    USDAddress: "0xEE43369197F78CFDF0D8fc48D296964C50AC7B57",
+    UserBalanceImplementationAddress:
+      "0x6F2B6796286B83cA46D4C4F19A3FaE4f58ae11D1",
+    USDCAddress: "0xD33Db7EC50A98164cC865dfaa64666906d79319C",
+    WETHAddress: "",
+    WBTCAddress: "",
+    rWETHAddress: "",
+    LimitOrderImplementationAddress:
+      "0x37116988bCfaD8bc54f671950F2b1561CF030F96",
+    MarketOrderImplementationAddress:
+      "0x6C000776979075DF04C99928FE9Dcf4036B3d942",
+    StopOrderImplementationAddress:
+      "0x92445994ac7F18420819B8230592F5ABa9A24cFd",
+    UpdateCollateralOrderImplementationAddress:
+      "0xA8fc3Dd52532Cc3788c536E7fFB68e83DB9aD006",
+    LongAddress: "0xeD0B0AdB05D35cfe48C1e2a9d68A9f861F64a96c",
+    ShortAddress: "0x46DbD669dB03561C8B921ea0C7EC404941E43101",
+    ExchangeManagerImplementationAddress:
+      "0x8398A6bCe3e8681AdBF532dD339A951315b4BFCE",
+    SwapManagerImplementation: "",
+    LiquidityPoolImplementationAddress:
+      "0x38b0Fef032c4fC0aAF2900Cdd6F83761FA662318",
+    OptionManagerImplementationAddress:
+      "0x3C3Ae736aE9c76307682627B87D8e0A0006F524b",
+    OptionAddress: "0x6ac91C0C5f609c77288C90d20A84Af4e9cc2ba87",
+    SlpTokenAddress: "0x38b0Fef032c4fC0aAF2900Cdd6F83761FA662318",
+    DAIAddress: "",
+    USDTAddress: "",
+    rebateContractAddress: "0x3f34e34F983e4508d8d6412ADAbCcED6d93C4188",
+    SEXAddress: "0x825b4244684d5A07fCeF8124D9B21FD868b39654",
+    SLPAddress: "0x38b0Fef032c4fC0aAF2900Cdd6F83761FA662318",
+    USDCEAddress: "",
+    xHPX: "0x4F2811c7A3Bd088f8A4dEC976dd2960Fd2F30E43",
+    HPXSwap: "0x5Cc24515A769521203aF6E843b7Fb6EFcD4cecFB",
+    HPXRefund: "0x00939a0958596C468f74d66B1fEeE4b3F73F7f6c",
+  },
 };
 
 export default addressMap;

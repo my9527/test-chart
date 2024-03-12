@@ -1,9 +1,10 @@
 
 import { useChainId } from "wagmi";
 import { useMemo } from "react";
-import { tokens } from "../config/tokens";
+import { Token, tokens } from "../config/tokens";
 import { useParams } from "next/navigation";
 import { DEFAULT_TOKEN_SYMBOL } from "../config/common";
+
 
 
 
@@ -49,4 +50,36 @@ export const useTokenByFutureId = (futureId: number | string) => {
     }, [tokens, futureId]);
 
     return token[0];
+}
+
+/**
+ * 交易对map， 直接通过名称获取
+ * @returns 
+ */
+export const useTokensMap = () => {
+    const tokens = useTokens();
+
+    return useMemo(() => {
+        let result: Record<string, Token> = {};
+        for(let i of tokens) {
+            result[i.symbolName] = i;
+        }
+        return result;
+    }, [tokens]);
+}
+
+/**
+ * 根据futureId map
+ * @returns 
+ */
+export const useTokensIdMap = () => {
+    const tokens = useTokens();
+
+    return useMemo(() => {
+        let result: Record<string, Token> = {};
+        for(let i of tokens) {
+            result[i.futureLongId] = i;
+        }
+        return result;
+    }, [tokens]);
 }
