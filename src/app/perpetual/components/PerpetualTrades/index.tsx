@@ -1,7 +1,7 @@
 "use client";
 import styled from "styled-components";
 import DraggableIcon from "../DraggableIcon";
-import { useEffect, useState, useMemo } from "react";
+import { useEffect, useState, useMemo, useCallback } from "react";
 import { ethers } from "ethers";
 import { useRequest } from "ahooks";
 import {
@@ -12,8 +12,9 @@ import BigNumber from "bignumber.js";
 import { filterPrecision, getExponent } from "@/app/utils/tools";
 import dayjs from "dayjs";
 import useGraphqlFetch from "@/app/hooks/useGraphqlFetch";
-import { useTokenByName, useTokens } from "@/app/hooks/useTokens";
-import { useParams } from "next/navigation";
+import { useTokensIdMap } from "@/app/hooks/useTokens";
+import useCurToken from "@/app/perpetual/hooks/useCurToken";
+
 interface TdType {
   width?: string;
   key: string;
@@ -146,14 +147,8 @@ const PerpetualTrades = () => {
     }
   );
 
-  const params = useParams<{ symbol: string }>();
-  const { symbol } = params;
-  const symbolName = useMemo(() => {
-    return symbol.split("USD")[0];
-  }, [symbol]);
-
   //获取当前token
-  const curToken = useTokenByName(symbolName);
+  const { curToken, symbolName } = useCurToken();
   useEffect(() => {
     if (curToken?.symbolName) {
       run({ futureId: curToken?.futureLongId?.toString() });
@@ -170,19 +165,15 @@ const PerpetualTrades = () => {
     [data, activeTab]
   );
 
-  const tokens = useTokens();
-  const getToken = (futureId: string) => {
-    const token =
-      tokens.filter((token_) => token_.futureLongId === +futureId)[0] || {};
-    return token;
-  };
+  const tokens = useTokensIdMap();
+
   const baseColumns: columnsType[] = [
     {
       key: "price",
       label: "Price",
       width: "30%",
       Components: (v: string, item: dataSourceType) => {
-        const token = getToken(item?.futureId);
+        const token = tokens[item?.futureId];
         const _v = BigNumber(ethers?.utils.formatUnits(v, 6)).toFixed(
           token?.displayDecimal || 4,
           BigNumber.ROUND_DOWN
@@ -199,7 +190,7 @@ const PerpetualTrades = () => {
       label: "Size",
       width: "30%",
       Components: (v: string, item: dataSourceType) => {
-        const token = getToken(item?.futureId);
+        const token = tokens[item?.futureId];
 
         return (
           <>
@@ -238,7 +229,7 @@ const PerpetualTrades = () => {
       ];
     }
     return baseColumns;
-  }, [activeTab]);
+  }, [activeTab, baseColumns]);
   return (
     <Wrapper>
       <Tabs>
