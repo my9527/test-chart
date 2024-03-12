@@ -26,7 +26,7 @@ const HeaderItems = [{
 
 const Wrapper = styled(Row)`
     
-    padding: 14px 8px 12px;
+    // padding: 0px 8px;
 
     background: ${(props) => props.theme.colors.fill1};
     color: ${(props) => props.theme.colors.text4};
@@ -35,10 +35,17 @@ const Wrapper = styled(Row)`
     .order-header{
 
         cursor: pointer;
+        color: ${(props) => props.theme.colors.textFAFAFA};
+        font-family: Arial;
+        font-size: ${(props) => props.theme.fontSize.medium};
+        font-style: normal;
+        font-weight: 400;
+        line-height: 100%; /* 14px */
+        padding: 14px 8px 12px;
 
 
         &.active{
-            border-bottom: 2px solid ${(props) => props.theme.colors.primary1}
+            border-bottom: 2px solid ${(props) => props.theme.colors.border1};
             color: ${(props) => props.theme.colors.textFAFAFA}
         }
     }

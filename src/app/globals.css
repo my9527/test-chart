@@ -108,3 +108,7 @@ a {
 .pointer {
   cursor: pointer;
 }
+
+.full {
+  width: 100%;
+}
