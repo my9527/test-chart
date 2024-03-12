@@ -13,7 +13,8 @@ export const overrides = {
     'paneProperties.vertGridProperties.style': 2,
     'paneProperties.horzGridProperties.style': 2,
     "scalesProperties.showSymbolLabels": true,
-    'mainSeriesProperties.showCountdown': true
+    'mainSeriesProperties.showCountdown': true,
+    // "symbolWatermark": "{\"visibility\":true,\"color\":\"rgba(80, 83, 94, 0.25)\"}"
 
     // 'scalesProperties.axisLineToolLabelBackgroundColorCommon': '"#ff0000'
 };

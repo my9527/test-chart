@@ -52,12 +52,7 @@ export const OpenPostionsEffects = memo(() => {
                 return i;
 
                 // const positionReadable = BigNumber(i?.tokenSize || '0').multipliedBy(par).toString();
-            })
-            
-            ;
-
-
-            console.log("updatePositionList 1111:", user_, result.length);
+            });
 
             updatePositionList(result);
         }

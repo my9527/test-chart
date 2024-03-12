@@ -11,5 +11,5 @@ const Wrapper = styled(Row)`
 
 export const BaseListHeader: FC = () => {
 
-    return ();
+    return <div>123123</div>;
 }

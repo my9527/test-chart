@@ -73,7 +73,6 @@ export const CmptMarketSocket: FC = memo(() => {
     const handleCurSymbolIndexPrice = useCallback(( evt: Event & { data: string } ) => {
         const data = JSON.parse(evt?.data);
         if(data.type === SOCKET_MSG_TYPE.MARKET_INDEX_PRICE && data.symbol === routeParams.symbol) {
-            console.log("MARKET_INDEX_PRICE");
             // updateMarkets(data.data);
             // 此处不用reduce， 减少性能消耗，直接for 循环
             // const result = data?.data.

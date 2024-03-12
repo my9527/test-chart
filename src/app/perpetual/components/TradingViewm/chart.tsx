@@ -79,10 +79,7 @@ export const CmptTradingView: FCC<{
 
     const initChart = useCallback((_symbol: string) => {
 
-        const symbols = (tokens[chainId] || []).reduce((result, token) => {
-
-            console.log("token111:", token.displayDecimal);
-            
+        const symbols = (tokens[chainId] || []).reduce((result, token) => {            
 
             return {
                 ...result,
@@ -118,18 +115,18 @@ export const CmptTradingView: FCC<{
             // settings_overrides: {
             //     symbolWatermark: "{\"visibility\":true,\"color\":\"rgba(80, 83, 94, 0.25)\"}"
             // },
-            settings_adapter: {
+            // settings_adapter: {
 
-                initialSettings: {
-                    symbolWatermark: "{\"visibility\":true,\"color\":\"rgba(80, 83, 94, 0.25)\"}"
-                },
-                setValue(key, value) {
-                    localStorage.setItem(`tradingview.${key}`, value);
-                },
-                removeValue(key) {
-                    localStorage.removeItem(`tradingview.${key}`);
-                },
-            },
+            //     initialSettings: {
+            //         symbolWatermark: "{\"visibility\":true,\"color\":\"rgba(80, 83, 94, 0.25)\"}"
+            //     },
+            //     setValue(key, value) {
+            //         localStorage.setItem(`tradingview.${key}`, value);
+            //     },
+            //     removeValue(key) {
+            //         localStorage.removeItem(`tradingview.${key}`);
+            //     },
+            // },
             
             favorites: {
                 intervals: ["1", "15", "30", "60", "120", "4h", "1D"] as ResolutionString[],
@@ -159,8 +156,11 @@ export const CmptTradingView: FCC<{
         });
 
         _widget.current.onChartReady(() => {
-            const priceScale = (_widget.current as IChartingLibraryWidget).activeChart().getPanes()[0].getMainSourcePriceScale();
-            priceScale?.setAutoScale(true);
+            _widget.current?.applyOverrides({
+                symbolWatermark: "{\"visibility\":true,\"color\":\"rgba(80, 83, 94, 0.25)\"}"
+            });
+            // const priceScale = (_widget.current as IChartingLibraryWidget).activeChart().getPanes()[0].getMainSourcePriceScale();
+            // priceScale?.setAutoScale(true);
         });
     }, []);
 

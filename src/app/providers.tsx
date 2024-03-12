@@ -15,9 +15,6 @@ type ProvidersProps = {};
 
 export const Providers: FCC<ProvidersProps> = (props) => {
 
-  useLayoutEffect(() => {
-    console.log("asdfasdfas 11111");
-  }, []);
   return (
     <RecoilRoot>
       <RainbowProvider>
