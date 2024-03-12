@@ -22,7 +22,8 @@ const Trades = styled.div`
   gap: 20px;
   height: 100%;
 `;
-const Trade = styled.div<{ change: string }>`
+type TradeProps = { change: string };
+const Trade = styled.div<TradeProps>`
   display: flex;
   align-items: center;
   gap: 20px;

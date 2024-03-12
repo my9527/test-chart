@@ -4,7 +4,8 @@ import { useRecoilValue } from "recoil";
 import { recoilIndexPrices } from "@/app/models";
 import { filterPrecision } from "@/app/utils/tools";
 
-const Wrapper = styled.div<{ change: string }>`
+type WrapperProps = { change: string };
+const Wrapper = styled.div<WrapperProps>`
   color: ${(props) =>
     +props.change > 0
       ? props.theme.colors.text2
@@ -27,7 +28,7 @@ const Wrapper = styled.div<{ change: string }>`
 const ChangPrice: React.FC<{ symbolName: string }> = ({ symbolName }) => {
   const indexPrices = useRecoilValue(recoilIndexPrices);
   const change = indexPrices[symbolName]?.change;
-  
+
   return (
     <Wrapper change={change}>
       <p className="price">{indexPrices[symbolName]?.price || "-"}</p>
