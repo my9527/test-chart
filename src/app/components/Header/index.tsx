@@ -1,9 +1,10 @@
 "use client";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import styled from "styled-components";
 import LogoIcon from "@/app/assets/header/logo.svg";
 import Image from "next/image";
 import Menu from "./Menu";
+import Wallet from "./Wallet";
 
 const Wrapper = styled.div`
   background: ${(props) => props.theme.colors.fill1};
@@ -12,6 +13,7 @@ const Wrapper = styled.div`
   display: flex;
   align-items: center;
   border-bottom: ${props=>`2px solid ${props.theme.colors.border1}`};
+  justify-content: space-between;
 `;
 const Left = styled.div`
   display: flex;
@@ -31,6 +33,8 @@ const Right = styled.div`
   padding-right: 15px;
 `;
 const Header = () => {
+  const [visible, setVisible] = useState(false)
+
   return (
     <Wrapper>
       <Left>
@@ -38,6 +42,8 @@ const Header = () => {
         <Line />
         <Menu />
       </Left>
+      <button onClick={() => setVisible(true)}>connect</button>
+      <Wallet visible={visible} onHide={() => setVisible(false)} />
     </Wrapper>
   );
 };

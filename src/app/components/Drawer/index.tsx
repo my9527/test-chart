@@ -14,7 +14,7 @@ const Wrapper = styled(motion.div)`
   position: fixed;
   height: 100%;
   border-radius: 8px;
-  background: #1B1B21;
+  background-color: ${(props) => props.theme.colors.fill2};
   color: #fff;
   padding: 0 10px;
   z-index: 1000;
