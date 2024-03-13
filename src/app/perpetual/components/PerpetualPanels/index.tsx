@@ -4,7 +4,7 @@ import DraggableIcon from "../DraggableIcon";
 import { useState } from "react";
 import Tabs from "../Tabs";
 import { tabProps } from "../Tabs";
-
+import Slider from "../Slider";
 const Wrapper = styled.div`
   position: relative;
   width: 100%;
@@ -43,6 +43,7 @@ const Content = styled.div`
 `;
 
 const OrderTypeTabs = styled(Tabs)`
+  margin-bottom: 15px;
   padding: 10px 0 5px 0;
   .tab {
     padding: 0px 8px 5px 0px;
@@ -78,6 +79,35 @@ const PerpetualPanels = () => {
           handleClick={(item: tabProps) => {
             setActiveOrderTab(item?.key);
           }}
+        />
+        <Slider
+          value={40}
+          marks={[
+            {
+              label: "1X",
+              value: 1,
+            },
+            {
+              label: "25X",
+              value: 25,
+            },
+            {
+              label: "50X",
+              value: 50,
+            },
+
+            {
+              label: "75X",
+              value: 75,
+            },
+            {
+              label: "100X",
+              value: 100,
+            },
+          ]}
+          min={1}
+          max={100}
+          step={25}
         />
       </Content>
       <DraggableIcon />
