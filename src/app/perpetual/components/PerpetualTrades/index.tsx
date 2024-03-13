@@ -1,7 +1,7 @@
 "use client";
 import styled from "styled-components";
 import DraggableIcon from "../DraggableIcon";
-import { useEffect, useState, useMemo, useCallback, useRef } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { ethers } from "ethers";
 import { useRequest } from "ahooks";
 import {
@@ -40,48 +40,7 @@ const Wrapper = styled.div`
     background: #292929;
   }
 `;
-// type tabProps = {
-//   label: string;
-//   key: number;
-//   value: string | number;
-// };
-// const Tabs = styled.div<tabsProps>`
-//   display: flex;
-//   align-items: center;
-//   border-bottom: ${(props) => `1px solid ${props.theme.colors.border1}`};
-//   position: relative;
-//   gap: 20px;
-//   &::before {
-//     width: ${(props) => {
-//       return props?.width + "px";
-//     }};
-//     height: 2px;
-//     background-color: ${(props) => props.theme.colors.primary1};
-//     content: "";
-//     position: absolute;
-//     bottom: -1px;
-//     transition: all 0.3s linear;
-//     left: ${(props) => {
-//       console.log("left", props?.left);
-//       return props?.left + "px";
-//     }};
-//   }
-//   .tab {
-//     color: ${(props) => props.theme.colors.text4};
-//     font-family: Arial;
-//     font-size: ${(props) => props.theme.fontSize.medium};
-//     font-style: normal;
-//     font-weight: 400;
-//     line-height: 100%;
-//     position: relative;
-//     padding: 15px 7px;
-//     cursor: pointer;
-//     transition: all 0.3s linear;
-//   }
-//   .active_tab {
-//     color: ${(props) => props.theme.colors.primary1};
-//   }
-// `;
+
 const Table = styled.div`
   height: calc(100% - 45px);
   min-width: 350px;
@@ -247,19 +206,10 @@ const PerpetualTrades = () => {
     return baseColumns;
   }, [activeTab, baseColumns]);
 
-  const tabRefs = useRef<[HTMLDivElement | null]>([null]);
   const tabList = [
     { label: "Last Trades", key: 0, value: 0 },
     { label: "All Trades", key: 1, value: 1 },
   ];
-
-  const left = useMemo(() => {
-    let width = 0;
-    for (let i = 0; i < activeTab; i++) {
-      width += (tabRefs?.current[i]?.clientWidth || 0) + 20;
-    }
-    return width;
-  }, [tabRefs, activeTab]);
 
   return (
     <Wrapper>
