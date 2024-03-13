@@ -27,7 +27,6 @@ const TabsWrapper = styled.div<tabsProps>`
     bottom: -1px;
     transition: all 0.3s linear;
     left: ${(props) => {
-      console.log("left", props?.left);
       return props?.left + "px";
     }};
   }

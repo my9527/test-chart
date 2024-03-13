@@ -149,13 +149,7 @@ const NetworkStatus = () => {
       const deltaBlock = BigNumber(data?.toString() || 0).minus(
         _meta?.block.number
       );
-      console.log(
-        "blockin",
-        data,
-        deltaBlock,
-        deltaBlock.lt(30),
-        BigNumber(0).lt(30)
-      );
+     
       let _status = NetworkStatusMap.OFFLINE;
       if (deltaBlock.lt(30)) {
         _status = NetworkStatusMap.FINE;
