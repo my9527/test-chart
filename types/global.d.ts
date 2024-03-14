@@ -24,6 +24,8 @@ declare global {
 
     type Addr = Address | undefined
 
+    type StringNum = number | string
+
 
     interface Window {
         ethereum: any;

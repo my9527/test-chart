@@ -293,6 +293,8 @@ export const OpenInterestsEffects: FC = memo(() => {
                 };
             });
 
+            console.log("borrowingFees:", borrowingFees, borrowingFeeResults);
+
             const currentTokenAvailableLiq = {
                 long: availableLiqResults?.[0]?.result?.toString(),
                 short: availableLiqResults?.[1]?.result?.toString(),

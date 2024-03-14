@@ -45,7 +45,7 @@ export const recoilFavoriateList = atom<ITokenList>({
 
 
 
-type PositionType = {
+export type PositionType = {
   futureId: string | number;
   id: string;
   collateral: string;
@@ -54,12 +54,21 @@ type PositionType = {
   openCost: string | number;
   tokenSize: string;
   user: Address;
+  isLong: boolean;
+  entryPriceReadable: string;
+  collateralReadable: string;
+  cumulativeFundingFeeReadable: string;
+  cumulativeBorrowingFeeReadable: string;
+  entryFundingFeePerTokenReadable: string;
+  entryBorrowingFeePerTokenReadable: string;
+  cumulativeTeamFeeReadable: string;
 }
 
 
 /**
  * open position list
  */
+
 export const recoilPositions = atom<PositionType[]>({
   key: 'open_positions',
   default: [],
@@ -89,10 +98,28 @@ export const recoilExecutionFee = atom<string | BigNumber | number>({
 });
 
 
+// openInterests,
+//                 globalUsdValues,
+//                 fundingFees,
+//                 borrowingFees,
+//                 currentTokenAvailableLiq,
 
-export const recoilOpenInterests = atom({
+export type OpenInterestsType = {
+  fundingFees: any;
+  globalUsdValues: any;
+  openInterests: any;
+  borrowingFees: any;
+  currentTokenAvailableLiq: any;
+
+}
+
+export const recoilOpenInterests = atom<OpenInterestsType>({
   key: 'open_interests',
   default: {
-
+        openInterests: [],
+        globalUsdValues: [],
+        fundingFees: [],
+        borrowingFees: [],
+        currentTokenAvailableLiq: [],
   }
 })

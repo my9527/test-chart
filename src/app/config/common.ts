@@ -37,3 +37,10 @@ export enum FutureType {
 }
 
 
+// default remain Collateral ratio
+export const DefaultRemainCollateralRatio = 0.5 / 100;
+
+
+
+// default tradingFeeRatio
+export const  BasicTradingFeeRatio = 0.08;

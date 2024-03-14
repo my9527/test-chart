@@ -3,12 +3,17 @@ import { Row } from "@/app/components/Row";
 import { TokenById } from "@/app/components/Token";
 import { useIndexPricesById } from "@/app/hooks/useIndexPrices";
 import { useTokenByFutureId } from "@/app/hooks/useTokens";
-import { recoilPositions } from "@/app/models";
+import { PositionType, recoilPositions } from "@/app/models";
 import { filterPrecision } from "@/app/utils/tools";
 import BigNumber from "bignumber.js";
-import { ThHTMLAttributes } from "react";
+import { ThHTMLAttributes, useMemo } from "react";
 import { useRecoilValue } from "recoil";
 import styled from "styled-components";
+import { getLiqPrice } from "../../lib/getLiqPrice";
+import { useFundingFeeByAddressSide } from "../../hooks/useFundingFee";
+import { FutureType } from "@/app/config/common";
+import { useBorrowingFeeByAddressSide } from "../../hooks/useBorrowingFee";
+import { calcPnl, calcPnlPercentage } from "../../lib/getPnl";
 
 
 
@@ -137,14 +142,104 @@ const PositionItemWrapper = styled.tr`
         font-weight: 400;
         line-height: 120%; /* 14.4px */
     }
+
+    .pos-long {
+        color: ${(props) => props.theme.colors.text5};
+    }
+
+    .pos-short {
+        color: ${(props) => props.theme.colors.text2};
+    }
+
+    .pnl-col {
+        font-family: Arial;
+        font-size: ${(props) => props.theme.fontSize.medium};
+        font-style: normal;
+        font-weight: 400;
+        line-height: 100%; /* 14px */
+    }
+
+    .pnl-profit{
+        color: ${(props) => props.theme.colors.text5};
+    }
+    .pnl-loss{
+        color: ${(props) => props.theme.colors.text2};
+    }
+
+    .margin-col{
+        color: ${(props) => props.theme.colors.text3};
+        font-family: Arial;
+        font-size: ${(props) => props.theme.fontSize.medium};
+        font-style: normal;
+        font-weight: 400;
+        line-height: 100%; /* 14px */
+    }
 `
 
-const Position: FCC<{ pos: any }> = ({ pos }) => {
+const Position: FCC<{ pos: PositionType }> = ({ pos }) => {
 
     const token = useTokenByFutureId(pos.futureId);
 
     const indexPrices = useIndexPricesById(pos.futureId);
 
+    const fundingFee = useFundingFeeByAddressSide(token.address as string, pos.isLong ? FutureType.LONG : FutureType.SHORT);
+
+    const borrowingFee = useBorrowingFeeByAddressSide(token.address as string, pos.isLong ? FutureType.LONG : FutureType.SHORT);
+
+    // const fundingFee = 
+
+    const fundingfeeReadable = BigNumber(pos.tokenSize)
+      .multipliedBy(BigNumber((fundingFee?.fee || '0') / 1e6).minus(pos.entryFundingFeePerTokenReadable))
+      .plus(pos.cumulativeFundingFeeReadable)
+      .multipliedBy(-1)
+      .toString();
+    // tokensize*（BorrowingFeePerToken-entryBorrowingFeePerToken）+ cumulativeBorrowingFee
+    const borrowingfeeReadable = BigNumber(pos.tokenSize)
+      .multipliedBy(BigNumber((borrowingFee?.fee || '0') / 1e6).minus(pos.entryBorrowingFeePerTokenReadable))
+      .plus(pos.cumulativeBorrowingFeeReadable)
+      .multipliedBy(-1)
+      .toString();
+
+    const openingfeeReadable = BigNumber(pos.cumulativeTeamFeeReadable).multipliedBy(-1).toString();
+
+    const feesReadable = BigNumber(fundingfeeReadable).plus(borrowingfeeReadable).plus(openingfeeReadable).toString();
+
+    
+
+    const liqPrice = useMemo(() => {
+
+        // console.log("liqPrice", pos.collateral, feesReadable, pos.entryPriceReadable, pos.tokenSize, pos.isLong, token)
+
+        return getLiqPrice({
+            collateral: pos.collateralReadable,
+            fees: feesReadable,
+            entryPrice: pos.entryPriceReadable,
+            size: pos.tokenSize,
+            isLong: pos.isLong,
+            token: token,
+        })
+    }, [feesReadable, pos.collateral, pos.entryPriceReadable, pos.tokenSize, pos.isLong, token]);
+
+    const tickPrice = useIndexPricesById(pos.futureId);
+
+    const pnl = useMemo(() => {
+        return calcPnl({
+            isLong: pos.isLong,
+            entryPrice: pos.entryPriceReadable,
+            tickPrice: tickPrice?.price,
+            size: pos.tokenSize,
+            pars: token.pars
+        });
+    }, [pos.entryPriceReadable, pos.tokenSize, tickPrice?.price, pos.isLong, token.pars]);
+
+    const pnlPercent = useMemo(() => {
+        return calcPnlPercentage({ pnl, collateral: pos.collateralReadable })
+    }, [pnl, pos.collateralReadable]);
+
+    const hasProfit = useMemo(() => {
+        return BigNumber(pnl).lt(0) ? false : true
+    }, [pnl]);
+    
     return (
         <PositionItemWrapper>
             <td align="left" width={140}>
@@ -154,7 +249,9 @@ const Position: FCC<{ pos: any }> = ({ pos }) => {
                 </Col>
             </td>
             <td {...PositionTdAttrs} width={140}>
-                {pos.tokenSize}
+                <div className={`pos-dir ${pos.isLong ? 'pos-long' : 'pos-short'}`}>
+                    {pos.tokenSize}
+                </div>
             </td>
             <td {...PositionTdAttrs} width={140}>
                 {filterPrecision(indexPrices?.price, token.displayDecimal)}
@@ -163,17 +260,18 @@ const Position: FCC<{ pos: any }> = ({ pos }) => {
                 {filterPrecision(pos.entryPriceReadable, token.displayDecimal)}
             </td>
             <td {...PositionTdAttrs} width={140}>
-                Unreallzed pnl {pos.id}
+                <Col gap="6px" className={hasProfit ? 'pnl-profit' : 'pnl-loss'} align="flex-start">
+                    <div>${filterPrecision(pnl, 2)}</div>
+                    <div>{pnlPercent}%</div>
+                </Col>
             </td>
             <td {...PositionTdAttrs} width={140}>
-                ${filterPrecision(pos.collateralReadable, 2)}
+                <div className="margin-col">
+                    ${filterPrecision(pos.collateralReadable, 2)}
+                </div>
             </td>
             <td {...PositionTdAttrs} width={140}>
-                {/* {filterPrecision(
-                    originLiqPrice,
-                    token.displayDecimal,
-                    pos?.isLong ? BigNumber.ROUND_CEIL : BigNumber.ROUND_DOWN,
-                  )} */}
+                {filterPrecision(liqPrice, token.displayDecimal, pos?.isLong ? BigNumber.ROUND_CEIL : BigNumber.ROUND_DOWN)}
             </td>
             <td {...PositionTdAttrs} width={140}>
                 <div>button +</div>
