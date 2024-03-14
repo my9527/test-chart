@@ -1,5 +1,7 @@
 import { AtomEffect, DefaultValue, atom } from "recoil";
 import { Token } from "../config/tokens";
+import { Address } from "viem";
+import BigNumber from "bignumber.js";
 
 export const localStorageEffect: <T>(key: string) => AtomEffect<T> =
   (key: string) =>
@@ -42,10 +44,23 @@ export const recoilFavoriateList = atom<ITokenList>({
 });
 
 
+
+type PositionType = {
+  futureId: string | number;
+  id: string;
+  collateral: string;
+  future: string; // future address
+  maxProfitRatio: string | number;
+  openCost: string | number;
+  tokenSize: string;
+  user: Address;
+}
+
+
 /**
  * open position list
  */
-export const recoilPositions = atom<any>({
+export const recoilPositions = atom<PositionType[]>({
   key: 'open_positions',
   default: [],
 });
@@ -63,4 +78,21 @@ export const recoilIndexPrices = atom<Record<string, any>>({
 export const recoilCurrentToken = atom<Token | null>({
   key: 'current_token',
   default: null, // use default token;
+})
+
+
+
+// 交易执行的 exeution fee
+export const recoilExecutionFee = atom<string | BigNumber | number>({
+  key: 'execution_fee',
+  default: 2000000, //
+});
+
+
+
+export const recoilOpenInterests = atom({
+  key: 'open_interests',
+  default: {
+
+  }
 })

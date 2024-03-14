@@ -141,8 +141,6 @@ const PositionItemWrapper = styled.tr`
 
 const Position: FCC<{ pos: any }> = ({ pos }) => {
 
-    console.log("pos--->", pos);
-
     const token = useTokenByFutureId(pos.futureId);
 
     const indexPrices = useIndexPricesById(pos.futureId);
@@ -165,7 +163,7 @@ const Position: FCC<{ pos: any }> = ({ pos }) => {
                 {filterPrecision(pos.entryPriceReadable, token.displayDecimal)}
             </td>
             <td {...PositionTdAttrs} width={140}>
-                Unreallzed pnl
+                Unreallzed pnl {pos.id}
             </td>
             <td {...PositionTdAttrs} width={140}>
                 ${filterPrecision(pos.collateralReadable, 2)}
@@ -206,7 +204,7 @@ export const PositionList = () => {
                         <tr>
                             {Headers.map(h => {
                                 return (
-                                    <th align={h.align ?? 'center'} className="thead-td">
+                                    <th key={h.key} align={h.align ?? 'center'} className="thead-td">
                                         <div className="header">
                                             {h.title}
                                         </div>

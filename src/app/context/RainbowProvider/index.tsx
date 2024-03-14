@@ -27,7 +27,7 @@ import {
 
 const { wallets } = getDefaultWallets();
 
-const config =getDefaultConfig({
+const config = getDefaultConfig({
   appName: 'nextjs-quenta',
   projectId: '8335051b217e5d8cbd9ecdcabdd0ebd2',
   wallets: [

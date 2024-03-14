@@ -31,4 +31,9 @@ export const NUMBER_READABLE_DECIMAL = 1e6;
 
 
 
+export enum FutureType {
+  LONG = 0,
+  SHORT = 1
+}
+
 
