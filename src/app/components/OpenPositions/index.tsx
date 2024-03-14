@@ -34,7 +34,6 @@ export const OpenPostionsEffects = memo(() => {
 
             const data = await getFuturesPositions({address: user_});
 
-
             if(!data) {
                 updatePositionList([]);
                 return ;
@@ -58,7 +57,6 @@ export const OpenPostionsEffects = memo(() => {
                 const maxProfitReadable = BigNumber(collateralReadable).multipliedBy(i.maxProfitRatio).toFixed(6, BigNumber.ROUND_DOWN);
 
                 const isLong = i.future.toLowerCase() === appConfig.contract_address.LongAddress.toLowerCase();
-            
 
                 return {
                     ...i,
@@ -83,7 +81,7 @@ export const OpenPostionsEffects = memo(() => {
 
         return _run();
 
-    }, [address, tokens, appConfig.contract_address.LongAddress]);
+    }, [tokens, appConfig.contract_address.LongAddress]);
 
 
     // fetch graqhql
@@ -91,13 +89,14 @@ export const OpenPostionsEffects = memo(() => {
         manual: true,
         pollingInterval: 15000,
         // defaultParams: [address],
-        refreshDeps: [address, queryPositions],
+        refreshDeps: [queryPositions],
     });
 
     // 地址变更之后重新获取数据
     useEffect(() => {
-
-        run(address);
+        if(address) {
+            run(address);
+        }
 
     }, [address]);
 

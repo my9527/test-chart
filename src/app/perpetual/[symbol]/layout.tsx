@@ -3,6 +3,7 @@ import Footer from "../components/Footer";
 import styled from "styled-components";
 
 import { CmptMarketSocket } from "../components/SocketMarket";
+import { OpenInterestsEffects } from "../components/OpenInterestsEffects";
 
 const Wrapper = styled.div`
   height: calc(100vh - 50px);
@@ -38,6 +39,7 @@ const PerpetualLayout = ({ children }: { children: React.ReactNode }) => {
   return (
     <Wrapper>
       <CmptMarketSocket />
+      <OpenInterestsEffects />
       <Content>{children}</Content>
       <Footer />
     </Wrapper>

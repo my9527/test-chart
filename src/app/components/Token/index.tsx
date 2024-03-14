@@ -5,8 +5,6 @@ import { memo } from "react";
 
 export const TokenById:FCC<{ futureId: number|string }> = memo(({ futureId }) => {
 
-    console.log("futureId", futureId);
-
     const token = useTokenByFutureId(futureId);
 
     return <>

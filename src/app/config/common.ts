@@ -31,4 +31,16 @@ export const NUMBER_READABLE_DECIMAL = 1e6;
 
 
 
+export enum FutureType {
+  LONG = 0,
+  SHORT = 1
+}
 
+
+// default remain Collateral ratio
+export const DefaultRemainCollateralRatio = 0.5 / 100;
+
+
+
+// default tradingFeeRatio
+export const  BasicTradingFeeRatio = 0.08;

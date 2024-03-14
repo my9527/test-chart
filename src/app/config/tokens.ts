@@ -1,4 +1,5 @@
-import { CHAINS_ID } from "./common";
+import BigNumber from "bignumber.js";
+import { BasicTradingFeeRatio, CHAINS_ID } from "./common";
 
 
 
@@ -12,6 +13,7 @@ export type Token = {
     pars: number;
     displayDecimal: number;
     maxProfitRatio: number;
+    minLeverage?: number;
     maxLeverage: number;
     borrowingFeeRatio: number;
     maintainMarginRatio: number;
@@ -25,13 +27,68 @@ export type Token = {
     needCalPriceImpactByUni?: boolean;
     address?: string;
     tradingFeeRatio?: number | string;
+    contractSize?: number;
+    minimalOpenSize?: number;
+    
+    perpConfig?: {
+      longToken: string;
+      shortToken: string;
+      minimalOpenSize:  string;
+      priceTickSize: number | string;
+      contractSize: number | string;
+      leverage: string;
+    }
+}
+
+
+const extendToken = (token_: Token): Token => {
+
+  const {
+    tradingFeeRatio = BasicTradingFeeRatio,
+    borrowingFeeRatio = 0, // 0%
+    fundingFeeRatio = 0.025, // 0.025% 12.7 废弃
+    maintainMarginRatio,
+    contractSize = 1,
+    minimalOpenSize = 10,
+    fundingFeeBaseRate = 0.0008,
+    fundingFeeLinearRate = 0.08,
+    maxliquidityLockRatio = 0.3, // 30%
+    pars,
+    priceTickSize,
+    minLeverage = 1,
+    maxLeverage = 100,
+
+  } = token_;
+
+
+  return {
+    ...token_,
+    tradingFeeRatio,
+    borrowingFeeRatio,
+    fundingFeeRatio,
+    maintainMarginRatio,
+    contractSize: pars || contractSize,
+    minimalOpenSize,
+    fundingFeeBaseRate,
+    fundingFeeLinearRate,
+    maxliquidityLockRatio,
+    perpConfig: {
+      longToken: 'USDX',
+      shortToken: 'USDX',
+      minimalOpenSize: `${minimalOpenSize}USDX`,
+      priceTickSize: priceTickSize || '0.001',
+      contractSize: pars || contractSize,
+      leverage: `${minLeverage}-${maxLeverage}x`,
+    },
+  }
 }
 
 
 
 
 
-export const tokens: Record<string, Token[]> = {
+// 基础配置，不直接使用
+const baseTokens: Record<string, Token[]> = {
     [CHAINS_ID.zkfair]: [
         {
           "symbolName": "AAVE",
@@ -3328,6 +3385,13 @@ export const tokens: Record<string, Token[]> = {
         maxliquidityLockRatio: 0.2,
     }],
 };
+
+export const tokens: Record<string, Token[]> = Object.keys(baseTokens).reduce((result, cur) => {
+  return {
+    ...result,
+    [cur]: baseTokens[cur].map(tk =>  extendToken(tk))
+  }
+}, {});
 
 // 获取整个token相关的map
 export const tokensMap: Record<string, Record<string, Token>> = Object.keys(tokens).reduce((result, curChain)=> {

@@ -27,7 +27,7 @@ export type AppConfigType = {
   };
 
     executionFee: string | number | BigNumber;
-    contract_address: AnyObjec;
+    contract_address: typeof addressMap[CHAINS_ID.zkfair];
 
 }
 
