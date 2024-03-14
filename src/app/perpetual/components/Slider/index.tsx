@@ -57,6 +57,24 @@ const CurDot = styled(Dot)<PercentProps>`
       return "translate(50%,-50%)";
     }
   }};
+  .value {
+    color: ${(props) => props.theme.colors.text1};
+    font-family: Arial;
+    font-size: ${(props) => props.theme.fontSize.min};
+    font-style: normal;
+    font-weight: 400;
+    line-height: 120%;
+    position: relative;
+    transform: ${(props) => {
+      if (props?.percent === 0) {
+        return "translate(0, -100%)";
+      } else if (props?.percent === 1) {
+        return "translate(-100%,-100%)";
+      } else {
+        return "translate(-100%,-100%)";
+      }
+    }};
+  }
 `;
 
 const SelectedDot = styled(Dot)`
@@ -123,6 +141,7 @@ const Slider: React.FC<SliderProps> = ({
   max = 100,
   step = 1,
   value = 0,
+  unit,
 }) => {
   const [selectedValue, setSelectedValue] = useState(0);
   const trackRef = useRef<HTMLDivElement | null>(null);
@@ -141,6 +160,7 @@ const Slider: React.FC<SliderProps> = ({
   }, [trackRef?.current]);
 
   const handleDotClick = (left: number) => {
+    console.log("left", left);
     setPercent(left);
   };
   const [startX, setStartX] = useState(0);
@@ -194,7 +214,12 @@ const Slider: React.FC<SliderProps> = ({
             setIsDragging(true);
             setStartX(e.clientX);
           }}
-        />
+        >
+          <p className="value">
+            {(percent * 100 + "").split(".")[0]}
+            {unit}
+          </p>
+        </CurDot>
       </SliderThumb>
       <Marks>
         {marks.map((i, index) => {

@@ -191,30 +191,31 @@ const PerpetualPanels = () => {
           value={40}
           marks={[
             {
-              label: "1X",
+              label: "",
               value: 1,
             },
             {
-              label: "25X",
+              label: "",
               value: 25,
             },
             {
-              label: "50X",
+              label: "",
               value: 50,
             },
 
             {
-              label: "75X",
+              label: "",
               value: 75,
             },
             {
-              label: "100X",
+              label: "",
               value: 100,
             },
           ]}
           min={1}
           max={100}
           step={25}
+          unit='%'
         />
       </Content>
       <DraggableIcon />
