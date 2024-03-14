@@ -1,5 +1,5 @@
 "use client";
-import { useMemo } from "react";
+import React, { useMemo } from "react";
 import styled from "styled-components";
 import { useEffect, useState, useRef } from "react";
 const Wrapper = styled.div`
@@ -13,19 +13,22 @@ const Track = styled.div`
   cursor: pointer;
   height: 2px;
 `;
-type SliderThumbProps = {
-  width: number;
+type PercentProps = {
+  percent: number;
 };
-const SliderThumb = styled.div<SliderThumbProps>`
+const SliderThumb = styled.div<PercentProps>`
+  transition: all 0.3s linear;
   height: 2px;
   background: ${(props) => props.theme.colors.primary1};
-  width: ${(props) => props?.width * 100 + "%"};
   display: flex;
   align-items: center;
-  z-index: 5;
   position: absolute;
   top: 0;
   left: 0;
+  right: ${(props) => {
+    return (1 - props?.percent) * 100 + "%";
+  }};
+  cursor: pointer;
 `;
 const Dot = styled.div`
   width: 8px;
@@ -36,29 +39,29 @@ const Dot = styled.div`
   flex-shrink: 0;
   cursor: pointer;
 `;
-const BaseDot = styled(Dot)`
-  position: absolute;
-  top: 50%;
-
-  transform: translateX(-50%) translateY(-50%);
-`;
-const CurDot = styled(BaseDot)`
+const CurDot = styled(Dot)<PercentProps>`
+  transition: all 0.3s linear;
   width: 10px;
   height: 10px;
   border: ${(props) => `2px solid ${props.theme.colors.primary1}`};
-  left: 100%;
-  transform: translateX(-100%) translateY(-50%);
-  cursor: grab;
-`;
-const SelectedDot = styled(BaseDot)<LeftProps>`
-  border: ${(props) => `1px solid ${props.theme.colors.primary1}`};
-  left: ${(props) => {
-    console.log("left", props?.left);
-    return props?.left * 100 + "%";
+  position: absolute;
+  top: 50%;
+  z-index: 6;
+  right: 0;
+  transform: ${(props) => {
+    if (props?.percent === 0) {
+      return "translate(100%,-50%)";
+    } else if (props?.percent === 1) {
+      return "translate(0,-50%)";
+    } else {
+      return "translate(50%,-50%)";
+    }
   }};
-  &:first-of-type {
-    transform: translateX(0) translateY(-50%);
-  }
+`;
+
+const SelectedDot = styled(Dot)`
+  border: ${(props) => `1px solid ${props.theme.colors.primary1}`};
+  transform: translateX(0) translateY(0);
 `;
 const Marks = styled.div`
   width: 100%;
@@ -70,10 +73,8 @@ const Marks = styled.div`
   left: 0;
   right: 0;
 `;
-type LeftProps = {
-  left: number;
-};
-const Mark = styled.div<LeftProps>`
+const Mark = styled.div<PercentProps>`
+  transition: all 0.3s linear;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -81,8 +82,7 @@ const Mark = styled.div<LeftProps>`
   top: 0;
   bottom: 0;
   left: ${(props) => {
-    
-    return props?.left * 100 + "%";
+    return props?.percent * 100 + "%";
   }};
   transform: translateX(-50%);
   .label {
@@ -93,6 +93,7 @@ const Mark = styled.div<LeftProps>`
     font-weight: 400;
     line-height: 100%;
     margin-top: 10px;
+    cursor: pointer;
   }
   &:first-of-type {
     align-items: flex-start;
@@ -123,48 +124,91 @@ const Slider: React.FC<SliderProps> = ({
   step = 1,
   value = 0,
 }) => {
-  const [selectedValue, setSelectedValue] = useState(value);
+  const [selectedValue, setSelectedValue] = useState(0);
   const trackRef = useRef<HTMLDivElement | null>(null);
+  const [percent, setPercent] = useState<number>(0);
+  const [isDragging, setIsDragging] = useState(false);
+  useEffect(() => {
+    setPercent(value / (max - min));
+  }, [value, min, max]);
 
-  const list = useMemo(() => {
-    const num = Math.ceil(value / step) + 1;
+  const trackWidth = useMemo(() => {
+    return trackRef?.current?.clientWidth || 0;
+  }, [trackRef?.current]);
 
-    return Array.from({ length: num });
-  }, [selectedValue, min, max]);
+  const zeroX = useMemo(() => {
+    return trackRef?.current?.getClientRects()[0].x || 0;
+  }, [trackRef?.current]);
+
+  const handleDotClick = (left: number) => {
+    setPercent(left);
+  };
+  const [startX, setStartX] = useState(0);
+
+  useEffect(() => {
+    if (startX) {
+      const distanceX = startX - zeroX;
+      setPercent((distanceX - 5) / trackWidth);
+    }
+  }, [startX, zeroX]);
+
+  const handleMouseMove = (e: MouseEvent) => {
+    if (isDragging) {
+      setStartX(e.clientX);
+    }
+  };
+  const handleMouseUp = (e: MouseEvent) => {
+    setIsDragging(false);
+    setStartX(e.clientX);
+  };
+
+  useEffect(() => {
+    if (isDragging) {
+      window.onmousemove = (e) => {
+        handleMouseMove(e);
+      };
+      window.onmouseup = (e) => handleMouseUp(e);
+    } else {
+      window.onmousemove = null;
+      window.onmouseup = null;
+    }
+  }, [isDragging]);
 
   return (
-    <Wrapper
-    //   onMouseDown={(e) => {
-    //     console.log("onMouseDown=", e.clientX);
-    //   }}
-    >
+    <Wrapper>
       <Track
         ref={trackRef}
         onClick={(e) => {
-          console.log("Trackclick", e.clientX, trackRef?.current?.getClientRects());
-          //   setSelectedValue();
+          setPercent((e.clientX - zeroX + 5) / trackWidth);
         }}
       />
       <SliderThumb
-        width={value / (max - min)}
+        percent={percent < 0 ? 0 : percent > 1 ? 1 : percent}
         onClick={(e) => {
-          console.log("SliderThumblick", e.clientX);
+          setPercent((e.clientX - zeroX + 5) / trackWidth);
         }}
       >
-        {list.map((item, index) => {
-          return index === list.length - 1 ? (
-            <CurDot />
-          ) : (
-            <SelectedDot left={(index * step) / value} />
-          );
-        })}
+        <CurDot
+          percent={percent < 0 ? 0 : percent > 1 ? 1 : percent}
+          onMouseDown={(e) => {
+            setIsDragging(true);
+            setStartX(e.clientX);
+          }}
+        />
       </SliderThumb>
       <Marks>
         {marks.map((i, index) => {
-          const per = i?.value / (max - min);
+          const left = i?.value / (max - min);
+          const _left = index === 0 ? 0 : left > 1 ? 1 : left;
+
           return (
-            <Mark left={index === 0 ? 0 : per > 1 ? 1 : per}>
-              <Dot />
+            <Mark
+              percent={_left}
+              onClick={(e) => {
+                handleDotClick(_left);
+              }}
+            >
+              {left > percent ? <Dot /> : <SelectedDot />}
               <p className="label">{i?.label}</p>
             </Mark>
           );
