@@ -6,22 +6,23 @@ import FavoriteIcon from "@/app/assets/perpetual/favorite.svg";
 import StarIcon from "@/app/assets/perpetual/star.svg";
 import Image from "next/image";
 import { useMemo, memo, useEffect } from "react";
-import { PieChart, Pie, Sector, Cell, ResponsiveContainer } from "recharts";
+import { PieChart, Pie, Cell, ResponsiveContainer } from "recharts";
 import SearchIcon from "@/app/assets/perpetual/search.svg";
 import IntroIcon from "@/app/assets/perpetual/intro.svg";
 import ChartIcon from "@/app/assets/perpetual/chart.svg";
-import { useRecoilState, useRecoilValue } from "recoil";
-import { recoilFavoriateList, recoilIndexPrices } from "@/app/models";
+import { useRecoilState } from "recoil";
+import { recoilFavoriateList } from "@/app/models";
 import { filterPrecision } from "@/app/utils/tools";
 import use24hPrice from "@/app/perpetual/hooks/use24hPrice";
 import useCurToken from "@/app/perpetual/hooks/useCurToken";
+import ChangPrice from "./ChangPrice";
 
 const Wrapper = styled.div`
   width: 100%;
-  /* height: 50px; */
+
   padding: 10px 0;
   background: ${(props) => props.theme.colors.fill1};
-  /* border-bottom: ${(props) => `1px solid ${props.theme.colors.border1}`}; */
+
   padding-left: 34px;
   padding-right: 20px;
   display: flex;
@@ -128,7 +129,6 @@ const PerpetualDetail = memo((props) => {
 
   const theme = useTheme();
   const [favoriateList, setFavoriateList] = useRecoilState(recoilFavoriateList);
-  const indexPrices = useRecoilValue(recoilIndexPrices);
 
   //获取24h high/low
   const { run, data } = use24hPrice();
@@ -203,16 +203,7 @@ const PerpetualDetail = memo((props) => {
         <Symbol>
           <h3 className="label">{symbolName}/USDT</h3>
           <Image src={ArrowIcon} width={11} height={6} alt="" />
-          <div className="change_price">
-            <p className="price">{indexPrices[symbolName]?.price || "-"}</p>
-            <p className="change">
-              {/* {filterPrecision(
-                priceChange?.[curToken?.kLineSymbol || ""]?.change || 0,
-                2
-              )} */}
-              %
-            </p>
-          </div>
+          <ChangPrice symbolName={symbolName} />
         </Symbol>
         <Favorite
           onClick={() => {

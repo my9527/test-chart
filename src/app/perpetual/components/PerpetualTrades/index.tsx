@@ -1,7 +1,7 @@
 "use client";
 import styled from "styled-components";
 import DraggableIcon from "../DraggableIcon";
-import { useEffect, useState, useMemo, useCallback } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { ethers } from "ethers";
 import { useRequest } from "ahooks";
 import {
@@ -14,6 +14,8 @@ import dayjs from "dayjs";
 import useGraphqlFetch from "@/app/hooks/useGraphqlFetch";
 import { useTokensIdMap } from "@/app/hooks/useTokens";
 import useCurToken from "@/app/perpetual/hooks/useCurToken";
+import Tabs from "../Tabs";
+import { tabProps } from "../Tabs";
 
 interface TdType {
   width?: string;
@@ -38,34 +40,7 @@ const Wrapper = styled.div`
     background: #292929;
   }
 `;
-const Tabs = styled.div`
-  display: flex;
-  align-items: center;
-  border-bottom: ${(props) => `1px solid ${props.theme.colors.border1}`};
-  .tab {
-    color: ${(props) => props.theme.colors.text4};
-    font-family: Arial;
-    font-size: ${(props) => props.theme.fontSize.medium};
-    font-style: normal;
-    font-weight: 400;
-    line-height: 100%;
-    position: relative;
-    padding: 15px 7px;
-    cursor: pointer;
-  }
-  .active_tab {
-    color: ${(props) => props.theme.colors.primary1};
-    &::after {
-      content: "";
-      position: absolute;
-      bottom: -1px;
-      left: 0;
-      right: 0;
-      height: 2px;
-      background: ${(props) => props.theme.colors.primary1};
-    }
-  }
-`;
+
 const Table = styled.div`
   height: calc(100% - 45px);
   min-width: 350px;
@@ -230,22 +205,21 @@ const PerpetualTrades = () => {
     }
     return baseColumns;
   }, [activeTab, baseColumns]);
+
+  const tabList = [
+    { label: "Last Trades", key: 0, value: 0 },
+    { label: "All Trades", key: 1, value: 1 },
+  ];
+
   return (
     <Wrapper>
-      <Tabs>
-        <div
-          className={`tab ${activeTab === 0 ? "active_tab" : ""}`}
-          onClick={() => setActiveTab(0)}
-        >
-          Last Trades
-        </div>
-        <div
-          className={`tab ${activeTab === 1 ? "active_tab" : ""}`}
-          onClick={() => setActiveTab(1)}
-        >
-          All Trades
-        </div>
-      </Tabs>
+      <Tabs
+        list={tabList}
+        handleClick={(item: tabProps) => {
+          setActiveTab(item?.key);
+        }}
+      />
+
       <Table>
         <THeader>
           {columns.map((i) => {
