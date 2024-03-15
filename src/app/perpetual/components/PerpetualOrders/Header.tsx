@@ -27,9 +27,12 @@ const HeaderItems = [{
 const Wrapper = styled(Row)`
     
     // padding: 0px 8px;
+    width: 100%;
 
     background: ${(props) => props.theme.colors.fill1};
     color: ${(props) => props.theme.colors.text4};
+    position: sticky;
+    top: 0;
     
 
     .order-header{

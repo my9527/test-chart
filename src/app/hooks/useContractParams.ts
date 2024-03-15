@@ -13,24 +13,24 @@ import OptionContractAbi from "@/app/config/abis/option.json";
 
 import SlpTokenContractAbi from "@/app/config/abis/slp.json";
 import SwapContractAbi from "@/app/config/abis/swapManager.json";
-import ExchangeContract from "@/app/config/abis/exchangeManager.json";
-import UpdateCollateralOrderImplementationContract from "@/app/config/abis/updateCollateralOrder.json";
+import ExchangeContractAbi from "@/app/config/abis/exchangeManager.json";
+import UpdateCollateralOrderImplementationContractAbi from "@/app/config/abis/updateCollateralOrder.json";
 
-import StopOrderImplementationContract from "@/app/config/abis/stopOrder.json";
-import MarketOrderImplementationContract from "@/app/config/abis/marketOrder.json";
+import StopOrderImplementationContractAbi from "@/app/config/abis/stopOrder.json";
+import MarketOrderImplementationContractAbi from "@/app/config/abis/marketOrder.json";
 
-import LimitOrderImplementationContract from "@/app/config/abis/limitOrder.json";
+import LimitOrderImplementationContractAbi from "@/app/config/abis/limitOrder.json";
 
 
 // import WETHContract from "@/app/config/abis/";
-import WithdrawContract from "@/app/config/abis/userBalance.json";
+import WithdrawContractAbi from "@/app/config/abis/userBalance.json";
 
-import DepositContract from "@/app/config/abis/userBalance.json";
+import DepositContractAbi from "@/app/config/abis/userBalance.json";
 
-import ExchangeStableTokenContract from "@/app/config/abis/usd.json";
-import StakeSexContract from "@/app/config/abis/stSEX.json";
+import ExchangeStableTokenContractAbi from "@/app/config/abis/usd.json";
+import StakeSexContractAbi from "@/app/config/abis/stSEX.json";
 
-import StakeSlpContract from "@/app/config/abis/stSLP.json";
+import StakeSlpContractAbi from "@/app/config/abis/stSLP.json";
 import FutureManagerContractAbi from "@/app/config/abis/futureManager.json";
 
 
@@ -82,7 +82,24 @@ export const useContractParams = (address: string) => {
             [config.contract_address.futureManager]: {
                 address: config.contract_address.futureManager,
                 abi: FutureManagerContractAbi
-            }
+            },
+            [config.contract_address.LimitOrderImplementationAddress]: {
+                address: config.contract_address.LimitOrderImplementationAddress,
+                abi: LimitOrderImplementationContractAbi
+            },
+            [config.contract_address.MarketOrderImplementationAddress]: {
+                address: config.contract_address.MarketOrderImplementationAddress,
+                abi: MarketOrderImplementationContractAbi
+            },
+            [config.contract_address.StopOrderImplementationAddress]: {
+                address: config.contract_address.StopOrderImplementationAddress,
+                abi: StopOrderImplementationContractAbi
+            },
+            [config.contract_address.UpdateCollateralOrderImplementationAddress]: {
+                address: config.contract_address.UpdateCollateralOrderImplementationAddress,
+                abi: UpdateCollateralOrderImplementationContractAbi
+            },
+            
         }
 
         return _contracts;

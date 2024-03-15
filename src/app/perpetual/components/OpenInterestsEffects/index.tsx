@@ -6,9 +6,9 @@
 
 import { useIndexPrices, useIndexPricesById } from "@/app/hooks/useIndexPrices";
 import { useTokens, useTokensIdMap } from "@/app/hooks/useTokens";
-import { recoilExecutionFee, recoilOpenInterests, recoilPositions } from "@/app/models";
+import { recoilExecutionFee, recoilOpenInterests, recoilPositionTokens, recoilPositions } from "@/app/models";
 import { FC, memo, useCallback, useEffect, useMemo, useRef } from "react";
-import { useRecoilState, useRecoilValue } from "recoil";
+import { useRecoilState, useRecoilValue, useSetRecoilState } from "recoil";
 import useCurToken from "../../hooks/useCurToken";
 import { useChainId, useClient } from "wagmi";
 import { useAppConfig } from "@/app/hooks/useAppConfig";
@@ -18,15 +18,16 @@ import BigNumber from "bignumber.js";
 import { FutureType } from "@/app/config/common";
 import { ContractFunctionParameters, formatUnits } from "viem";
 import { useInterval, useRequest } from "ahooks";
+import { Token } from "@/app/config/tokens";
 
 
 export const OpenInterestsEffects: FC = memo(() => {
 
 
 
-    const [, updateOpenInterests] = useRecoilState(recoilOpenInterests);
+    const updateOpenInterests = useSetRecoilState(recoilOpenInterests);
 
-    const [, updateExecutionFee] = useRecoilState(recoilExecutionFee);
+    const updateExecutionFee = useSetRecoilState(recoilExecutionFee);
 
 
     const callsRef = useRef<any[]>([]);
@@ -35,7 +36,9 @@ export const OpenInterestsEffects: FC = memo(() => {
     
 
     // 仓位
-    const positions = useRecoilValue(recoilPositions);
+    // const positions = useRecoilValue(recoilPositions);
+
+    const positions = useRecoilValue(recoilPositionTokens);
 
 
     const tokens = useTokensIdMap();
@@ -53,8 +56,10 @@ export const OpenInterestsEffects: FC = memo(() => {
 
     // 当前有仓位的tokens
     const positionTokens = useMemo(() => {
-        return positions.map(pos => {
-            return tokens[pos.futureId];
+        if(!positions) return [];
+        
+        return Array.from(new Set(positions.split("_"))).map(tk => {
+            return tokens[tk];
         });
     }, [positions]);
 
@@ -293,7 +298,6 @@ export const OpenInterestsEffects: FC = memo(() => {
                 };
             });
 
-            console.log("borrowingFees:", borrowingFees, borrowingFeeResults);
 
             const currentTokenAvailableLiq = {
                 long: availableLiqResults?.[0]?.result?.toString(),
@@ -302,16 +306,6 @@ export const OpenInterestsEffects: FC = memo(() => {
                 shortReadable: formatUnits((availableLiqResults?.[1]?.result || 0) as bigint, 6),
             };
 
-
-            
-            // console.log("updateExecutionFee: ", executionFeeResults?.[0]?.result?.toString() || '0');
-            // console.log("updateOpenInterests: ", {
-            //     openInterests,
-            //     globalUsdValues,
-            //     fundingFees,
-            //     borrowingFees,
-            //     currentTokenAvailableLiq,
-            // })
 
             // 更新execution fee
             updateExecutionFee(executionFeeResults?.[0]?.result?.toString() || '0');
@@ -331,10 +325,6 @@ export const OpenInterestsEffects: FC = memo(() => {
         _run();
     }, []);
 
-
-    // const interverCall = useInterval(() => {
-
-    // }, {});
 
     const { run, cancel } = useRequest(async () => {
         callFns();
