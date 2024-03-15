@@ -3,6 +3,7 @@ import { FC, useState } from "react";
 import styled from "styled-components";
 import Tabs from "@/app/components/Tabs";
 import PoolContent from "./components/Pool";
+import StakingContent from "./components/Staking";
 
 enum StakeTabType {
   Pool = 'pool',
@@ -11,7 +12,7 @@ enum StakeTabType {
 
 const Wrapper = styled.div`
   background-color: ${props => props.theme.colors.fill1};
-  padding-top: 50px;
+  padding: 50px 0;
 `
 
 const Content = styled.div`
@@ -23,21 +24,13 @@ const Content = styled.div`
 const Title = styled.h2`
   font-size: 30px;
   color: ${(props) => props.theme.colors.text1};
+  margin-bottom: 28px;
 `
-
-function StakeContent() {
-  return (
-    <div>
-      TODO
-    </div>
-  )
-}
-
 
 
 const token = 'QLP'
 const Stake: FC = () => {
-  const [tab, setTab] = useState(StakeTabType.Pool as string)
+  const [tab, setTab] = useState(StakeTabType.Staking as string)
 
   return (
     <Wrapper>
@@ -53,7 +46,7 @@ const Stake: FC = () => {
             { 
               key: StakeTabType.Staking, 
               title: 'staking', 
-              children: <StakeContent /> 
+              children: <StakingContent /> 
             }
           ]} 
           tab={tab}

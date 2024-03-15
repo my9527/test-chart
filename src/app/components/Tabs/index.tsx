@@ -3,8 +3,6 @@ import styled from "styled-components";
 import { motion } from 'framer-motion'
 
 const Wrapper = styled.div`
-  background-color: ${props => props.theme.colors.fill1};
-  height: calc(100vh - 50px);
   color: ${props => props.theme.colors.text1};
 `
 
@@ -22,7 +20,6 @@ const Title = styled.div`
   position: relative;
 `
 const Header = styled.div`
-  margin-top: 28px;
   display: flex;
   border-bottom: 1px solid ${props => props.theme.colors.border1};
 `

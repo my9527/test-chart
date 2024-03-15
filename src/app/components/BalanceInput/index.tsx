@@ -1,8 +1,6 @@
 import { motion } from "framer-motion"
 import styled from "styled-components"
 
-
-
 const FlexBox = styled.div<{ justify?: string }>`
   display: flex;
   justify-content: ${props => props.justify || "flex-start"};
@@ -26,19 +24,25 @@ const Currency = styled.div`
 `
 
 const Wrapper = styled.div`
-  background-color: ${props => props.theme.colors.fill3};
-  padding: 10px 16px;
-  border-radius: 8px;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
+  position: relative;
+  &:hover > div {
+    border-color: ${props => props.theme.colors.primary1};
+  }
 `
 
 const TextField = styled.input`
-  background-color: unset;
+  background: unset;
+  height: 20px;
   outline: none;
   color: ${props => props.theme.colors.text1};
   border: none;
+  position: absolute;
+  bottom: 10px;
+  left: 16px;
+  width: 70%;
+  &:hover, &:focus + div {
+    border-color: ${props => props.theme.colors.primary1};}
+  }
 `
 
 const SecondaryBtn = styled(motion.div)`
@@ -56,6 +60,16 @@ const SecondaryBtn = styled(motion.div)`
   }
 `
 
+const DisplayInput = styled.div`
+  background-color: ${props => props.theme.colors.fill3};
+  padding: 10px 16px;
+  border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  border: 1px solid transparent;
+`
+
 interface IInputProps {
   title: string
   balance: string
@@ -65,26 +79,40 @@ interface IInputProps {
     onClick: () => void
   },
   value: string,
-  onChange: (e: React.ChangeEvent<HTMLInputElement>) => void,
+  onChange: (v: string) => void,
 }
 
-export function BuySellInput ({ title, balance, currency, action, value = '0', onChange }: IInputProps) {
+function BalanceInput ({ title, balance, currency, action, value, onChange }: IInputProps) {
+
+  const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const input = event.target.value;
+    
+    const numericValue = input.replace(/[^0-9]/g, '');
+    //filter non-numeric input
+    if (numericValue !== input) {
+      event.preventDefault();
+    }
+    onChange(numericValue);
+  }
+
   return (
     <Wrapper>
-      <FlexBox justify="space-between">
-        <Label>{title}</Label>
-        <FlexBox>
-          <Label>Balance</Label>
-          <Value>{balance}</Value>
+      <TextField value={value} onChange={handleInputChange} />
+      <DisplayInput>
+        <FlexBox justify="space-between">
+          <Label>{title}</Label>
+          <FlexBox>
+            <Label>Balance</Label>
+            <Value>{balance}</Value>
+          </FlexBox>
         </FlexBox>
-      </FlexBox>
-      <FlexBox justify="space-between">
-        <TextField value={value} onChange={onChange} />
-        <FlexBox>
-          { action ? <SecondaryBtn onClick={action.onClick}>{action.text}</SecondaryBtn> : null}
+        <FlexBox justify="flex-end">
+          { action ? <SecondaryBtn onClick={action.onClick}>{action.text}</SecondaryBtn> : null }
           <Currency>{currency}</Currency>
         </FlexBox>
-      </FlexBox>
+      </DisplayInput>
     </Wrapper>
   )
 }
+
+export default BalanceInput
