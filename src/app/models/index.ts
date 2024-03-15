@@ -1,4 +1,4 @@
-import { AtomEffect, DefaultValue, atom } from "recoil";
+import { AtomEffect, DefaultValue, atom, selector } from "recoil";
 import { Token } from "../config/tokens";
 import { Address } from "viem";
 import BigNumber from "bignumber.js";
@@ -71,7 +71,23 @@ export type PositionType = {
 
 export const recoilPositions = atom<PositionType[]>({
   key: 'open_positions',
-  default: [],
+  default: []
+});
+
+
+/**
+ * 获取当前仓位的币种，避免因为仓位其他数据变化导致重复渲染
+ * 此处获取的事futureId, 所以需要自行处
+ */
+export const recoilPositionTokens = selector({
+  key: 'open_positions_tokens',
+  get: ({get}) => {
+    const list = get(recoilPositions);
+
+    return Array.from(new Set(list.map(li => {
+      return li.futureId
+    }))).join("_");
+  },
 });
 
 

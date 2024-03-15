@@ -20,7 +20,7 @@ import { calcPnl, calcPnlPercentage } from "../../lib/getPnl";
 
 
 const Wrapper = styled(Row)`
-
+width: 100%;
 height: 100%;
 overflow-y: auto;
 .table-wrapper{
@@ -43,7 +43,7 @@ table{
         border-bottom: 1px solid ${(props) => props.theme.colors.border1};
     }
     td {
-        width: 140px;
+        // width: 140px;
         color: var(--white, #FAFAFA);
         font-family: Arial;
         font-size: 14px;
@@ -144,11 +144,10 @@ const PositionItemWrapper = styled.tr`
     }
 
     .pos-long {
-        color: ${(props) => props.theme.colors.text5};
-    }
-
-    .pos-short {
         color: ${(props) => props.theme.colors.text2};
+    }
+    .pos-short {   
+        color: ${(props) => props.theme.colors.text5};
     }
 
     .pnl-col {
@@ -160,10 +159,11 @@ const PositionItemWrapper = styled.tr`
     }
 
     .pnl-profit{
-        color: ${(props) => props.theme.colors.text5};
+        color: ${(props) => props.theme.colors.text2};
     }
     .pnl-loss{
-        color: ${(props) => props.theme.colors.text2};
+        
+        color: ${(props) => props.theme.colors.text5};
     }
 
     .margin-col{
@@ -242,7 +242,7 @@ const Position: FCC<{ pos: PositionType }> = ({ pos }) => {
     
     return (
         <PositionItemWrapper>
-            <td align="left" width={140}>
+            <td align="left" width={80}>
                 <Col gap="6px" align="start" className={`symbol-name ${pos.isLong ? 'long-pos' : 'short-pos'}`}>
                     <div><TokenById futureId={pos.futureId} /></div>
                     <div className={`pos-dir`}>{pos.isLong ? 'Long' : 'Short'}</div>

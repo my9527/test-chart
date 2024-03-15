@@ -5,7 +5,7 @@ import { defineChain } from "viem";
 import { useChainId } from "wagmi";
 
 import { CHAINS_ID, DEFAULT_CHAIN_ID } from "@/app/config/common";
-import { arbitrumOne, zkFair, zkFairTestnet } from "@/app/config/chains";
+import { arbitrumGoerliTest, arbitrumOne, zkFair, zkFairTestnet } from "@/app/config/chains";
 
 import addressMap from "@/app/config/contract_address";
 
@@ -106,6 +106,31 @@ const AppConfigOnChain: Record<number, AppConfigType> = {
     executionFee: "2500000000000000000",
     contract_address: addressMap[CHAINS_ID.arbitrum],
   },
+  [CHAINS_ID.arbitrumGoerli]: {
+    chain: arbitrumGoerliTest,
+    // config graphhql
+    // config graphhql
+    graph: {
+      base: 'https://api.thegraph.com/subgraphs/name/substanceexchangedevelop/core',
+      perpetual: 'https://gql-testnet.substancex.io/subgraphs/name/sex/user',
+      baseBlock: 'https://api.thegraph.com/subgraphs/name/iliaazhel/arbitrum-goerli-blocklytics',
+    },
+
+    // config rpc
+    rpc: {
+      http: "https://arb.substancex.io/",
+      wss: "wss://api-testnet.substancex.io/",
+    },
+
+    // config api
+    api: {
+      http: "https://arbitrum-goerli.blastapi.io/5eda3ae1-cf24-4a67-86b6-3727bdd0d816",
+      wss: "wss://api-testnet.substancex.io/",
+    },
+
+    executionFee: '300000000000000',
+    contract_address: addressMap[CHAINS_ID.arbitrumGoerli]
+  }
 };
 
 // config app config on default chain id, if chain changes, then the provider should update
@@ -124,7 +149,7 @@ export const AppConfigProvider: FCC<{}> = memo(({ children }) => {
   }, [chainId]);
 
   return (
-    <AppConfigContext.Provider value={config}>
+    <AppConfigContext.Provider value={config} key={chainId}>
       {children}
     </AppConfigContext.Provider>
   );
