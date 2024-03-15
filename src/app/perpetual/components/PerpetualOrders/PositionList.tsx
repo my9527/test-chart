@@ -32,15 +32,20 @@ table{
     height: 100%;
     position: relative;
     thead{
-        background: ${(props) => props.theme.colors.fill2};
+        width: 100%;
+        background: ${(props) => props.theme.colors.fill1};
+        
         position: sticky;
         top: 0;
         th{
-            padding: 8px;
+            padding: 9px 8px 16px;
         }
     }
     tr{
-        border-bottom: 1px solid ${(props) => props.theme.colors.border1};
+        cursor: pointer;
+    }
+    tbody tr:hover{
+        background: ${(props) => props.theme.colors.fill2};
     }
     td {
         // width: 140px;
@@ -51,7 +56,18 @@ table{
         font-weight: 400;
         line-height: 100%; /* 14px */
         padding: 16px 8px;
+        border-top: 0.5px solid ${(props) => props.theme.colors.border1};
+        border-bottom: 0.5px solid ${(props) => props.theme.colors.border1};
+        border-collapse: collapse;
+        text-align: left;
+
+        
+
     }
+    // td + td {
+    //     padding-left: 40px;
+    //     padding-right: 40px;
+    // }
 }
 
 .header{
@@ -259,10 +275,10 @@ const Position: FCC<{ pos: PositionType }> = ({ pos }) => {
             <td {...PositionTdAttrs} width={140}>
                 {filterPrecision(pos.entryPriceReadable, token.displayDecimal)}
             </td>
-            <td {...PositionTdAttrs} width={140}>
+            <td {...PositionTdAttrs} width={200}>
                 <Col gap="6px" className={hasProfit ? 'pnl-profit' : 'pnl-loss'} align="flex-start">
                     <div>${filterPrecision(pnl, 2)}</div>
-                    <div>{pnlPercent}%</div>
+                    <div>({pnlPercent}%)</div>
                 </Col>
             </td>
             <td {...PositionTdAttrs} width={140}>
@@ -291,7 +307,13 @@ const Position: FCC<{ pos: PositionType }> = ({ pos }) => {
 export const PositionList = () => {
 
 
-    const openPositions = useRecoilValue(recoilPositions);
+    const _openPositions = useRecoilValue(recoilPositions);
+
+    // sort by futureId asc
+    const openPositions = useMemo(() => {
+        if(!_openPositions.length) return [];
+        return [..._openPositions].sort((a: any, b: any) => BigNumber(b.futureId).minus(a.futureId).toNumber());
+    }, [_openPositions]);
 
 
     return (
@@ -302,7 +324,7 @@ export const PositionList = () => {
                         <tr>
                             {Headers.map(h => {
                                 return (
-                                    <th key={h.key} align={h.align ?? 'center'} className="thead-td">
+                                    <th key={h.key} align={h.align ?? 'left'} className="thead-td">
                                         <div className="header">
                                             {h.title}
                                         </div>

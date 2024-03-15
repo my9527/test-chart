@@ -19,7 +19,7 @@ import ChangPrice from "./ChangPrice";
 
 const Wrapper = styled.div`
   width: 100%;
-
+  position: relative;
   padding: 10px 0;
   background: ${(props) => props.theme.colors.fill1};
 

@@ -1,5 +1,5 @@
 "use client";
-import { memo, createContext, useContext, useMemo } from "react";
+import { memo } from "react";
 import styled from "styled-components";
 import Image from "next/image";
 import Icon from "@/app/assets/perpetual/draggable.svg";

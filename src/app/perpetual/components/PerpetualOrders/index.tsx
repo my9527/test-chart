@@ -5,6 +5,7 @@ import { OrderHeader } from "./Header";
 
 import { PositionList } from "./PositionList";
 import { Col } from "@/app/components/Col";
+import { useState } from "react";
 const Wrapper = styled.div`
   position: relative;
   width: 100%;
@@ -27,6 +28,7 @@ height: 100%;
 
 const PerpetualOrders = () => {
 
+  // const [] = useState();
 
 
   return (
