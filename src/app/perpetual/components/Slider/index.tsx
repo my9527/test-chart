@@ -25,9 +25,12 @@ const SliderThumb = styled.div<PercentProps>`
   position: absolute;
   top: 0;
   left: 0;
-  right: ${(props) => {
-    return (1 - props?.percent) * 100 + "%";
+  width: ${(props) => {
+    return props?.percent * 100 + "%";
   }};
+  /* right: ${(props) => {
+    return (1 - props?.percent) * 100 + "%";
+  }}; */
   cursor: pointer;
 `;
 const Dot = styled.div`
@@ -160,17 +163,16 @@ const Slider: React.FC<SliderProps> = ({
   }, [trackRef?.current]);
 
   const handleDotClick = (left: number) => {
-    console.log("left", left);
     setPercent(left);
   };
   const [startX, setStartX] = useState(0);
 
   useEffect(() => {
-    if (startX) {
+    if (startX && isDragging) {
       const distanceX = startX - zeroX;
       setPercent((distanceX - 5) / trackWidth);
     }
-  }, [startX, zeroX]);
+  }, [startX, zeroX, isDragging]);
 
   const handleMouseMove = (e: MouseEvent) => {
     if (isDragging) {
