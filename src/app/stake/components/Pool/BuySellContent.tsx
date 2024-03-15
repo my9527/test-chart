@@ -3,25 +3,17 @@ import { useState } from "react"
 import styled from "styled-components"
 import ArrowDownIcon from "@/app/assets/stake/arrow-down.svg"
 import Image from "next/image"
-import { BuySellInput } from "./BuySellInput"
+import { TwoTabs } from "@/app/components/TwoTabs"
+import BalanceInput from "@/app/components/BalanceInput"
 
 enum TradeType {
   Buy = 'buy',
   Sell = 'sell'
 }
 
-const Title = styled.h2`
-  font-size: ${props => props.theme.fontSize.header2};
-  color: ${props => props.theme.colors.text4};
-`
-
 const ImageWrapper = styled.div`
   margin: 10px 0;
   text-align: center;
-`
-
-const Header = styled.div`
-  display: flex;
 `
 
 const TabPanel = styled.div<{ active: boolean }>`
@@ -73,54 +65,31 @@ const Form = styled.div`
   margin: 20px 0;
 `
 
-const Hilight = styled.div<{ active: boolean }>`
-  position: absolute;
-  left: 0;
-  top: 0;
-  height: 2px;
-  width: 100%;
-  background: ${props => props.active ? props.theme.colors.primary1 : 'transparent'};
-`
-
 const token = 'QLP'
 export function BuySellContent() {
-  const [type, setType] = useState<TradeType.Buy | TradeType.Sell>(TradeType.Buy)
-  const [position, setPosition] = useState('0')
-  const [receive, setReceive] = useState('0')
+  const [type, setType] = useState(TradeType.Buy as string)
+  const [position, setPosition] = useState('')
+  const [receive, setReceive] = useState('')
 
-  const lists = [
-    {
-      type: TradeType.Buy,
-      title: `Buy ${token}`,
-      btnText: "Buy"
-    },
-    {
-      type: TradeType.Sell,
-      title: `Sell ${token}`,
-      btnText: "Sell"
-    }
-  ]
-
-  const current = lists.find(item => item.type === type)
-
-  const handleTabChange = (v: TradeType.Buy | TradeType.Sell) => () => {
-    setType(v)
-  }
 
   return (
     <>
-      <Header>
-        {
-          lists.map(i => (
-            <TabPanel key={i.type} active={i.type === type} onClick={handleTabChange(i.type)}>
-              <Title>{i.title}</Title>
-              <Hilight active={i.type === type} />
-            </TabPanel>
-          ))
-        }
-      </Header>
+      <TwoTabs
+        tabs={[
+          {
+            key: TradeType.Buy,
+            title: `Buy ${token}`,
+          },
+          {
+            key: TradeType.Sell,
+            title: `Sell ${token}`,
+          },
+        ]}
+        activeTab={type}
+        onTabChange={setType}
+      />
       <Content>
-        <BuySellInput
+        <BalanceInput
           title="Your Position" 
           balance="123,123,123.00"
           currency="USDX"
@@ -129,15 +98,15 @@ export function BuySellContent() {
             onClick: () => {},
           }}
           value={position}
-          onChange={e => setPosition(e.target.value)}
+          onChange={setPosition}
         />
         <ImageWrapper><Image alt="" src={ArrowDownIcon} width={40} height={40} /></ImageWrapper>
-        <BuySellInput 
+        <BalanceInput 
           title="Your receive" 
           balance="123,123,123.00"
           currency={token}
           value={receive}
-          onChange={e => setReceive(e.target.value)}
+          onChange={setReceive}
         />
         <Form>
           <Label>{`1 ${token} = 1.00 USDX`}</Label>
@@ -150,7 +119,7 @@ export function BuySellContent() {
             <Value>123,123.00</Value>
           </FlexBox>
         </Form>
-        <Button whileTap={{ scale: 1.1 }}>{current?.btnText}</Button>
+        <Button whileTap={{ scale: 1.1 }}>{type === TradeType.Sell ? 'Sell' : 'Buy'}</Button>
       </Content>
     </>
   )

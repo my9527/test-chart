@@ -25,6 +25,9 @@ const SliderThumb = styled.div<PercentProps>`
   position: absolute;
   top: 0;
   left: 0;
+  /* width: ${(props) => {
+    return props?.percent * 100 + "%";
+  }}; */
   right: ${(props) => {
     return (1 - props?.percent) * 100 + "%";
   }};
@@ -145,8 +148,11 @@ const Slider: React.FC<SliderProps> = ({
 }) => {
   const [selectedValue, setSelectedValue] = useState(0);
   const trackRef = useRef<HTMLDivElement | null>(null);
+  const thumbRef = useRef<HTMLDivElement | null>(null);
+
   const [percent, setPercent] = useState<number>(0);
   const [isDragging, setIsDragging] = useState(false);
+
   useEffect(() => {
     setPercent(value / (max - min));
   }, [value, min, max]);
@@ -159,18 +165,29 @@ const Slider: React.FC<SliderProps> = ({
     return trackRef?.current?.getClientRects()[0].x || 0;
   }, [trackRef?.current]);
 
+  const [startX, setStartX] = useState(zeroX);
+
+  const thumbWidth = useMemo(() => {
+    return thumbRef?.current?.clientWidth || 0;
+  }, [thumbRef?.current]);
+
+  //   useEffect(() => {
+  //     setStartX(thumbWidth + zeroX);
+  //   }, [thumbWidth, zeroX]);
+
   const handleDotClick = (left: number) => {
-    console.log("left", left);
     setPercent(left);
   };
-  const [startX, setStartX] = useState(0);
 
   useEffect(() => {
-    if (startX) {
+    if (startX && isDragging) {
       const distanceX = startX - zeroX;
-      setPercent((distanceX - 5) / trackWidth);
+
+      if (distanceX) {
+        setPercent((distanceX - 5) / trackWidth);
+      }
     }
-  }, [startX, zeroX]);
+  }, [startX, zeroX, isDragging]);
 
   const handleMouseMove = (e: MouseEvent) => {
     if (isDragging) {
@@ -199,24 +216,33 @@ const Slider: React.FC<SliderProps> = ({
       <Track
         ref={trackRef}
         onClick={(e) => {
-          setPercent((e.clientX - zeroX + 5) / trackWidth);
+          setPercent((e.clientX - zeroX - 5) / trackWidth);
         }}
       />
       <SliderThumb
+        ref={thumbRef}
         percent={percent < 0 ? 0 : percent > 1 ? 1 : percent}
         onClick={(e) => {
-          setPercent((e.clientX - zeroX + 5) / trackWidth);
+          if (!isDragging) {
+            setPercent((e.clientX - zeroX - 5) / trackWidth);
+          }
         }}
       >
         <CurDot
           percent={percent < 0 ? 0 : percent > 1 ? 1 : percent}
           onMouseDown={(e) => {
+            e.nativeEvent.stopImmediatePropagation();
+
             setIsDragging(true);
-            setStartX(e.clientX);
+            setStartX(thumbWidth + zeroX);
           }}
         >
           <p className="value">
-            {(percent * 100 + "").split(".")[0]}
+            {
+              ((percent < 0 ? 0 : percent > 1 ? 1 : percent) * 100 + "").split(
+                "."
+              )[0]
+            }
             {unit}
           </p>
         </CurDot>
