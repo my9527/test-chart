@@ -18,6 +18,7 @@ const Wrapper = styled(motion.div)`
   color: #fff;
   padding: 0 10px;
   z-index: 1000;
+  box-sizing: content-box;
 
   &.placement-right {
     right: 0;

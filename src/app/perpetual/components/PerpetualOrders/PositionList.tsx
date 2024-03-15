@@ -21,7 +21,7 @@ import { calcPnl, calcPnlPercentage } from "../../lib/getPnl";
 
 const Wrapper = styled(Row)`
 width: 100%;
-height: 100%;
+max-height: 100%;
 overflow-y: auto;
 .table-wrapper{
     height: 100%:

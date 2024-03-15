@@ -5,6 +5,8 @@ import LogoIcon from "@/app/assets/header/logo.svg";
 import Image from "next/image";
 import Menu from "./Menu";
 import Wallet from "./Wallet";
+import { useAccount } from "wagmi";
+import { shortenString } from "@/app/lib/shortenString";
 
 const Wrapper = styled.div`
   background: ${(props) => props.theme.colors.fill1};
@@ -32,8 +34,54 @@ const Right = styled.div`
   gap: 20px;
   padding-right: 15px;
 `;
+
+const ConnectButton = styled.div`
+  width: 144px;
+  height: 26px;
+  flex-shrink: 0;
+  color: ${(props) => props.theme.colors.text1};
+  font-family: Arial;
+  font-size: ${(props) => props.theme.fontSize.medium};
+  font-style: normal;
+  font-weight: 400;
+  line-height: 100%;
+
+`
+
+const ConnectedButton = styled.div`
+  display: inline-flex;
+  align-items: center;
+  border-radius: 26px;
+  height: 26px;
+  padding: 3px 4px;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+
+  color: ${(props) => props.theme.colors.text1};
+
+  font-family: Arial;
+  font-size: ${(props) => props.theme.fontSize.medium};
+  font-style: normal;
+  font-weight: 400;
+  line-height: 100%;
+  background: ${(props) => props.theme.colors.fill2};
+  cursor: pointer;
+  
+
+`
+
 const Header = () => {
-  const [visible, setVisible] = useState(false)
+  const [visible, setVisible] = useState(false);
+
+  const { isConnected, address, connector } = useAccount();
+
+  console.log("connector", connector);
+
+
+
 
   return (
     <Wrapper>
@@ -42,7 +90,9 @@ const Header = () => {
         <Line />
         <Menu />
       </Left>
-      <button onClick={() => setVisible(true)}>connect</button>
+      {
+        isConnected ? <ConnectedButton onClick={() => setVisible(true)}>{connector?.name} {shortenString(address as string)}</ConnectedButton> : <ConnectButton onClick={() => setVisible(true)}>connect wallet</ConnectButton> 
+      }
       <Wallet visible={visible} onHide={() => setVisible(false)} />
     </Wrapper>
   );
