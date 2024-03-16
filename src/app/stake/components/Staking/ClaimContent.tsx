@@ -1,5 +1,6 @@
 import { motion } from "framer-motion"
 import styled from "styled-components"
+import Button from "@/app/components/LinearGradientButton"
 
 
 const FieldColumn = styled.div`
@@ -36,18 +37,6 @@ const Divider = styled.div`
   width: 1px;
   background-color: ${props => props.theme.colors.border1};
   height: 100%;
-`
-
-const Button = styled(motion.div)`
-  font-size: ${props => props.theme.fontSize.header2};
-  color: ${props => props.theme.colors.text1};
-  line-height: 40px;
-  width: 200px;
-  background: linear-gradient(90deg, #634AFF 0%, #7E73FF 100%);
-  border-radius: 999px;
-  text-align: center;
-  cursor: pointer;
-  margin: 0 auto;
 `
 
 const token = 'QLP'
@@ -87,7 +76,7 @@ export function ClaimContent () {
           <FieldLabel>Claimable Rewards</FieldLabel>
           <RewardText>123,123.00</RewardText>
         </FieldItem>
-        <Button whileTap={{ scale: 1.1 }}>Claim</Button>
+        <Button>Claim</Button>
       </FieldColumn>
     </>
   )
