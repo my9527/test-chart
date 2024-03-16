@@ -24,16 +24,6 @@ const InputWrapper = styled.div`
   position: relative;
 `
 
-const DisplayInput = styled.div`
-  display: flex;
-  justify-content: flex-end;
-  border: 1px solid transparent;
-  height: 32px;
-  background: ${props => props.theme.colors.fill3 };
-  border-radius: 30px;
-  align-items: center;
-  padding-right: 20px;
-`
 
 const Input = styled.input`
   outline: none;
@@ -45,9 +35,21 @@ const Input = styled.input`
   width: calc(100% - 70px);
   background: unset;
   color: ${props => props.theme.colors.text1};
-  &:focus + div {
+`
+
+const DisplayInput = styled.div`
+  display: flex;
+  justify-content: flex-end;
+  border: 1px solid transparent;
+  height: 32px;
+  background: ${props => props.theme.colors.fill3 };
+  border-radius: 30px;
+  align-items: center;
+  padding-right: 20px;
+  ${Input}:focus + && {
     border-color: ${ props => props.theme.colors.primary1 };
-  }
+  };
+  transition: border-color 0.2s ease-in-out;
 `
 
 const Suffix = styled.span`
@@ -55,7 +57,7 @@ const Suffix = styled.span`
   color: ${props => props.theme.colors.text4};
 `
 
-const options = [
+const durationOptions = [
   { label: "1M", value: '30' },
   { label: "3M", value: '90' },
   { label: "6M", value: '180' },
@@ -85,7 +87,7 @@ const Duration = ({ value, onChange }: IDurationProps) => {
     <Wrapper>
       <FlexBox>
         {
-          options.map((item) => {
+          durationOptions.map((item) => {
             return (
               <Item active={value === item.value} key={item.value} onClick={handleQuickSelect(item.value)}>{item.label}</Item>
             )

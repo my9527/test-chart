@@ -38,7 +38,7 @@ const Title = styled.div`
   align-items: center;
 `
 
-interface IDrawerProps extends React.PropsWithChildren {
+interface IDrawerProps {
   placement?: DirectionEnum.LEFT | DirectionEnum.RIGHT,
   visible: boolean,
   onHide: () => void,
@@ -46,14 +46,14 @@ interface IDrawerProps extends React.PropsWithChildren {
   title?: React.ReactNode,
 }
 
-export const Drawer = ({
+export const Drawer: FCC<IDrawerProps> = ({
   placement = DirectionEnum.RIGHT, 
   visible = false,
   children,
   onHide,
   width = 320,
   title,
-}: IDrawerProps) => {
+}) => {
   const ref = useRef<HTMLDivElement>(null);
 
   const handleClickOutside = useCallback(() => {
