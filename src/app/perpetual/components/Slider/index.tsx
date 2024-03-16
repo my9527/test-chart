@@ -25,9 +25,6 @@ const SliderThumb = styled.div<PercentProps>`
   position: absolute;
   top: 0;
   left: 0;
-  /* width: ${(props) => {
-    return props?.percent * 100 + "%";
-  }}; */
   right: ${(props) => {
     return (1 - props?.percent) * 100 + "%";
   }};
@@ -145,6 +142,7 @@ const Slider: React.FC<SliderProps> = ({
   step = 1,
   value = 0,
   unit,
+  onChange,
 }) => {
   const [selectedValue, setSelectedValue] = useState(0);
   const trackRef = useRef<HTMLDivElement | null>(null);
@@ -152,9 +150,14 @@ const Slider: React.FC<SliderProps> = ({
 
   const [percent, setPercent] = useState<number>(0);
   const [isDragging, setIsDragging] = useState(false);
+  const [isChange, setIsChange] = useState(false);
 
   useEffect(() => {
-    setPercent(value / (max - min));
+    if (value < min) {
+      setPercent(0);
+    } else {
+      setPercent((value - min) / (max - min));
+    }
   }, [value, min, max]);
 
   const trackWidth = useMemo(() => {
@@ -171,11 +174,8 @@ const Slider: React.FC<SliderProps> = ({
     return thumbRef?.current?.clientWidth || 0;
   }, [thumbRef?.current]);
 
-  //   useEffect(() => {
-  //     setStartX(thumbWidth + zeroX);
-  //   }, [thumbWidth, zeroX]);
-
   const handleDotClick = (left: number) => {
+    setIsChange(true);
     setPercent(left);
   };
 
@@ -184,6 +184,7 @@ const Slider: React.FC<SliderProps> = ({
       const distanceX = startX - zeroX;
 
       if (distanceX) {
+        setIsChange(true);
         setPercent((distanceX - 5) / trackWidth);
       }
     }
@@ -211,11 +212,15 @@ const Slider: React.FC<SliderProps> = ({
     }
   }, [isDragging]);
 
+  useEffect(() => {
+    onChange && isChange && onChange(Math.floor((max - min) * percent + min));
+  }, [percent, isChange]);
   return (
     <Wrapper>
       <Track
         ref={trackRef}
         onClick={(e) => {
+          setIsChange(true);
           setPercent((e.clientX - zeroX - 5) / trackWidth);
         }}
       />
@@ -224,6 +229,7 @@ const Slider: React.FC<SliderProps> = ({
         percent={percent < 0 ? 0 : percent > 1 ? 1 : percent}
         onClick={(e) => {
           if (!isDragging) {
+            setIsChange(true);
             setPercent((e.clientX - zeroX - 5) / trackWidth);
           }
         }}
@@ -238,18 +244,14 @@ const Slider: React.FC<SliderProps> = ({
           }}
         >
           <p className="value">
-            {
-              ((percent < 0 ? 0 : percent > 1 ? 1 : percent) * 100 + "").split(
-                "."
-              )[0]
-            }
+            {Math.floor((max - min) * percent + min)}
             {unit}
           </p>
         </CurDot>
       </SliderThumb>
       <Marks>
         {marks.map((i, index) => {
-          const left = i?.value / (max - min);
+          const left = (i?.value - min) / (max - min);
           const _left = index === 0 ? 0 : left > 1 ? 1 : left;
 
           return (
