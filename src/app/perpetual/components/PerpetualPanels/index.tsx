@@ -1,7 +1,7 @@
 "use client";
 import styled from "styled-components";
 import DraggableIcon from "../DraggableIcon";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Tabs from "../Tabs";
 import { tabProps } from "../Tabs";
 import Slider from "../Slider";
@@ -14,7 +14,8 @@ import useCurToken from "../../hooks/useCurToken";
 import Button from "../Button";
 import LongIcon from "@/app/assets/perpetual/long.svg";
 import ShortIcon from "@/app/assets/perpetual/short.svg";
-
+import Modal from "@/app/components/Modal";
+import AdjustLeverage from "./AdjustLeverage";
 const Wrapper = styled.div`
   position: relative;
   width: 100%;
@@ -231,10 +232,35 @@ const StopOrder = styled.div`
   }
 `;
 const Fee = styled(DataItem)`
-  .label {
+  position: relative;
+  & > .label {
     cursor: pointer;
     &:hover {
       color: ${(props) => props.theme.colors.primary1};
+      .content {
+        display: block;
+      }
+    }
+  }
+
+  .content {
+    transition: all 0.3s linear;
+    display: none;
+    position: absolute;
+    top: 15px;
+    left: 0;
+    right: 0;
+    padding: 27px 20px;
+
+    border-radius: 8px;
+    border: ${(props) => `1px solid ${props.theme.colors.fill2}`};
+    background: ${(props) => props.theme.colors.fill2};
+    .upgrade_item {
+      margin-bottom: 16px;
+    }
+    .upgrade {
+      color: ${(props) => props.theme.colors.primary1};
+      cursor: pointer;
     }
   }
 `;
@@ -249,17 +275,26 @@ const Btns = styled.div`
     margin-right: 14px;
   }
 `;
+
 const PerpetualPanels = () => {
   const { symbolName } = useCurToken();
   const [curCurrency, setCurCurrency] = useState("USD");
 
   const [activeTab, setActiveTab] = useState<string>("open");
   const [activeOrderTab, setActiveOrderTab] = useState<string>("limit");
-  const [leverage, setLeverage] = useState(3.0);
+  const defaultLeverage = 11;
+  const [leverage, setLeverage] = useState<number>(defaultLeverage);
+  const [confirmedLeverage, setConfirmedLeverage] =
+    useState<number>(defaultLeverage);
   const [price, setPrice] = useState<number | undefined>(undefined);
   const [margin, SetMargin] = useState<number | undefined>(undefined);
   const [amount, SetAmount] = useState<number | undefined>(undefined);
-
+  const [visible, setVisible] = useState(false);
+  const fundsAvailable = 2000;
+  
+  const onClose = () => {
+    setVisible(false);
+  };
   const actionTabList = [
     { label: "OPEN", key: "open" },
     { label: "CLOSE", key: "close" },
@@ -272,6 +307,18 @@ const PerpetualPanels = () => {
   const getMarketPrice = () => {
     setPrice(6666.77);
   };
+  const onConfirm = () => {
+    setConfirmedLeverage(leverage);
+    setVisible(false);
+  };
+  const onCancel = () => {
+    setVisible(false);
+  };
+  useEffect(() => {
+    if (!visible) {
+      setLeverage(confirmedLeverage);
+    }
+  }, [visible]);
   return (
     <Wrapper>
       <ActionTabs
@@ -291,8 +338,8 @@ const PerpetualPanels = () => {
               setActiveOrderTab(item?.key);
             }}
           />
-          <Leverage>
-            <p className="label">{leverage}X</p>
+          <Leverage onClick={() => setVisible(true)}>
+            <p className="label">{confirmedLeverage}X</p>
             <Image src={ArrowIcon} width={8} height={6} alt="" />
           </Leverage>
         </OrderTypeTabsWrapper>
@@ -300,15 +347,18 @@ const PerpetualPanels = () => {
           <Price>
             <p className="title">Price</p>
             <Input
+              disabled={activeOrderTab === "market"}
               value={price}
-              onChange={(e) => {
+              onChange={(e: React.FormEvent<HTMLInputElement>) => {
                 setPrice(+e?.currentTarget.value || undefined);
               }}
               placeholder="input price"
               suffix={
-                <div className="market" onClick={getMarketPrice}>
-                  market
-                </div>
+                activeOrderTab === "market" ? (
+                  <div className="market" onClick={getMarketPrice}>
+                    market
+                  </div>
+                ) : null
               }
             />
           </Price>
@@ -321,7 +371,7 @@ const PerpetualPanels = () => {
               <Input
                 placeholder="input margin"
                 value={margin}
-                onChange={(e) => {
+                onChange={(e: React.FormEvent<HTMLInputElement>) => {
                   SetMargin(+e?.currentTarget.value || undefined);
                 }}
               />
@@ -340,7 +390,7 @@ const PerpetualPanels = () => {
               <Input
                 placeholder="input amount"
                 value={amount}
-                onChange={(e) => {
+                onChange={(e: React.FormEvent<HTMLInputElement>) => {
                   SetAmount(+e?.currentTarget.value || undefined);
                 }}
               />
@@ -379,7 +429,7 @@ const PerpetualPanels = () => {
           <Data>
             <DataItem className="item">
               <p className="label">Funds Available</p>
-              <p className="value">2000.00 USD</p>
+              <p className="value">{fundsAvailable} USD</p>
             </DataItem>
             <DataItem className="item">
               <p className="label">Max Long</p>
@@ -400,7 +450,7 @@ const PerpetualPanels = () => {
                 <div className="item">
                   <Input
                     value={price}
-                    onChange={(e) => {
+                    onChange={(e: React.FormEvent<HTMLInputElement>) => {
                       setPrice(+e?.currentTarget.value || undefined);
                     }}
                     placeholder="TP Trigger Price"
@@ -413,7 +463,7 @@ const PerpetualPanels = () => {
                 <div className="item">
                   <Input
                     value={price}
-                    onChange={(e) => {
+                    onChange={(e: React.FormEvent<HTMLInputElement>) => {
                       setPrice(+e?.currentTarget.value || undefined);
                     }}
                     placeholder="SL Trigger Price"
@@ -431,7 +481,19 @@ const PerpetualPanels = () => {
             <p className="value">0.5%</p>
           </DataItem>
           <Fee>
-            <p className="label">Fee</p>
+            <p className="label">
+              Fee
+              <div className="content">
+                <DataItem className="item upgrade_item">
+                  <p className="label">VIP Level:Tier</p>
+                  <p className="value upgrade">upgrade</p>
+                </DataItem>
+                <DataItem className="item">
+                  <p className="label">Fee discount</p>
+                  <p className="value">20%</p>
+                </DataItem>
+              </div>
+            </p>
             <p className="value">0.05%</p>
           </Fee>
           <Btns>
@@ -445,6 +507,20 @@ const PerpetualPanels = () => {
         </ScrollWrapper>
       </Content>
       <DraggableIcon />
+      <Modal
+        onClose={onClose}
+        visible={visible}
+        title="Adjusting leverage"
+        onConfirm={onConfirm}
+        onCancel={onCancel}
+      >
+        <AdjustLeverage
+          leverage={leverage}
+          setLeverage={(v) => {
+            setLeverage(v);
+          }}
+        />
+      </Modal>
     </Wrapper>
   );
 };
