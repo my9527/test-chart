@@ -1,7 +1,7 @@
 import { defineChain } from 'viem';
 
 export const arbitrumGoerliTest = /*#__PURE__*/ defineChain({
-  id: 421_613,
+  id: 421613,
   name: 'Arbitrum Goerli',
   network: 'arbitrum-goerli',
   nativeCurrency: {

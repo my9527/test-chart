@@ -90,6 +90,18 @@ export const recoilPositionTokens = selector({
   },
 });
 
+/**
+ * position 长度
+ */
+export const recoilPositionNums = selector({
+  key: 'open_positions_length',
+  get: ({get}) => {
+    const list = get(recoilPositions);
+
+    return list.length;
+  },
+});
+
 
 /**
  * 所有交易对的标记价格

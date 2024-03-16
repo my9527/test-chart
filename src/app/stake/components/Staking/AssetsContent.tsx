@@ -1,52 +1,16 @@
 import Tabs from "@/app/components/Tabs"
 import { useState } from "react"
 import styled from "styled-components"
+import Table from "../Table"
+import Button from "@/app/components/Button"
 
-const Title = styled.h2`
-  font-size: ${props => props.theme.fontSize.header2};
-  color: ${props => props.theme.colors.text1};
-  margin-bottom: 10px;
-`
-const FieldFlex = styled.div`
-  display: flex;
-  justify-content: space-between;
-`
-
-const FieldBox = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-`
-
-const FieldLabel = styled.div`
-  font-size: ${props => props.theme.fontSize.small};
-  color: ${props => props.theme.colors.text4};
-  line-height: 20px;
-`
-
-const FieldValue = styled.div`
+const Text = styled.div`
   font-size: ${props => props.theme.fontSize.small};
   color: ${props => props.theme.colors.text1};
+  align-self: center;
 `
-
-const Button = styled.div`
-  font-size: ${props => props.theme.fontSize.small};
+const PrimaryText = styled.span`
   color: ${props => props.theme.colors.primary1};
-  line-height: 20px;
-  padding: 0 14px;
-  background: ${props => props.theme.colors.fill3};
-  border-radius: 99px;
-  &:hover {
-    background: ${props => props.theme.colors.primary1};
-    color: ${props => props.theme.colors.text1};
-  }
-`
-
-const Actions = styled.div`
-  display: flex;
-  gap: 20px;
-  align-items: center;
-  cursor: pointer;
 `
 
 const token = 'QLP'
@@ -65,16 +29,123 @@ export function AssetsContent() {
         {
           key: TabType.Stake, 
           title: 'Staking assets', 
-          children: '111',
+          children: <StakeAssets />,
         },
         {
           key: TabType.Unstake, 
           title: 'UnStaked assets',
-          children: '222',
+          children: <UnstakedAssets />,
         },
       ]}
       tab={tab}
       onTabChange={setTab}
     />
+  )
+}
+
+
+function StakeAssets () {
+  const data = [
+    {
+      token: 'QLP',
+      amount: '123,123.00',
+      duration: '1M',
+      score: '123,123',
+      maturity: '26 Mar 2024',
+    }
+  ]
+
+  const columns = [
+    {
+      title: 'Token',
+      dataKey: 'token',
+    },
+    {
+      title: 'Amount',
+      dataKey: 'amount',
+    },
+    {
+      title: 'Duration',
+      dataKey: 'duration',
+    },
+    {
+      title: 'Score',
+      dataKey: 'score'
+    },
+    {
+      title: 'Maturity',
+      dataKey: 'maturity'
+    },
+    {
+      title: 'Action',
+      render: () => {
+        return (
+          <Button secondary padding="5px 24px">Claim</Button>
+        )
+      }
+    }
+  ]
+  return (
+      <Table
+        data={data}
+        columns={columns}
+      />
+  )
+}
+
+
+
+function UnstakedAssets () {
+  const data = [
+    {
+      token: 'QLP',
+      amount: '123,123.00',
+      claimed: '123',
+      total: '123,123',
+      unstakeDate: '123,123',
+      maturity: '26 Mar 2024',
+    }
+  ]
+
+  const columns = [
+    {
+      title: 'Token',
+      dataKey: 'token',
+    },
+    {
+      title: 'Amount',
+      dataKey: 'amount',
+    },
+    {
+      title: 'Claimed/Total',
+      dataKey: 'claimTotal',
+      render: (row: {[key: string]: any}) => {
+        return (
+          <Text>{row.claimed}/<PrimaryText>{row.total}</PrimaryText></Text>
+        )
+      }
+    },
+    {
+      title: 'Unstake date',
+      dataKey: 'unstakeDate'
+    },
+    {
+      title: 'Maturity',
+      dataKey: 'maturity'
+    },
+    {
+      title: 'Action',
+      render: () => {
+        return (
+          <Button secondary padding="5px 24px">Claim</Button>
+        )
+      }
+    }
+  ]
+  return (
+      <Table
+        data={data}
+        columns={columns}
+      />
   )
 }

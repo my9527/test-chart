@@ -1,4 +1,4 @@
-import styled from "styled-components"
+import styled, { keyframes, useTheme } from "styled-components"
 import { AreaChart, Area, Tooltip, ResponsiveContainer, XAxis, Text, YAxis } from 'recharts';
 import Image from "next/image";
 import DotPng from "@/app/assets/stake/dot.png";
@@ -31,21 +31,19 @@ const TooltipText = styled.div`
   color: ${props => props.theme.colors.text1};
 `
 
+const breath_light = keyframes`
+  0% {
+    opacity: 0.5;
+  }
+  100% {
+    opacity: 1;
+  }
+`
+
 const Light = styled(Image)`
   width: 100%;
   height: 100%;
-  animation: breath_light 3s ease-in-out infinite;
-  @keyframes breath_light {
-    0% {
-      opacity: 0.5;
-    }
-    50% {
-      opacity: 1;
-    }
-    100% {
-      opacity: 0.5;
-    }
-  }
+  animation: ${breath_light} 3s ease-in-out infinite;
 `
 
 const ChartWrapper = styled.div`
@@ -72,6 +70,7 @@ const CustomTooltip = (props: any) => {
 const token = 'QLP'
 export function Chart() {
   const data = useTokenPrice()
+  const theme = useTheme()
 
   const CustomizedDot = (props: any) => {
     const { cx, cy, index } = props;
@@ -79,7 +78,7 @@ export function Chart() {
     if (index === (data.length - 1)) {
       return (
         <svg x={cx - 10} y={cy - 10} width={20} height={20} fill="red" viewBox="0 0 20 20">
-          <circle cx="9.52979" cy="9.73096" r="8.5293" fill="white" stroke="#7C67FF" stroke-width="2"/>
+          <circle cx="9.52979" cy="9.73096" r="8.5293" fill="white" stroke={theme.colors.primary1} stroke-width="2"/>
         </svg>
       )
     }
@@ -97,8 +96,8 @@ export function Chart() {
             <AreaChart data={data} margin={{ top: 0, right: 10, bottom: 0, left: 0 }}>
               <defs>
                 <linearGradient id="colorUv" x1="543.424" y1="0.0653076" x2="543.424" y2="282.757" gradientUnits="userSpaceOnUse">
-                  <stop offset="0.5" stop-color="rgba(124, 103, 255, 0.5)"/>
-                  <stop offset="1" stop-color="rgba(124, 103, 255, 0.5)" stop-opacity="0"/>
+                  <stop offset="0.5" stop-color={theme.colors.primary2} />
+                  <stop offset="1" stop-color={theme.colors.primary2} stop-opacity="0"/>
                 </linearGradient>
               </defs>
               <XAxis
@@ -110,7 +109,7 @@ export function Chart() {
                     payload: { value },
                   } = e;
                   return (
-                    <Text {...e} fill="rgba(255,255,255,0.5)" fontSize={10}>
+                    <Text {...e} fill={theme.colors.text4} fontSize={10}>
                       {dayjs.unix(value).format('hh:mm A')}
                     </Text>
                   );
@@ -120,12 +119,12 @@ export function Chart() {
                 axisLine={false}
                 tickLine={false}
                 domain={['auto', 'auto']}
-                tick={{ dx: 0, fill: 'rgba(255,255,255,0.45)', fontSize: 14 }}
+                tick={{ dx: 0, fill: theme.colors.text4, fontSize: 14 }}
                 // width={10 * 11}
                 // domain={['dataMin', 'dataMax']}
               />
-              <Tooltip cursor={{ stroke: '#7C67FF' }} content={<CustomTooltip />} />
-              <Area dot={<CustomizedDot />} type="linear" strokeWidth={2} dataKey="price" stroke="#7C67FF" fill="url(#colorUv)" />
+              <Tooltip cursor={{ stroke: theme.colors.primary1 }} content={<CustomTooltip />} />
+              <Area dot={<CustomizedDot />} type="linear" strokeWidth={2} dataKey="price" stroke={theme.colors.primary1} fill="url(#colorUv)" />
             </AreaChart>
           </ResponsiveContainer>
         </ChartWrapper>

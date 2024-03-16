@@ -18,6 +18,7 @@ const Wrapper = styled(motion.div)`
   color: #fff;
   padding: 0 10px;
   z-index: 1000;
+  box-sizing: content-box;
 
   &.placement-right {
     right: 0;
@@ -37,7 +38,7 @@ const Title = styled.div`
   align-items: center;
 `
 
-interface IDrawerProps extends React.PropsWithChildren {
+interface IDrawerProps {
   placement?: DirectionEnum.LEFT | DirectionEnum.RIGHT,
   visible: boolean,
   onHide: () => void,
@@ -45,14 +46,14 @@ interface IDrawerProps extends React.PropsWithChildren {
   title?: React.ReactNode,
 }
 
-export const Drawer = ({
+export const Drawer: FCC<IDrawerProps> = ({
   placement = DirectionEnum.RIGHT, 
   visible = false,
   children,
   onHide,
   width = 320,
   title,
-}: IDrawerProps) => {
+}) => {
   const ref = useRef<HTMLDivElement>(null);
 
   const handleClickOutside = useCallback(() => {

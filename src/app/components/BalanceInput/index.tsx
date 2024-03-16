@@ -1,5 +1,6 @@
 import { motion } from "framer-motion"
 import styled from "styled-components"
+import Button from "../Button"
 
 const FlexBox = styled.div<{ justify?: string }>`
   display: flex;
@@ -21,13 +22,12 @@ const Value = styled.div`
 const Currency = styled.div`
   font-size: ${props => props.theme.fontSize.header2};
   color: ${props => props.theme.colors.primary1};
+  margin-left: 39px;
 `
 
 const Wrapper = styled.div`
   position: relative;
-  &:hover > div {
-    border-color: ${props => props.theme.colors.primary1};
-  }
+
 `
 
 const TextField = styled.input`
@@ -39,25 +39,8 @@ const TextField = styled.input`
   position: absolute;
   bottom: 10px;
   left: 16px;
-  width: 70%;
-  &:hover, &:focus + div {
-    border-color: ${props => props.theme.colors.primary1};}
-  }
-`
-
-const SecondaryBtn = styled(motion.div)`
-  font-size: ${props => props.theme.fontSize.small};
-  color: ${props => props.theme.colors.primary1};
-  line-height: 20px;
-  padding: 0 14px;
-  background: ${props => props.theme.colors.fill2};
-  border-radius: 99px;
-  margin-right: 40px;
-  cursor: pointer;
-  &:hover {
-    background: ${props => props.theme.colors.primary1};
-    color: ${props => props.theme.colors.text1};
-  }
+  /* leave space for not overlapping right side DOM elements */
+  width: 60%;
 `
 
 const DisplayInput = styled.div`
@@ -68,6 +51,11 @@ const DisplayInput = styled.div`
   flex-direction: column;
   gap: 10px;
   border: 1px solid transparent;
+  ${TextField}:focus + &&,
+  ${Wrapper}:hover > && {
+    border-color: ${props => props.theme.colors.primary1};}
+  }
+  transition: border-color 0.2s ease-in-out;
 `
 
 interface IInputProps {
@@ -107,7 +95,7 @@ function BalanceInput ({ title, balance, currency, action, value, onChange }: II
           </FlexBox>
         </FlexBox>
         <FlexBox justify="flex-end">
-          { action ? <SecondaryBtn onClick={action.onClick}>{action.text}</SecondaryBtn> : null }
+          { action ? <Button primary padding="2px 14px" onClick={action.onClick}>{action.text}</Button> : null }
           <Currency>{currency}</Currency>
         </FlexBox>
       </DisplayInput>

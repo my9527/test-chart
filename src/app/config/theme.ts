@@ -4,6 +4,7 @@ export const theme: stringKey = {
     colors: {
       primary1: "#7C67FF",
       primary2: "rgba(124, 103, 255, 0.50)",
+      primary3: "linear-gradient(90deg, #634AFF 0%, #7E73FF 100%)",
       border1: "#272341",
       fill1: "#121212",
       fill2: "#1B1B21",
@@ -33,6 +34,7 @@ export const theme: stringKey = {
     colors: {
       primary1: "#7C67FF",
       primary2: "rgba(124, 103, 255, 0.50)",
+      primary3: "linear-gradient(90deg, #634AFF 0%, #7E73FF 100%)",
       border1: "#272341",
       fill1: "#121212",
       fill2: "#1B1B21",

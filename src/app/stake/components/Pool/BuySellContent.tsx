@@ -5,7 +5,7 @@ import ArrowDownIcon from "@/app/assets/stake/arrow-down.svg"
 import Image from "next/image"
 import { TwoTabs } from "@/app/components/TwoTabs"
 import BalanceInput from "@/app/components/BalanceInput"
-
+import Button from '@/app/components/LinearGradientButton'
 enum TradeType {
   Buy = 'buy',
   Sell = 'sell'
@@ -16,30 +16,10 @@ const ImageWrapper = styled.div`
   text-align: center;
 `
 
-const TabPanel = styled.div<{ active: boolean }>`
-  flex-grow: 1;
-  text-align: center;
-  line-height: 55px;
-  background: ${props => props.active ? 'unset' : props.theme.colors.fill3};
-  cursor: pointer;
-  position: relative;
-`
-
 const Content = styled.div`
   padding: 20px 35px 15px;
 `
 
-const Button = styled(motion.div)`
-  font-size: ${props => props.theme.fontSize.header2};
-  color: ${props => props.theme.colors.text1};
-  line-height: 40px;
-  width: 200px;
-  background: linear-gradient(90deg, #634AFF 0%, #7E73FF 100%);
-  border-radius: 999px;
-  text-align: center;
-  cursor: pointer;
-  margin: 0 auto;
-`
 
 const FlexBox = styled.div<{ justify?: string }>`
   display: flex;
@@ -119,7 +99,7 @@ export function BuySellContent() {
             <Value>123,123.00</Value>
           </FlexBox>
         </Form>
-        <Button whileTap={{ scale: 1.1 }}>{type === TradeType.Sell ? 'Sell' : 'Buy'}</Button>
+        <FlexBox justify="center"><Button>{type === TradeType.Sell ? 'Sell' : 'Buy'}</Button></FlexBox>
       </Content>
     </>
   )

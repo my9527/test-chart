@@ -3,7 +3,7 @@
 
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 
-import { WagmiProvider, createConfig} from 'wagmi';
+import { WagmiProvider} from 'wagmi';
 
 import {
   RainbowKitProvider,
@@ -30,7 +30,6 @@ import {
 const { wallets } = getDefaultWallets();
 
 const config = getDefaultConfig({
-  
   appName: 'nextjs-quenta',
   projectId: '8335051b217e5d8cbd9ecdcabdd0ebd2',
   wallets: [
@@ -47,8 +46,7 @@ const config = getDefaultConfig({
     arbitrumOne,
     arbitrumGoerliTest
   ],
-  ssr: false, // 设置为false， 避免因服务端导致初始Chain 为 chains 的第一个
-  syncConnectedChain:true,
+  ssr: true,
 
 });
 
@@ -59,9 +57,7 @@ export function RainbowProvider({ children }: { children: React.ReactNode }) {
   return (
     <WagmiProvider config={config} >
       <QueryClientProvider client={queryClient}>
-        <RainbowKitProvider>
-          {children}  
-        </RainbowKitProvider>
+        {children}
       </QueryClientProvider>
     </WagmiProvider>
   );

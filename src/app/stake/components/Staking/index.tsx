@@ -37,10 +37,7 @@ const Claim = styled(Box)`
 
 const Chart = styled(Box)`
   grid-area: chart;
-  padding: 23px 28px;
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
+  padding: 12px 16px;
 `
 
 const Assets = styled(Box)`

@@ -10,7 +10,7 @@ export function useTokenPrice() {
     if (!data) return [];
     const res = data?.data?.data || [];
     return res
-      ?.map((i) => ({
+      ?.map((i: any) => ({
         ...i,
         price: BigNumber(i?.slpPrice).div(1e6).toString(),
       }))
