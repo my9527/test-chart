@@ -69,12 +69,25 @@ const Wrapper = styled.div<Props>`
 
 const Input: React.FC<{
   placeholder?: string;
-  value?: string | number | undefined;
-  onChange?: React.ChangeEventHandler<HTMLInputElement>;
+  value?: string | number | null;
+  onChange?: Function;
   suffix?: React.ReactNode;
   prefix?: React.ReactNode;
   className?: string;
-}> = ({ placeholder, value, onChange, prefix, suffix, className }) => {
+  type?: string;
+  onBlur?: Function;
+  disabled?: boolean;
+}> = ({
+  placeholder,
+  value,
+  onChange,
+  prefix,
+  suffix,
+  className,
+  type = "number",
+  onBlur,
+  disabled,
+}) => {
   const prefixRef = useRef<HTMLDivElement | null>(null);
   const suffixRef = useRef<HTMLDivElement | null>(null);
 
@@ -89,12 +102,21 @@ const Input: React.FC<{
           {prefix}
         </div>
       )}
-      <input
-        className="input"
-        placeholder={placeholder}
-        value={value}
-        onChange={onChange}
-      />
+      {disabled ? (
+        <div className="input">{value}</div>
+      ) : (
+        <input
+          onBlur={(e) => {
+            onBlur && onBlur(e);
+          }}
+          className="input"
+          placeholder={placeholder}
+          value={value}
+          onChange={(e) => {
+            onChange && onChange(e, type);
+          }}
+        />
+      )}
       {suffix && (
         <div className="suffix" ref={suffixRef}>
           {suffix}
