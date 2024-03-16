@@ -47,7 +47,8 @@ const config = getDefaultConfig({
     arbitrumOne,
     arbitrumGoerliTest
   ],
-  ssr: true,
+  ssr: false, // 设置为false， 避免因服务端导致初始Chain 为 chains 的第一个
+  syncConnectedChain:true,
 
 });
 

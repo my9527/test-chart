@@ -57,7 +57,7 @@ export const OrderHeader:FC = () => {
 
     const HeaderItems = useMemo(() => {
         return [{
-            label: `Position(${positions})`,
+            label: `Position${positions ? `(${positions})` : ''}`,
             key: 'pos',
         }, {
             label: 'Limit Orders',

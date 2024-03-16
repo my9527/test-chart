@@ -134,6 +134,8 @@ const AppConfigOnChain: Record<number, AppConfigType> = {
 };
 
 // config app config on default chain id, if chain changes, then the provider should update
+
+
 export const AppConfigContext = createContext(
   AppConfigOnChain[DEFAULT_CHAIN_ID]
 );

@@ -260,6 +260,9 @@ export const OpenInterestsEffects: FC = memo(() => {
                     id: `${targetCall.address}-${targetCall.args?.[0]}`,
                     tokenSize: rslt?.result?.toString() || '0',
                     type: 'openInterest',
+                    address: targetCall.address,
+                    futureId: targetCall.args?.[0],
+                    side: targetCall.address === LongContractParams.address ? FutureType.LONG : FutureType.SHORT
                 };
             });
 
@@ -269,6 +272,7 @@ export const OpenInterestsEffects: FC = memo(() => {
                     id: `${targetCall?.address}-${targetCall?.args?.[0]}`,
                     tokenSize: rslt ? BigNumber(rslt?.result?.toString()).div(10 ** 6).toString() : '0',
                     type: 'globalUsdValue',
+                    futureId: targetCall?.args?.[0],
                 };
             });
 
@@ -285,6 +289,7 @@ export const OpenInterestsEffects: FC = memo(() => {
                     side: targetCall.address === LongContractParams.address ? FutureType.LONG : FutureType.SHORT,
                     id: `${targetCall?.address}-${targetCall?.args?.[0]}`,
                     fee: rslt?.result?.toString() || '0',
+                    futureId: targetCall?.args?.[0],
                 };
             });
 
@@ -295,6 +300,7 @@ export const OpenInterestsEffects: FC = memo(() => {
                     side: targetCall.address === LongContractParams.address ? FutureType.LONG : FutureType.SHORT,
                     id: `${targetCall?.address}-${targetCall?.args?.[0]}`,
                     fee: rslt?.result?.toString() || '0',
+                    futureId: targetCall?.args?.[0],
                 };
             });
 
@@ -305,6 +311,9 @@ export const OpenInterestsEffects: FC = memo(() => {
                 longReadable: formatUnits((availableLiqResults?.[0]?.result || 0) as bigint, 6),
                 shortReadable: formatUnits((availableLiqResults?.[1]?.result || 0) as bigint, 6),
             };
+
+
+            console.log("openInterests", openInterests);
 
 
             // 更新execution fee

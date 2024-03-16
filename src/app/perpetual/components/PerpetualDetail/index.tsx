@@ -16,6 +16,11 @@ import { filterPrecision } from "@/app/utils/tools";
 import use24hPrice from "@/app/perpetual/hooks/use24hPrice";
 import useCurToken from "@/app/perpetual/hooks/useCurToken";
 import ChangPrice from "./ChangPrice";
+import { useIndexPricesById } from "@/app/hooks/useIndexPrices";
+import BigNumber from "bignumber.js";
+import useTickerPrice from "@/app/hooks/useTickerPrice";
+import { useOpenInterests, useOpenInterestsByAddressId, useOpenInterestsBySideId } from "../../hooks/useOpenInterest";
+import { FutureType } from "@/app/config/common";
 
 const Wrapper = styled.div`
   width: 100%;
@@ -144,9 +149,35 @@ const PerpetualDetail = memo((props) => {
     );
   }, [favoriateList]);
 
+  
+  const tickerPrice = useTickerPrice();
+
+  const [currentTokenOpenLongInterest] = useOpenInterestsBySideId(FutureType.LONG, curToken.futureLongId);
+  const [currentTokenOpenShortInterest] = useOpenInterestsBySideId(FutureType.SHORT, curToken.futureShortId);
+
+
+  // long open interest
+  const longIO = useMemo(() => {
+
+    const _long = BigNumber(currentTokenOpenLongInterest?.tokenSize).multipliedBy(curToken.pars).toString()
+    return  BigNumber(tickerPrice?.currentTickerPrice)
+    .multipliedBy(_long || '0')
+    .toFixed(2, BigNumber.ROUND_DOWN)
+  }, [currentTokenOpenLongInterest, tickerPrice?.currentTickerPrice]);
+
+
+  // short open interest
+  const shortIO = useMemo(() => {
+    const _long = BigNumber(currentTokenOpenShortInterest?.tokenSize).multipliedBy(curToken.pars).toString()
+    return  BigNumber(tickerPrice?.currentTickerPrice)
+    .multipliedBy(_long || '0')
+    .toFixed(2, BigNumber.ROUND_DOWN)
+  }, [currentTokenOpenShortInterest, tickerPrice?.currentTickerPrice]);
+
+
   const ifZeroOI = 0,
-    longPie = 130,
-    shortPie = 232;
+    longPie = longIO,
+    shortPie = shortIO;
   const oiChart = useMemo(() => {
     return (
       <ResponsiveContainer width="100%" height="100%">
@@ -239,8 +270,8 @@ const PerpetualDetail = memo((props) => {
             <div className="pie_chart">{oiChart}</div>
           </div>
           <div className="content">
-            <p className="long">$2,123,456.00</p>/
-            <p className="short">$2,123,456.00</p>
+            <p className="long">${filterPrecision(longIO, curToken.displayDecimal)}</p>/
+            <p className="short">${filterPrecision(shortIO, curToken.displayDecimal)}</p>
           </div>
         </OpenInterest>
         <Line />

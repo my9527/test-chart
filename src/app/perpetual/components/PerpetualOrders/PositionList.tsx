@@ -10,9 +10,9 @@ import { ThHTMLAttributes, useMemo } from "react";
 import { useRecoilValue } from "recoil";
 import styled from "styled-components";
 import { getLiqPrice } from "../../lib/getLiqPrice";
-import { useFundingFeeByAddressSide } from "../../hooks/useFundingFee";
+import { useFundingFeeByAddressSide } from "../../hooks/useFundingFees";
 import { FutureType } from "@/app/config/common";
-import { useBorrowingFeeByAddressSide } from "../../hooks/useBorrowingFee";
+import { useBorrowingFeeByAddressSide } from "../../hooks/useBorrowingFees";
 import { calcPnl, calcPnlPercentage } from "../../lib/getPnl";
 
 

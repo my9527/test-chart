@@ -40,7 +40,8 @@ const Right = styled.div`
 `;
 
 const ConnectButton = styled(Row)`
-  width: 144px;
+  // width: 144px;
+  padding: 6px 25px;
   height: 26px;
   box-sizing: border-box;
   flex-shrink: 0;
