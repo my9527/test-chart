@@ -6,6 +6,8 @@ import { filterPrecision } from "@/app/utils/tools";
 
 type WrapperProps = { change: string };
 const Wrapper = styled.div<WrapperProps>`
+  width: 80px;
+  text-align: center;
   color: ${(props) =>
     +props.change > 0
       ? props.theme.colors.text2

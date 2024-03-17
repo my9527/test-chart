@@ -4,6 +4,8 @@ import styled from "styled-components"
 import Duration from "./StakeDuration"
 import BalanceInput from "@/app/components/BalanceInput"
 import { TwoTabs } from "@/app/components/TwoTabs"
+import Button from "@/app/components/LinearGradientButton"
+import FlexBox from "../FlexBox"
 
 enum TradeCoin {
   Token = 'QLP',
@@ -12,24 +14,6 @@ enum TradeCoin {
 
 const Content = styled.div`
   padding: 25px 35px 0;
-`
-
-const Button = styled(motion.div)`
-  font-size: ${props => props.theme.fontSize.header2};
-  color: ${props => props.theme.colors.text1};
-  line-height: 40px;
-  width: 200px;
-  background: linear-gradient(90deg, #634AFF 0%, #7E73FF 100%);
-  border-radius: 999px;
-  text-align: center;
-  cursor: pointer;
-  margin: 0 auto;
-`
-
-const FlexBox = styled.div<{ justify?: string }>`
-  display: flex;
-  justify-content: ${props => props.justify || "flex-start"};
-  align-items: center;
 `
 
 const Label = styled.div`
@@ -109,7 +93,7 @@ export function StakeFormContent() {
             <Label>26 Mar 2024</Label>
           </FlexBox>
         </Form>
-        <Button whileTap={{ scale: 1.1 }}>Stake</Button>
+        <FlexBox justify="center"><Button>Stake</Button></FlexBox>
       </Content>
     </>
   )
