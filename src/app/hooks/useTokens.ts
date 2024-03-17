@@ -1,8 +1,6 @@
 import { useChainId } from "wagmi";
 import { useMemo } from "react";
 import { Token, tokens } from "../config/tokens";
-import { useParams } from "next/navigation";
-import { DEFAULT_TOKEN_SYMBOL } from "../config/common";
 
 /**
  * 获取全部token
@@ -22,8 +20,10 @@ export const useTokens = () => {
  */
 export const useTokenByName = (tokenName: string) => {
   const tokens = useTokens();
+
+  
   const token = useMemo(() => {
-    return tokens.filter((token_) => token_.symbolName === tokenName);
+    return tokens.filter((token_) => token_.symbolName.toLowerCase() === tokenName.toLowerCase());
   }, [tokens, tokenName]);
 
   return token[0];
@@ -74,3 +74,16 @@ export const useTokensIdMap = () => {
     return result;
   }, [tokens]);
 };
+
+
+
+/**
+ * 获取usdTokens
+ * @returns 
+ */
+export const useUSDTokens = () => {
+  const tokens = useTokens();
+  return useMemo(() => {
+    return tokens.filter(token_ => token_.exchangeStable)
+  }, [tokens]);
+}

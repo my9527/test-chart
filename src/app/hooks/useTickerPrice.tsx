@@ -4,20 +4,20 @@ import useCurToken from "@/app/perpetual/hooks/useCurToken";
 import { useMemo } from "react";
 
 const useTickerPrice = () => {
-  const { curToken } = useCurToken();
+  const { token } = useCurToken();
   const indexPrices = useRecoilValue(recoilIndexPrices);
 
   const currentTickerPrice = useMemo(() => {
-    if (!curToken.symbolName) return "0";
+    if (!token.symbolName) return "0";
 
-    return indexPrices[curToken.symbolName]?.price || "0";
-  }, [curToken, indexPrices]);
+    return indexPrices[token.symbolName]?.price || "0";
+  }, [token, indexPrices]);
 
   const ethTickerPrice = useMemo(() => {
-    if (!curToken.symbolName) return "0";
+    if (!token.symbolName) return "0";
 
     return indexPrices["ETH"]?.price || "0";
-  }, [curToken, indexPrices]);
+  }, [token, indexPrices]);
 
   return {
     currentTickerPrice,

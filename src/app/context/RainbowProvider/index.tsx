@@ -15,6 +15,7 @@ import {
   argentWallet,
   trustWallet,
   ledgerWallet,
+  walletConnectWallet
 } from '@rainbow-me/rainbowkit/wallets';
 
 import {
@@ -37,7 +38,7 @@ const config = getDefaultConfig({
     ...wallets,
     {
       groupName: 'Other',
-      wallets: [argentWallet, trustWallet, ledgerWallet],
+      wallets: [walletConnectWallet],
     },
   ],
   chains: [

@@ -254,6 +254,7 @@ const Slider: React.FC<SliderProps> = ({
 
           return (
             <Mark
+              key={_left}
               percent={_left}
               onClick={(e) => {
                 handleDotClick(_left);

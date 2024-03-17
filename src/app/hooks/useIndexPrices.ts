@@ -20,5 +20,5 @@ export const useIndexPricesById = (futureId: number | string) => {
 
     const token = useTokenByFutureId(futureId);
 
-    return prices[token.symbolName];
+    return prices[token?.symbolName];
 }

@@ -9,6 +9,8 @@ import { useAccount } from "wagmi";
 import { shortenString } from "@/app/lib/shortenString";
 import { walletsMap } from "./Wallet/contants";
 import { Row } from "../Row";
+import { useRecoilState } from "recoil";
+import { recoilWalletConnectPanel } from "@/app/models";
 
 const Wrapper = styled.div`
   background: ${(props) => props.theme.colors.fill1};
@@ -84,13 +86,8 @@ const ConnectedButton = styled(Row)`
 `
 
 const Header = () => {
-  const [visible, setVisible] = useState(false);
-
+  const [visible, setVisible] = useRecoilState(recoilWalletConnectPanel);
   const { isConnected, address, connector } = useAccount();
-
-
-
-
 
   return (
     <Wrapper>
@@ -101,7 +98,9 @@ const Header = () => {
       </Left>
       <Right>
       {
-        isConnected ? <ConnectedButton onClick={() => setVisible(true)}>{walletsMap[connector?.name as string]?.icon} <span>{shortenString(address as string)}</span></ConnectedButton> : <ConnectButton onClick={() => setVisible(true)}>Connect Wallet</ConnectButton> 
+        isConnected ? <ConnectedButton onClick={() => {
+          setVisible(true);
+        }}>{walletsMap[connector?.name as string]?.icon} <span>{shortenString(address as string)}</span></ConnectedButton> : <ConnectButton onClick={() => setVisible(true)}>Connect Wallet</ConnectButton> 
       }
       </Right>
       

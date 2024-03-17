@@ -2,6 +2,7 @@ import { AtomEffect, DefaultValue, atom, selector } from "recoil";
 import { Token } from "../config/tokens";
 import { Address } from "viem";
 import BigNumber from "bignumber.js";
+import dayjs from "dayjs";
 
 export const localStorageEffect: <T>(key: string) => AtomEffect<T> =
   (key: string) =>
@@ -150,4 +151,27 @@ export const recoilOpenInterests = atom<OpenInterestsType>({
         borrowingFees: [],
         currentTokenAvailableLiq: [],
   }
+});
+
+
+export type LPInfoType = {
+  poolAmount: number | string;
+  poolLockedAmount: number | string;
+}
+
+export const recoilLPInfo = atom<LPInfoType>({
+  key: 'lp_info',
+  default: {
+    poolAmount: 0,
+    poolLockedAmount: 0,
+  }
+})
+
+
+/**
+ * 钱包链接侧边栏是否打开
+ */
+export const recoilWalletConnectPanel = atom<boolean>({
+  key: 'wallet_connect_panel',
+  default: false,
 })

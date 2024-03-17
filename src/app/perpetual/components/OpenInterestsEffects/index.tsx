@@ -66,8 +66,8 @@ export const OpenInterestsEffects: FC = memo(() => {
     
 
     const availableTokens = useMemo(() => {
-        return [...positionTokens, currentToken.curToken]
-    }, [positionTokens, currentToken.curToken]);
+        return [...positionTokens, currentToken.token]
+    }, [positionTokens, currentToken.token]);
 
 
     // 用于监听仓位或当前 token 的变化，一遍重新请求相关数据
@@ -77,7 +77,7 @@ export const OpenInterestsEffects: FC = memo(() => {
 
 
 
-    const currentTokenPrice = useIndexPricesById(currentToken.curToken.futureLongId);
+    const currentTokenPrice = useIndexPricesById(currentToken.token.futureLongId);
 
 
 
@@ -88,13 +88,13 @@ export const OpenInterestsEffects: FC = memo(() => {
                 ...LiquidityPoolParams,
                 chainId: chainId,
                 functionName: 'getAvailableTokenForFuture',
-                args: [appConfig.contract_address.LongAddress, currentToken.curToken.futureLongId],
+                args: [appConfig.contract_address.LongAddress, currentToken.token.futureLongId],
             },
             {
                 ...LiquidityPoolParams,
                 chainId: chainId,
                 functionName: 'getAvailableTokenForFuture',
-                args: [appConfig.contract_address.ShortAddress, currentToken.curToken.futureShortId],
+                args: [appConfig.contract_address.ShortAddress, currentToken.token.futureShortId],
             },
         ];
     }, [appConfig, currentToken, LiquidityPoolParams, chainId])
@@ -105,13 +105,13 @@ export const OpenInterestsEffects: FC = memo(() => {
             ...LongContractParams,
             chainId: chainId,
             functionName: 'sizeGlobal',
-            args: [currentToken.curToken.futureLongId],
+            args: [currentToken.token.futureLongId],
         },
         {
             ...ShortContractParams,
             chainId: chainId,
             functionName: 'sizeGlobal',
-            args: [currentToken.curToken.futureShortId],
+            args: [currentToken.token.futureShortId],
         }];
     }, [LongContractParams, ShortContractParams, chainId, currentToken])
 
@@ -197,21 +197,22 @@ export const OpenInterestsEffects: FC = memo(() => {
     }, [FutureManagerContractParams , chainId]);
 
 
+    
     //
     const globalUsdValueCalls = useMemo(() => {
         return [{
             ...LongContractParams,
             chainId: chainId,
             functionName: 'getGlobalUSDValue',
-            args: [currentToken.curToken.futureLongId, currentTokenPrice?.price * 10 ** 6],
+            args: [currentToken.token.futureLongId, currentTokenPrice?.price * 10 ** 6 || Math.random()],
         },
         {
             ...ShortContractParams,
             chainId: chainId,
             functionName: 'getGlobalUSDValue',
-            args: [currentToken.curToken.futureShortId, currentTokenPrice?.price * 10 ** 6],
+            args: [currentToken.token.futureShortId, currentTokenPrice?.price * 10 ** 6],
         }];
-    }, [chainId, currentTokenPrice?.price, LongContractParams, ShortContractParams, currentToken.curToken])
+    }, [chainId, currentTokenPrice, LongContractParams, ShortContractParams, currentToken.token])
 
 
 
@@ -235,7 +236,7 @@ export const OpenInterestsEffects: FC = memo(() => {
 
 
 
-    const callFns = useCallback(() => {
+    const callFns = useCallback(async () => {
 
         const [
             openInterestsCalls,
@@ -268,11 +269,14 @@ export const OpenInterestsEffects: FC = memo(() => {
 
             const globalUsdValues = globalUsdValueResults?.map((rslt: any, index) => {
                 const targetCall = globalUsdValueCalls[index];
+
                 return {
                     id: `${targetCall?.address}-${targetCall?.args?.[0]}`,
                     tokenSize: rslt ? BigNumber(rslt?.result?.toString()).div(10 ** 6).toString() : '0',
                     type: 'globalUsdValue',
                     futureId: targetCall?.args?.[0],
+                    address: targetCall?.address,
+                    side: targetCall.address === LongContractParams.address ? FutureType.LONG : FutureType.SHORT,
                 };
             });
 
@@ -312,10 +316,6 @@ export const OpenInterestsEffects: FC = memo(() => {
                 shortReadable: formatUnits((availableLiqResults?.[1]?.result || 0) as bigint, 6),
             };
 
-
-            console.log("openInterests", openInterests);
-
-
             // 更新execution fee
             updateExecutionFee(executionFeeResults?.[0]?.result?.toString() || '0');
 
@@ -335,9 +335,7 @@ export const OpenInterestsEffects: FC = memo(() => {
     }, []);
 
 
-    const { run, cancel } = useRequest(async () => {
-        callFns();
-    }, {
+    const { run, cancel } = useRequest(callFns, {
         manual: true,
         pollingInterval: 15 * 1000,
         // refreshDeps: [callFns]

@@ -6,6 +6,7 @@ import { OrderHeader } from "./Header";
 import { PositionList } from "./PositionList";
 import { Col } from "@/app/components/Col";
 import { useState } from "react";
+import { NotAuthed } from "@/app/components/NotAuthed";
 const Wrapper = styled.div`
   position: relative;
   width: 100%;
@@ -36,7 +37,10 @@ const PerpetualOrders = () => {
       <DraggableIcon />
       <Content>
         <OrderHeader />
-        <PositionList />
+        <NotAuthed>
+          <PositionList />
+        </NotAuthed>
+        
       </Content>
       
     </Wrapper>

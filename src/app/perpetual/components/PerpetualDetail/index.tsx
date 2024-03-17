@@ -21,6 +21,8 @@ import BigNumber from "bignumber.js";
 import useTickerPrice from "@/app/hooks/useTickerPrice";
 import { useOpenInterests, useOpenInterestsByAddressId, useOpenInterestsBySideId } from "../../hooks/useOpenInterest";
 import { FutureType } from "@/app/config/common";
+import { FundingFeeCountDown } from "./FundingFeeCountDown";
+import { FundingFeeRate } from "./FundingFeeRate";
 
 const Wrapper = styled.div`
   width: 100%;
@@ -130,7 +132,7 @@ const FundingRate = styled(InfoItem)`
   }
 `;
 const PerpetualDetail = memo((props) => {
-  const { curToken, symbolName } = useCurToken();
+  const { token: curToken, symbolName } = useCurToken();
 
   const theme = useTheme();
   const [favoriateList, setFavoriateList] = useRecoilState(recoilFavoriateList);
@@ -280,14 +282,14 @@ const PerpetualDetail = memo((props) => {
             <p>Funding Rate L/S(D) | Countdown</p>
           </div>
           <div className="content">
-            <p className="rate">+0.1% / -0.1% </p>
-            <p className="short">|1h 56m 59s</p>
+            <p className="rate"><FundingFeeRate /> / -0.1% </p>
+            <p className="short">|<FundingFeeCountDown/></p>
           </div>
         </FundingRate>
         <Line />
         <InfoItem>
           <p className="label">Max Profit Ratio</p>
-          <p className="content">9,999.99%</p>
+          <p className="content">{BigNumber(curToken.maxProfitRatio).multipliedBy(100).toFixed(2, BigNumber.ROUND_DOWN)}%</p>
         </InfoItem>
       </Layout>
       <Layout>

@@ -32,9 +32,6 @@ export const getLiqPrice = ({
     const numerator = BigNumber(collateral).plus(fees).plus(BigNumber(isLong ? -1 : 1).multipliedBy(BigNumber(size).multipliedBy(par).multipliedBy(entryPrice)));
     const denominator = BigNumber(size).multipliedBy(par).multipliedBy(totalFeeRatio);
     liq = BigNumber(numerator).div(denominator);
-
-    console.log("get liq:", token.symbolName, liq.toString());
-
     return liq.lte(0) ? '0' : liq.toString();
 
 }

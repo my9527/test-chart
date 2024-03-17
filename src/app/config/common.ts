@@ -45,3 +45,11 @@ export const DefaultRemainCollateralRatio = 0.5 / 100;
 
 // default tradingFeeRatio
 export const  BasicTradingFeeRatio = 0.08;
+
+
+// 
+export const generateSignApiTokenMessage = (address: string, now: number) => `
+Welcome to HyperionX.
+Your address: ${address}
+Timestamp: ${now}
+`
