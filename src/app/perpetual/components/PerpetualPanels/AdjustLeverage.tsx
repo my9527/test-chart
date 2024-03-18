@@ -73,15 +73,24 @@ const AdjustLeverage: React.FC<{
   setLeverage: (value: number) => any;
 }> = ({ leverage, setLeverage }) => {
   const { symbolName } = useCurToken();
-  const [value, setValue] = useState<number>(leverage);
+  const [value, setValue] = useState<number | undefined>(leverage);
   const max = 100;
   const min = 1;
-  const valueRef = useRef<number>();
+
+  const [percent, setPercent] = useState<number>(0);
 
   useEffect(() => {
-    valueRef.current = value;
-    setLeverage(value);
-  }, [value, valueRef?.current]);
+    if (typeof value === "number") {
+      setLeverage(value);
+      if (value < min) {
+        setPercent(0);
+      } else {
+        setPercent((value - min) / (max - min));
+      }
+    }else{
+      setPercent(0);
+    }
+  }, [value]);
 
   return (
     <Wrapper>
@@ -103,31 +112,27 @@ const AdjustLeverage: React.FC<{
           onChange={(e: React.FormEvent<HTMLInputElement>, type: string) => {
             const reg = /^\+?[1-9][0-9]*$/;
             const flag = reg.test(e?.currentTarget?.value);
+          
             if (!e?.currentTarget?.value) {
-              setValue(0);
+              setValue(undefined);
+              setPercent(0);
               return;
             }
-            if (type === "number" && flag) {
-              if (valueRef?.current === +e?.currentTarget?.value) {
+            if (flag) {
+              if (+e?.currentTarget.value > max) {
+                setValue(max);
               } else {
-                if (+e?.currentTarget.value > max) {
-                  setValue(max);
-                } else {
-                  setValue(+e?.currentTarget.value || 0);
-                }
+                setValue(+e?.currentTarget.value || 0);
               }
             }
           }}
         />
       </LeverageRatio>
       <Slider
+        per={percent}
         onChange={(value) => {
-          if (valueRef?.current === value) {
-          } else {
-            setValue(value);
-          }
+          setValue(value);
         }}
-        value={value || 0}
         marks={[
           {
             label: "1X",
@@ -153,7 +158,6 @@ const AdjustLeverage: React.FC<{
         ]}
         min={min}
         max={max}
-        step={25}
         unit="X"
       />
       <Desc>

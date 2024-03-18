@@ -4,6 +4,7 @@ import { useRef } from "react";
 type Props = {
   prefixWidth: number;
   suffixWidth: number;
+  type: string;
 };
 const Wrapper = styled.div<Props>`
   display: flex;
@@ -16,7 +17,12 @@ const Wrapper = styled.div<Props>`
     display: flex;
     align-items: center;
     border-radius: 8px;
-    border: ${(props) => `1px solid ${props.theme.colors.border1}`};
+    border: ${(props) =>
+      `1px solid ${
+        props.type === "warn"
+          ? props.theme.colors.text5
+          : props.theme.colors.border1
+      }`};
     background: ${(props) => props.theme.colors.fill2};
     outline-style: none;
     padding-left: ${(props) =>
@@ -46,7 +52,12 @@ const Wrapper = styled.div<Props>`
       font-size: ${(props) => props.theme.fontSize.medium};
     }
     &:focus {
-      border: ${(props) => `1px solid ${props.theme.colors.primary1}`};
+      border: ${(props) =>
+        `1px solid ${
+          props.type === "warn"
+            ? props.theme.colors.text5
+            : props.theme.colors.primary1
+        }`};
     }
   }
   .prefix {
@@ -77,6 +88,7 @@ const Input: React.FC<{
   type?: string;
   onBlur?: Function;
   disabled?: boolean;
+  maxLength?: number;
 }> = ({
   placeholder,
   value,
@@ -84,15 +96,17 @@ const Input: React.FC<{
   prefix,
   suffix,
   className,
-  type = "number",
+  type = "normal",
   onBlur,
   disabled,
+  maxLength,
 }) => {
   const prefixRef = useRef<HTMLDivElement | null>(null);
   const suffixRef = useRef<HTMLDivElement | null>(null);
 
   return (
     <Wrapper
+      type={type}
       className={className}
       prefixWidth={prefixRef?.current?.clientWidth || 0}
       suffixWidth={suffixRef?.current?.clientWidth || 0}
@@ -106,6 +120,7 @@ const Input: React.FC<{
         <div className="input">{value}</div>
       ) : (
         <input
+          maxLength={maxLength}
           onBlur={(e) => {
             onBlur && onBlur(e);
           }}
@@ -113,7 +128,7 @@ const Input: React.FC<{
           placeholder={placeholder}
           value={value}
           onChange={(e) => {
-            onChange && onChange(e, type);
+            onChange && onChange(e);
           }}
         />
       )}
