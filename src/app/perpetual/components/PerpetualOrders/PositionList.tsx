@@ -258,7 +258,7 @@ const Position: FCC<{ pos: PositionType }> = ({ pos }) => {
     
     return (
         <PositionItemWrapper>
-            <td align="left" width={80}>
+            <td align="left" width={140}>
                 <Col gap="6px" align="start" className={`symbol-name ${pos.isLong ? 'long-pos' : 'short-pos'}`}>
                     <div><TokenById futureId={pos.futureId} /></div>
                     <div className={`pos-dir`}>{pos.isLong ? 'Long' : 'Short'}</div>

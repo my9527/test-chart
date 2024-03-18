@@ -80,7 +80,7 @@ const Wrapper = styled.div<Props>`
 
 const Input: React.FC<{
   placeholder?: string;
-  value?: string | number | null;
+  value?: string | number;
   onChange?: Function;
   suffix?: React.ReactNode;
   prefix?: React.ReactNode;

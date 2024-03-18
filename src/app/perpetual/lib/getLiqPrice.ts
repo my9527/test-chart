@@ -23,18 +23,15 @@ export const getLiqPrice = ({
 
     if (!size || !token) return '0';
 
-    const par = token.pars;
+    const par = token?.pars;
 
     let liq = BigNumber(0);
-    const feeRatio = BigNumber(token.tradingFeeRatio || 0).div(100).plus(token.maintainMarginRatio || DefaultRemainCollateralRatio).toString();
+    const feeRatio = BigNumber(token?.tradingFeeRatio || 0).div(100).plus(token?.maintainMarginRatio || DefaultRemainCollateralRatio).toString();
 
     const totalFeeRatio = BigNumber(feeRatio).plus(isLong ? -1 : 1);
     const numerator = BigNumber(collateral).plus(fees).plus(BigNumber(isLong ? -1 : 1).multipliedBy(BigNumber(size).multipliedBy(par).multipliedBy(entryPrice)));
     const denominator = BigNumber(size).multipliedBy(par).multipliedBy(totalFeeRatio);
     liq = BigNumber(numerator).div(denominator);
-
-    console.log("get liq:", token.symbolName, liq.toString());
-
     return liq.lte(0) ? '0' : liq.toString();
 
 }

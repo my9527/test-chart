@@ -2,6 +2,7 @@ import { AtomEffect, DefaultValue, atom, selector } from "recoil";
 import { Token } from "../config/tokens";
 import { Address } from "viem";
 import BigNumber from "bignumber.js";
+import dayjs from "dayjs";
 
 export const localStorageEffect: <T>(key: string) => AtomEffect<T> =
   (key: string) =>
@@ -149,5 +150,88 @@ export const recoilOpenInterests = atom<OpenInterestsType>({
         fundingFees: [],
         borrowingFees: [],
         currentTokenAvailableLiq: [],
+  }
+});
+
+
+export type LPInfoType = {
+  poolAmount: number | string;
+  poolLockedAmount: number | string;
+}
+
+export const recoilLPInfo = atom<LPInfoType>({
+  key: 'lp_info',
+  default: {
+    poolAmount: 0,
+    poolLockedAmount: 0,
+  }
+})
+
+
+/**
+ * 钱包链接侧边栏是否打开
+ */
+export const recoilWalletConnectPanel = atom<boolean>({
+  key: 'wallet_connect_panel',
+  default: false,
+})
+
+
+
+type FutureOrderType = {
+    orders: any[],
+    validOrders: any[],
+    inValidOrders: any[]
+}
+
+export const recoilFutureOrders = atom<FutureOrderType>({
+
+  key: 'future_orders',
+  default: {
+    orders: [],
+    validOrders: [],
+    inValidOrders: []
+  },
+})
+
+export const recoilFutureLimitOrMarketOrders = selector({
+  key: 'future_orders_limit',
+  get: ({get}) => {
+    const { validOrders } = get(recoilFutureOrders);
+
+    return validOrders.filter(order => {
+      return ['increaseMarketOrders', 'increaseLimitOrders', 'decreaseLimitOrders', 'decreaseMarketOrders'].includes(order.type);
+    })
+    // .sort((a, b) => b.futureId - a.futureId);
+  },
+});
+
+export const recoilFutureStopOrders = selector({
+  key: 'future_orders_stop',
+  get: ({get}) => {
+    const { validOrders } = get(recoilFutureOrders);
+
+    return validOrders.filter(order => {
+      return ['futureStopOrders'].includes(order.type);
+    });
+  },
+});
+
+
+
+export const recoilOrdersLen = selector({
+  key: 'future_orders_len',
+  get:({ get }) => {
+    const positionList = get(recoilPositions);
+    const limitList = get(recoilFutureLimitOrMarketOrders);
+    const stopList = get(recoilFutureStopOrders);
+
+    return {
+      position: positionList.length,
+      limit:  limitList.length,
+      stop: stopList.length,
+      history: 0,
+    }
+
   }
 })

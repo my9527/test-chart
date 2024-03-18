@@ -264,11 +264,15 @@ const FastTradeInfo = () => {
 
 
 
-export const UserWalletInfo = () => {
+export const UserWalletInfo: FC<{ address: `0x${string}` | undefined }> = ({ address }) => {
 
-    const { connector, address, isConnected } = useAccount();
+    const { connector, isConnected } = useAccount();
     const { disconnect } = useDisconnect();
-    console.log("isConnectedisConnected", isConnected)
+    console.log("isConnectedisConnected", isConnected);
+
+    if(!isConnected) {
+        return null;
+    }
 
 
     return (

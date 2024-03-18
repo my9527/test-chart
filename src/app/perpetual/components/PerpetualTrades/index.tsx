@@ -123,7 +123,7 @@ const PerpetualTrades = () => {
   );
 
   //获取当前token
-  const { curToken, symbolName } = useCurToken();
+  const { token: curToken, symbolName } = useCurToken();
   useEffect(() => {
     if (curToken?.symbolName) {
       run({ futureId: curToken?.futureLongId?.toString() });

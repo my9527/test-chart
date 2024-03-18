@@ -12,8 +12,10 @@ const useCurToken = () => {
     return symbol.split("USD")[0].toLocaleUpperCase();
   }, [symbol]);
 
-  const curToken = useTokenByName(symbolName);
+  
 
-  return { symbolName, curToken };
+  const token = useTokenByName(symbolName);
+
+  return { symbolName, token };
 };
 export default useCurToken;

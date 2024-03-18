@@ -1,4 +1,4 @@
-import Button from "@/app/components/Button"
+import { useMemo } from "react"
 import styled from "styled-components"
 
 const TableWrapper = styled.div<{ columnLen: number }>`
@@ -19,11 +19,31 @@ const TableCell = styled.div`
 `
 
 type TColumnData = {
-  title: string,
-  dataKey?: string,
-  render?: (row: any) => React.ReactNode
-}
-function Table ({ data, columns }: { data: { [key: string]: any }[], columns: TColumnData[] }) {
+  title: string;
+  dataKey?: string;
+  render?: (row: any) => React.ReactNode;
+};
+
+type TRowData = {
+  [key: string]: any;
+};
+
+type TTableProps = {
+  data: TRowData[];
+  columns: TColumnData[];
+};
+function Table ({ data, columns }: TTableProps) {
+
+  const renderBodyCell = useMemo(() => {
+    return data.flatMap((row, rowIndex) =>
+      columns.map((column, columnIndex) => {
+        if (column.render) {
+          return column.render(row);
+        }
+        return <TableCell key={`${rowIndex}-${columnIndex}`}>{row[column.dataKey!]}</TableCell>;
+      })
+    );
+  }, [data, columns]);
   return (
     <TableWrapper columnLen={columns.length}>
       {
@@ -35,18 +55,7 @@ function Table ({ data, columns }: { data: { [key: string]: any }[], columns: TC
           )
         })
       }
-      {
-        data.map((row, index) => {
-          return columns.map((column, index) => {
-            if (column.render) return column.render(row)
-            return (
-              <TableCell key={index}>
-                {row[column.dataKey!]}
-              </TableCell>
-            )
-          })
-        })
-      }
+      { renderBodyCell }
     </TableWrapper>
   )
 }

@@ -6,6 +6,9 @@ import { OrderHeader } from "./Header";
 import { PositionList } from "./PositionList";
 import { Col } from "@/app/components/Col";
 import { useState } from "react";
+import { NotAuthed } from "@/app/components/NotAuthed";
+import { LimitMarketOrderList } from "./LimitOrders";
+import { StopOrderList } from "./StopOrder";
 const Wrapper = styled.div`
   position: relative;
   width: 100%;
@@ -26,19 +29,39 @@ height: 100%;
 
 
 
+enum ListType {
+  POSITIONS = 'pos',
+  LIMITMARKET = 'lo',
+  STOP = 'ts',
+}
+
+
+
 const PerpetualOrders = () => {
 
   // const [] = useState();
+
+  const [listType, updateListType] = useState(ListType.POSITIONS);
+
 
 
   return (
     <Wrapper>
       <DraggableIcon />
       <Content>
-        <OrderHeader />
-        <PositionList />
+        <OrderHeader switchListType={(nextType: string) => updateListType(nextType as ListType)} />
+        <NotAuthed>
+          {
+            listType === ListType.POSITIONS && <PositionList />
+          }
+          {
+            listType === ListType.LIMITMARKET && <LimitMarketOrderList />
+          }
+          {
+            listType === ListType.STOP && <StopOrderList />
+          }
+        </NotAuthed>
       </Content>
-      
     </Wrapper>
   );
 };

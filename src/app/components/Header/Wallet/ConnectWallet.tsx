@@ -3,7 +3,11 @@ import styled from "styled-components";
 import { WalletButton } from "@rainbow-me/rainbowkit";
 
 import { walletConfigs } from "./contants";
-import { FC } from "react";
+import { FC, useCallback, useContext, useEffect } from "react";
+import { useAccount, useConfig, useConnect, useSignMessage } from "wagmi";
+import { UserSignedContext } from "@/app/context/UserSignedProvider";
+import { generateSignApiTokenMessage } from "@/app/config/common";
+import { getAccount } from "wagmi/actions";
 
 
 
@@ -44,12 +48,36 @@ const WalletList = styled.div`
 `
 
 
+type AA =  Parameters<typeof WalletButton.Custom>[0];
+// WalletButtonRendererProps
+const WalletItem = ({ ready, connected, connect, connector, name, icon, onClick }: Parameters<AA['children']>[0] & {name: string, icon: JSX.Element, onClick: () => void}) => {
+  
+
+    const handleClick = useCallback(async () => {
+        await connector.connect();
+        onClick();
+    }, []);
+
+    return (
+        <Item key={name} onClick={handleClick}>
+            {icon} {name}
+        </Item>
+    );
+}
 
 
 
 
-export const ConnectWallet: FC = () => {
 
+
+
+
+export const ConnectWallet: FC<{afterConnect: () => void}> = ({ afterConnect }) => {
+    const { isConnected } = useAccount();
+
+    if(isConnected) {
+        return null;
+    }
 
     return (
         <>
@@ -60,11 +88,10 @@ export const ConnectWallet: FC = () => {
                     walletConfigs.map(({ name, icon }) => (
 
                         <WalletButton.Custom wallet={name}>
-                            {({ ready, connect }) => {
+                        
+                            {(props) => {
                                 return (
-                                    <Item key={name} onClick={connect}>
-                                        {icon} {name}
-                                    </Item>
+                                    <WalletItem {...props} onClick={afterConnect} icon={icon} name={name} />
                                 );
                             }}
                         </WalletButton.Custom>

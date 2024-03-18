@@ -5,7 +5,7 @@ import Duration from "./StakeDuration"
 import BalanceInput from "@/app/components/BalanceInput"
 import { TwoTabs } from "@/app/components/TwoTabs"
 import Button from "@/app/components/LinearGradientButton"
-import FlexBox from "../FlexBox"
+import FlexBox from '@/app/components/FlexBox'
 
 enum TradeCoin {
   Token = 'QLP',

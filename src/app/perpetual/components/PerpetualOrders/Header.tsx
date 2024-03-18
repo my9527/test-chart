@@ -4,7 +4,7 @@ import styled from "styled-components";
 import { Row } from "@/app/components/Row";
 import Tabs from "../Tabs";
 import { useRecoilValue } from "recoil";
-import { recoilPositionNums } from "@/app/models";
+import { recoilOrdersLen, recoilPositionNums } from "@/app/models";
 
 
 enum TabKeys {
@@ -49,27 +49,28 @@ const Wrapper = styled(Row)`
 `;
 
 
-export const OrderHeader:FC = () => {
+export const OrderHeader:FC<{ switchListType: (nextType: string) => any }> = ({ switchListType }) => {
 
     const [curTab, updateCurTab] = useState<string>('pos');
 
-    const positions = useRecoilValue(recoilPositionNums);
+    // const positions = useRecoilValue(recoilPositionNums);
+    const { position, limit, stop, history } = useRecoilValue(recoilOrdersLen);
 
     const HeaderItems = useMemo(() => {
         return [{
-            label: `Position${positions ? `(${positions})` : ''}`,
+            label: `Position${position ? `(${position})` : ''}`,
             key: 'pos',
         }, {
-            label: 'Limit Orders',
+            label: `Limit Orders${limit ? `(${limit})` : ''}`,
             key: 'lo'
         }, {
-            label: 'TP/SL',
+            label: `TP/SL${stop ? `(${stop})` : ''}`,
             key: 'ts'
         }, {
             label: 'History',
             key: 'his'
         }]
-    }, [positions]);
+    }, [position, limit, stop]);
 
     return (
         <Wrapper>
@@ -78,6 +79,7 @@ export const OrderHeader:FC = () => {
                     gap={55}
                     list={HeaderItems}
                     handleClick={(item: typeof HeaderItems[0]) => {
+                        switchListType(item.key);
                         updateCurTab(item?.key);
                     }}
                 />

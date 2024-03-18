@@ -28,6 +28,7 @@ export type AppConfigType = {
 
     executionFee: string | number | BigNumber;
     contract_address: typeof addressMap[CHAINS_ID.zkfair];
+    epoch_duration: number; // 每个epoch 的周期 ， h 为单位
 
 }
 
@@ -56,6 +57,7 @@ const AppConfigOnChain: Record<number, AppConfigType> = {
 
     executionFee: "2500000000000000000",
     contract_address: addressMap[CHAINS_ID.zkfair],
+    epoch_duration: 4,
   },
   [CHAINS_ID.zkfairtest]: {
     chain: zkFairTestnet,
@@ -79,6 +81,7 @@ const AppConfigOnChain: Record<number, AppConfigType> = {
 
     executionFee: "2500000000000000000",
     contract_address: addressMap[CHAINS_ID.zkfairtest],
+    epoch_duration: 4,
   },
   [CHAINS_ID.arbitrum]: {
     chain: arbitrumOne,
@@ -105,6 +108,7 @@ const AppConfigOnChain: Record<number, AppConfigType> = {
 
     executionFee: "2500000000000000000",
     contract_address: addressMap[CHAINS_ID.arbitrum],
+    epoch_duration: 1,
   },
   [CHAINS_ID.arbitrumGoerli]: {
     chain: arbitrumGoerliTest,
@@ -129,7 +133,9 @@ const AppConfigOnChain: Record<number, AppConfigType> = {
     },
 
     executionFee: '300000000000000',
-    contract_address: addressMap[CHAINS_ID.arbitrumGoerli]
+    contract_address: addressMap[CHAINS_ID.arbitrumGoerli],
+
+    epoch_duration: 1,
   }
 };
 

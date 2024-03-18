@@ -32,6 +32,7 @@ import StakeSexContractAbi from "@/app/config/abis/stSEX.json";
 
 import StakeSlpContractAbi from "@/app/config/abis/stSLP.json";
 import FutureManagerContractAbi from "@/app/config/abis/futureManager.json";
+import { useChainId } from "wagmi";
 
 
 
@@ -62,6 +63,7 @@ import FutureManagerContractAbi from "@/app/config/abis/futureManager.json";
 export const useContractParams = (address: string) => {
 
     const config = useAppConfig();
+    const chainId = useChainId();
 
     const contracts = useMemo(() => {
 
@@ -70,34 +72,43 @@ export const useContractParams = (address: string) => {
             [config.contract_address.LongAddress]: {
                 address: config.contract_address.LongAddress,
                 abi: LongContractAbi,
+                chainId: chainId,
             },
             [config.contract_address.ShortAddress]: {
                 address: config.contract_address.ShortAddress,
                 abi: ShortContractAbi,
+                chainId: chainId,
             },
             [config.contract_address.LiquidityPoolImplementationAddress]: {
                 address: config.contract_address.LiquidityPoolImplementationAddress,
                 abi: LiquidityPoolContractAbi,
+                chainId: chainId,
             },
             [config.contract_address.futureManager]: {
                 address: config.contract_address.futureManager,
-                abi: FutureManagerContractAbi
+                abi: FutureManagerContractAbi,
+                chainId: chainId,
+
             },
             [config.contract_address.LimitOrderImplementationAddress]: {
                 address: config.contract_address.LimitOrderImplementationAddress,
-                abi: LimitOrderImplementationContractAbi
+                abi: LimitOrderImplementationContractAbi,
+                chainId: chainId,
             },
             [config.contract_address.MarketOrderImplementationAddress]: {
                 address: config.contract_address.MarketOrderImplementationAddress,
-                abi: MarketOrderImplementationContractAbi
+                abi: MarketOrderImplementationContractAbi,
+                chainId: chainId,
             },
             [config.contract_address.StopOrderImplementationAddress]: {
                 address: config.contract_address.StopOrderImplementationAddress,
-                abi: StopOrderImplementationContractAbi
+                abi: StopOrderImplementationContractAbi,
+                chainId: chainId,
             },
             [config.contract_address.UpdateCollateralOrderImplementationAddress]: {
                 address: config.contract_address.UpdateCollateralOrderImplementationAddress,
-                abi: UpdateCollateralOrderImplementationContractAbi
+                abi: UpdateCollateralOrderImplementationContractAbi,
+                chainId: chainId,
             },
             
         }
@@ -107,7 +118,7 @@ export const useContractParams = (address: string) => {
 
 
 
-    }, [config]);
+    }, [config, chainId]);
 
     return contracts[address];
 
