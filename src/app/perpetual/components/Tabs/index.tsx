@@ -1,6 +1,6 @@
 "use client";
 import styled from "styled-components";
-import { useState, useMemo, useRef } from "react";
+import { useState, useMemo, useRef, useEffect } from "react";
 
 type tabsProps = {
   activeTab: number;
@@ -58,8 +58,9 @@ const Tabs: React.FC<{
   list: tabProps[];
   handleClick: Function;
   className?: string;
+  initial?: number;
   gap?: number;
-}> = ({ list, handleClick, className, gap = 20 }) => {
+}> = ({ list, handleClick, className, gap = 20, initial = 0 }) => {
   const [activeTab, setActiveTab] = useState<number>(0);
   const tabRefs = useRef<[HTMLDivElement | null]>([null]);
 
@@ -70,6 +71,12 @@ const Tabs: React.FC<{
     }
     return width;
   }, [tabRefs, activeTab]);
+
+  useEffect(() => {
+    if(initial) {
+      setActiveTab(initial);
+    }
+  }, []);
 
   return (
     <TabsWrapper

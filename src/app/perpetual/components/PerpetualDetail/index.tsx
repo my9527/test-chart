@@ -23,6 +23,7 @@ import { useOpenInterests, useOpenInterestsByAddressId, useOpenInterestsBySideId
 import { FutureType } from "@/app/config/common";
 import { FundingFeeCountDown } from "./FundingFeeCountDown";
 import { FundingFeeRate } from "./FundingFeeRate";
+import { MarketPanel } from "./MarketPanel";
 
 const Wrapper = styled.div`
   width: 100%;
@@ -151,7 +152,7 @@ const PerpetualDetail = memo((props) => {
     );
   }, [favoriateList]);
 
-  
+
   const tickerPrice = useTickerPrice();
 
   const [currentTokenOpenLongInterest] = useOpenInterestsBySideId(FutureType.LONG, curToken.futureLongId);
@@ -162,18 +163,18 @@ const PerpetualDetail = memo((props) => {
   const longIO = useMemo(() => {
 
     const _long = BigNumber(currentTokenOpenLongInterest?.tokenSize).multipliedBy(curToken.pars).toString()
-    return  BigNumber(tickerPrice?.currentTickerPrice)
-    .multipliedBy(_long || '0')
-    .toFixed(2, BigNumber.ROUND_DOWN)
+    return BigNumber(tickerPrice?.currentTickerPrice)
+      .multipliedBy(_long || '0')
+      .toFixed(2, BigNumber.ROUND_DOWN)
   }, [currentTokenOpenLongInterest, tickerPrice?.currentTickerPrice]);
 
 
   // short open interest
   const shortIO = useMemo(() => {
     const _long = BigNumber(currentTokenOpenShortInterest?.tokenSize).multipliedBy(curToken.pars).toString()
-    return  BigNumber(tickerPrice?.currentTickerPrice)
-    .multipliedBy(_long || '0')
-    .toFixed(2, BigNumber.ROUND_DOWN)
+    return BigNumber(tickerPrice?.currentTickerPrice)
+      .multipliedBy(_long || '0')
+      .toFixed(2, BigNumber.ROUND_DOWN)
   }, [currentTokenOpenShortInterest, tickerPrice?.currentTickerPrice]);
 
 
@@ -218,7 +219,7 @@ const PerpetualDetail = memo((props) => {
                   stroke="transparent"
                   fill={
                     [theme.colors.text2, theme.colors.text5][
-                      index % [theme.colors.text2, theme.colors.text5].length
+                    index % [theme.colors.text2, theme.colors.text5].length
                     ]
                   }
                 />
@@ -235,7 +236,8 @@ const PerpetualDetail = memo((props) => {
       <Layout>
         <Symbol>
           <h3 className="label">{symbolName}/USDT</h3>
-          <Image src={ArrowIcon} width={11} height={6} alt="" />
+          {/* <Image src={ArrowIcon} width={11} height={6} alt="" /> */}
+          <MarketPanel />
           <ChangPrice symbolName={symbolName} />
         </Symbol>
         <Favorite
@@ -283,7 +285,7 @@ const PerpetualDetail = memo((props) => {
           </div>
           <div className="content">
             <p className="rate"><FundingFeeRate /> / -0.1% </p>
-            <p className="short">|<FundingFeeCountDown/></p>
+            <p className="short">|<FundingFeeCountDown /></p>
           </div>
         </FundingRate>
         <Line />
