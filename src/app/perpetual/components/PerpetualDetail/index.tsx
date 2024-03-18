@@ -289,7 +289,7 @@ const PerpetualDetail = memo((props) => {
         <Line />
         <InfoItem>
           <p className="label">Max Profit Ratio</p>
-          <p className="content">{BigNumber(curToken.maxProfitRatio).multipliedBy(100).toFixed(2, BigNumber.ROUND_DOWN)}%</p>
+          <p className="content">{BigNumber(curToken.maxProfitRatio as number).multipliedBy(100).toFixed(2, BigNumber.ROUND_DOWN)}%</p>
         </InfoItem>
       </Layout>
       <Layout>

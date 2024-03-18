@@ -19,10 +19,10 @@ export type Token = {
   borrowingFeeRatio?: number;
   maintainMarginRatio?: number;
   fundingFeeRatio?: number;
-  priceTickSize: number;
-  fundingFeeBaseRate?: number;
-  fundingFeeLinearRate?: number;
-  maxliquidityLockRatio?: number;
+  priceTickSize: number | string;
+  fundingFeeBaseRate: number;
+  fundingFeeLinearRate: number;
+  maxliquidityLockRatio: number;
   hot?: boolean;
   image?: string;
   needCalPriceImpactByUni?: boolean;
@@ -2135,7 +2135,7 @@ const baseTokens: Record<string, Token[]> = {
       displayDecimal: 2,
       "borrowingFeeRatio": 0,
       "maintainMarginRatio": 0.005,
-      priceTickSize: '0.01',
+      priceTickSize: 0.01,
       fundingFeeBaseRate: 0.0008,
       fundingFeeLinearRate: 0.08,
       maxliquidityLockRatio: 1, // 100%
