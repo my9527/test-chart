@@ -1,0 +1,3017 @@
+[
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "address",
+        "name": "previousAdmin",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "address",
+        "name": "newAdmin",
+        "type": "address"
+      }
+    ],
+    "name": "AdminChanged",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "beacon",
+        "type": "address"
+      }
+    ],
+    "name": "BeaconUpgraded",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "implementation",
+        "type": "address"
+      }
+    ],
+    "name": "Upgraded",
+    "type": "event"
+  },
+  {
+    "stateMutability": "payable",
+    "type": "fallback"
+  },
+  {
+    "stateMutability": "payable",
+    "type": "receive"
+  },
+  {
+    "inputs": [],
+    "name": "BaseFuture__GreaterThanMaxFee",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "BaseFuture__InvalidMaxProfitRatio",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "BaseFuture__PositionInvalid",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "SubproductPausable__Paused",
+    "type": "error"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "user",
+        "type": "address"
+      },
+      {
+        "indexed": true,
+        "internalType": "uint256",
+        "name": "futureId",
+        "type": "uint256"
+      },
+      {
+        "indexed": true,
+        "internalType": "enum BaseFuture.ChargeFeeReason",
+        "name": "reason",
+        "type": "uint8"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "txFee",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "piFee",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "remianCollateral",
+        "type": "uint256"
+      }
+    ],
+    "name": "ChargeFees",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "uint256",
+        "name": "futureId",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "string",
+        "name": "name",
+        "type": "string"
+      }
+    ],
+    "name": "CreateFuture",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "user",
+        "type": "address"
+      },
+      {
+        "indexed": true,
+        "internalType": "uint256",
+        "name": "futureId",
+        "type": "uint256"
+      },
+      {
+        "indexed": true,
+        "internalType": "enum BaseFuture.ForceClosePositionReason",
+        "name": "reason",
+        "type": "uint8"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "price",
+        "type": "uint256"
+      }
+    ],
+    "name": "ForceClosePosition",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "uint8",
+        "name": "version",
+        "type": "uint8"
+      }
+    ],
+    "name": "Initialized",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "previousOwner",
+        "type": "address"
+      },
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "newOwner",
+        "type": "address"
+      }
+    ],
+    "name": "OwnershipTransferred",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "address",
+        "name": "account",
+        "type": "address"
+      }
+    ],
+    "name": "Paused",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "uint256",
+        "name": "subproduct",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "bool",
+        "name": "paused",
+        "type": "bool"
+      }
+    ],
+    "name": "SubproductPaused",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "address",
+        "name": "account",
+        "type": "address"
+      }
+    ],
+    "name": "Unpaused",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "uint256",
+        "name": "futureId",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "rate",
+        "type": "uint256"
+      }
+    ],
+    "name": "UpdateBorrowingFeePerToken",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "user",
+        "type": "address"
+      },
+      {
+        "indexed": true,
+        "internalType": "uint256",
+        "name": "futureId",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "bool",
+        "name": "increase",
+        "type": "bool"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "amount",
+        "type": "uint256"
+      }
+    ],
+    "name": "UpdateCollateral",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "uint256",
+        "name": "futureId",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "int256",
+        "name": "rate",
+        "type": "int256"
+      }
+    ],
+    "name": "UpdateFundingFeePerToken",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "user",
+        "type": "address"
+      },
+      {
+        "indexed": true,
+        "internalType": "uint256",
+        "name": "futureId",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "offset",
+        "type": "uint256"
+      }
+    ],
+    "name": "UpdateOffset",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "user",
+        "type": "address"
+      },
+      {
+        "indexed": true,
+        "internalType": "uint256",
+        "name": "futureId",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "price",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "bytes32",
+        "name": "label",
+        "type": "bytes32"
+      },
+      {
+        "components": [
+          {
+            "internalType": "uint256",
+            "name": "openCost",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "tokenSize",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "collateral",
+            "type": "uint256"
+          },
+          {
+            "internalType": "int256",
+            "name": "entryFundingFeePerToken",
+            "type": "int256"
+          },
+          {
+            "internalType": "int256",
+            "name": "cumulativeFundingFee",
+            "type": "int256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "entryBorrowingFeePerToken",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "cumulativeBorrowingFee",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "maxProfitRatio",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "cumulativeTeamFee",
+            "type": "uint256"
+          }
+        ],
+        "indexed": false,
+        "internalType": "struct Struct.Position",
+        "name": "position",
+        "type": "tuple"
+      },
+      {
+        "components": [
+          {
+            "internalType": "uint256",
+            "name": "userBalanceToTeam",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "userBalanceToCollateral",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "collateralToLp",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "collateralToTeam",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "collateralToUserBalance",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "lpToUserBalance",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "lpToTeam",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "lockedTokenSize",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "unlockedTokenSize",
+            "type": "uint256"
+          },
+          {
+            "internalType": "bool",
+            "name": "success",
+            "type": "bool"
+          }
+        ],
+        "indexed": false,
+        "internalType": "struct Struct.UpdatePositionResult",
+        "name": "result",
+        "type": "tuple"
+      }
+    ],
+    "name": "UpdatePosition",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "uint256",
+        "name": "futureId",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "volume",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "bool",
+        "name": "increase",
+        "type": "bool"
+      }
+    ],
+    "name": "UpdateTradingVolume",
+    "type": "event"
+  },
+  {
+    "inputs": [],
+    "name": "MAX_FEE_PER_TOKEN_PRECISION",
+    "outputs": [
+      {
+        "internalType": "uint64",
+        "name": "",
+        "type": "uint64"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "_futureId",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "_increaseTokenSize",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "_price",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "_priceImpactRatio",
+        "type": "uint256"
+      }
+    ],
+    "name": "_chargePriceImpactFee",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "_futureId",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "_increaseTokenSize",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "_price",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "_txFeeRatio",
+        "type": "uint256"
+      }
+    ],
+    "name": "_chargeTransactionFee",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "name": "borrowingFeeGlobal",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "name": "borrowingFeePerToken",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "borrowingFeeUpdateInterval",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "name": "borrowingUpdateLastTime",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "_futureId",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "_tokenSize",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "_entryBorrowingFeePerToken",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "_cumulativeBorrowingFee",
+        "type": "uint256"
+      }
+    ],
+    "name": "calcBorrowingFee",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "_futureId",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "_tokenSize",
+        "type": "uint256"
+      },
+      {
+        "internalType": "int256",
+        "name": "_entryFundingFeePerToken",
+        "type": "int256"
+      },
+      {
+        "internalType": "int256",
+        "name": "_cumulativeFundingFee",
+        "type": "int256"
+      }
+    ],
+    "name": "calcFundingFee",
+    "outputs": [
+      {
+        "internalType": "int256",
+        "name": "",
+        "type": "int256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "_user",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "_futureId",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "decreaseTokenSize",
+        "type": "uint256"
+      }
+    ],
+    "name": "checkEnoughDecreaseTokenSize",
+    "outputs": [
+      {
+        "internalType": "bool",
+        "name": "",
+        "type": "bool"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "_user",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "_futureId",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "_decreaseTokenSize",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "_price",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "_minUSDValue",
+        "type": "uint256"
+      }
+    ],
+    "name": "checkEnoughRemainingUSDValue",
+    "outputs": [
+      {
+        "internalType": "bool",
+        "name": "",
+        "type": "bool"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "_futureId",
+        "type": "uint256"
+      }
+    ],
+    "name": "checkFutureId",
+    "outputs": [],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "_futureId",
+        "type": "uint256"
+      },
+      {
+        "components": [
+          {
+            "internalType": "uint256",
+            "name": "openCost",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "tokenSize",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "collateral",
+            "type": "uint256"
+          },
+          {
+            "internalType": "int256",
+            "name": "entryFundingFeePerToken",
+            "type": "int256"
+          },
+          {
+            "internalType": "int256",
+            "name": "cumulativeFundingFee",
+            "type": "int256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "entryBorrowingFeePerToken",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "cumulativeBorrowingFee",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "maxProfitRatio",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "cumulativeTeamFee",
+            "type": "uint256"
+          }
+        ],
+        "internalType": "struct Struct.Position",
+        "name": "position",
+        "type": "tuple"
+      },
+      {
+        "internalType": "uint256",
+        "name": "_price",
+        "type": "uint256"
+      },
+      {
+        "components": [
+          {
+            "internalType": "uint256",
+            "name": "userBalanceToTeam",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "userBalanceToCollateral",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "collateralToLp",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "collateralToTeam",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "collateralToUserBalance",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "lpToUserBalance",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "lpToTeam",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "lockedTokenSize",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "unlockedTokenSize",
+            "type": "uint256"
+          },
+          {
+            "internalType": "bool",
+            "name": "success",
+            "type": "bool"
+          }
+        ],
+        "internalType": "struct Struct.UpdatePositionResult",
+        "name": "result",
+        "type": "tuple"
+      },
+      {
+        "internalType": "uint256",
+        "name": "_predictedFeeRatio",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "_availableLp",
+        "type": "uint256"
+      },
+      {
+        "components": [
+          {
+            "internalType": "uint256",
+            "name": "txFee",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "piFee",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "remainCollateral",
+            "type": "uint256"
+          }
+        ],
+        "internalType": "struct Struct.ChargeFeeResult",
+        "name": "chargeFeeResult",
+        "type": "tuple"
+      }
+    ],
+    "name": "checkLiquidation",
+    "outputs": [
+      {
+        "internalType": "bool",
+        "name": "",
+        "type": "bool"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "_futureId",
+        "type": "uint256"
+      },
+      {
+        "components": [
+          {
+            "internalType": "uint256",
+            "name": "openCost",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "tokenSize",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "collateral",
+            "type": "uint256"
+          },
+          {
+            "internalType": "int256",
+            "name": "entryFundingFeePerToken",
+            "type": "int256"
+          },
+          {
+            "internalType": "int256",
+            "name": "cumulativeFundingFee",
+            "type": "int256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "entryBorrowingFeePerToken",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "cumulativeBorrowingFee",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "maxProfitRatio",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "cumulativeTeamFee",
+            "type": "uint256"
+          }
+        ],
+        "internalType": "struct Struct.Position",
+        "name": "position",
+        "type": "tuple"
+      },
+      {
+        "internalType": "uint256",
+        "name": "_price",
+        "type": "uint256"
+      },
+      {
+        "components": [
+          {
+            "internalType": "uint256",
+            "name": "userBalanceToTeam",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "userBalanceToCollateral",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "collateralToLp",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "collateralToTeam",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "collateralToUserBalance",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "lpToUserBalance",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "lpToTeam",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "lockedTokenSize",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "unlockedTokenSize",
+            "type": "uint256"
+          },
+          {
+            "internalType": "bool",
+            "name": "success",
+            "type": "bool"
+          }
+        ],
+        "internalType": "struct Struct.UpdatePositionResult",
+        "name": "result",
+        "type": "tuple"
+      },
+      {
+        "internalType": "uint256",
+        "name": "_predictedFeeRatio",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "_availableLp",
+        "type": "uint256"
+      },
+      {
+        "components": [
+          {
+            "internalType": "uint256",
+            "name": "txFee",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "piFee",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "remainCollateral",
+            "type": "uint256"
+          }
+        ],
+        "internalType": "struct Struct.ChargeFeeResult",
+        "name": "chargeFeeResult",
+        "type": "tuple"
+      }
+    ],
+    "name": "checkMaxProfitClosePosition",
+    "outputs": [
+      {
+        "internalType": "bool",
+        "name": "",
+        "type": "bool"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "name": "contractValueDecimal",
+    "outputs": [
+      {
+        "internalType": "int8",
+        "name": "",
+        "type": "int8"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "name": "costGlobal",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "string",
+        "name": "name",
+        "type": "string"
+      },
+      {
+        "internalType": "uint8",
+        "name": "_priceDecimal",
+        "type": "uint8"
+      },
+      {
+        "internalType": "int8",
+        "name": "_contractValueDecimal",
+        "type": "int8"
+      }
+    ],
+    "name": "createFuture",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "name": "currentEpoch",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "name": "currentEpochEndTime",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "_user",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "_futureId",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "_price",
+        "type": "uint256"
+      },
+      {
+        "components": [
+          {
+            "internalType": "uint256",
+            "name": "txFeeRatio",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "priceImpactRatio",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "availableUserBalance",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "availableLp",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "predictedLiquidateFeeRatio",
+            "type": "uint256"
+          }
+        ],
+        "internalType": "struct Struct.FutureFeeInfo",
+        "name": "_feeInfo",
+        "type": "tuple"
+      },
+      {
+        "internalType": "uint256",
+        "name": "_decreaseCollateral",
+        "type": "uint256"
+      },
+      {
+        "internalType": "bytes32",
+        "name": "label",
+        "type": "bytes32"
+      }
+    ],
+    "name": "decreaseCollateral",
+    "outputs": [
+      {
+        "components": [
+          {
+            "internalType": "uint256",
+            "name": "userBalanceToTeam",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "userBalanceToCollateral",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "collateralToLp",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "collateralToTeam",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "collateralToUserBalance",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "lpToUserBalance",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "lpToTeam",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "lockedTokenSize",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "unlockedTokenSize",
+            "type": "uint256"
+          },
+          {
+            "internalType": "bool",
+            "name": "success",
+            "type": "bool"
+          }
+        ],
+        "internalType": "struct Struct.UpdatePositionResult",
+        "name": "result",
+        "type": "tuple"
+      }
+    ],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "_user",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "_futureId",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "_price",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "_decreaseTokenSize",
+        "type": "uint256"
+      },
+      {
+        "components": [
+          {
+            "internalType": "uint256",
+            "name": "txFeeRatio",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "priceImpactRatio",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "availableUserBalance",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "availableLp",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "predictedLiquidateFeeRatio",
+            "type": "uint256"
+          }
+        ],
+        "internalType": "struct Struct.FutureFeeInfo",
+        "name": "_feeInfo",
+        "type": "tuple"
+      },
+      {
+        "internalType": "bytes32",
+        "name": "label",
+        "type": "bytes32"
+      }
+    ],
+    "name": "decreasePosition",
+    "outputs": [
+      {
+        "components": [
+          {
+            "internalType": "uint256",
+            "name": "userBalanceToTeam",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "userBalanceToCollateral",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "collateralToLp",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "collateralToTeam",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "collateralToUserBalance",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "lpToUserBalance",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "lpToTeam",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "lockedTokenSize",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "unlockedTokenSize",
+            "type": "uint256"
+          },
+          {
+            "internalType": "bool",
+            "name": "success",
+            "type": "bool"
+          }
+        ],
+        "internalType": "struct Struct.UpdatePositionResult",
+        "name": "result",
+        "type": "tuple"
+      }
+    ],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "feeDecimal",
+    "outputs": [
+      {
+        "internalType": "uint8",
+        "name": "",
+        "type": "uint8"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "name": "fundingFeeGlobal",
+    "outputs": [
+      {
+        "internalType": "int256",
+        "name": "",
+        "type": "int256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "name": "fundingFeePerToken",
+    "outputs": [
+      {
+        "internalType": "int256",
+        "name": "",
+        "type": "int256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "fundingFeeUpdateInterval",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "name": "fundingUpdateLastTime",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "name": "futureInfo",
+    "outputs": [
+      {
+        "internalType": "string",
+        "name": "",
+        "type": "string"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "string",
+        "name": "",
+        "type": "string"
+      }
+    ],
+    "name": "futureLookup",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "futureManager",
+    "outputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "string[]",
+        "name": "tokens",
+        "type": "string[]"
+      }
+    ],
+    "name": "getFutureInfo",
+    "outputs": [
+      {
+        "components": [
+          {
+            "internalType": "uint256",
+            "name": "futureId",
+            "type": "uint256"
+          },
+          {
+            "internalType": "int8",
+            "name": "contractValueDecimal",
+            "type": "int8"
+          },
+          {
+            "internalType": "uint8",
+            "name": "priceDecimal",
+            "type": "uint8"
+          },
+          {
+            "internalType": "uint256",
+            "name": "reaminCollateralRatio",
+            "type": "uint256"
+          },
+          {
+            "internalType": "int256",
+            "name": "fundingFeePerToken",
+            "type": "int256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "borrowingFeePerToken",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "sizeGlobal",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "costGlobal",
+            "type": "uint256"
+          }
+        ],
+        "internalType": "struct Struct.FutureInfo[]",
+        "name": "futureIds",
+        "type": "tuple[]"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "_futureId",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "_price",
+        "type": "uint256"
+      }
+    ],
+    "name": "getGlobalUSDValue",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "_futureId",
+        "type": "uint256"
+      },
+      {
+        "internalType": "address",
+        "name": "_user",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "_increaseCollateral",
+        "type": "uint256"
+      }
+    ],
+    "name": "getLockedTokenSize",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "_futureId",
+        "type": "uint256"
+      },
+      {
+        "components": [
+          {
+            "internalType": "uint256",
+            "name": "openCost",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "tokenSize",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "collateral",
+            "type": "uint256"
+          },
+          {
+            "internalType": "int256",
+            "name": "entryFundingFeePerToken",
+            "type": "int256"
+          },
+          {
+            "internalType": "int256",
+            "name": "cumulativeFundingFee",
+            "type": "int256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "entryBorrowingFeePerToken",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "cumulativeBorrowingFee",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "maxProfitRatio",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "cumulativeTeamFee",
+            "type": "uint256"
+          }
+        ],
+        "internalType": "struct Struct.Position",
+        "name": "position",
+        "type": "tuple"
+      },
+      {
+        "internalType": "uint256",
+        "name": "_price",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "_predictedFeeRatio",
+        "type": "uint256"
+      }
+    ],
+    "name": "getMaxDecreaseCollateral",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "_futureId",
+        "type": "uint256"
+      },
+      {
+        "components": [
+          {
+            "internalType": "uint256",
+            "name": "openCost",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "tokenSize",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "collateral",
+            "type": "uint256"
+          },
+          {
+            "internalType": "int256",
+            "name": "entryFundingFeePerToken",
+            "type": "int256"
+          },
+          {
+            "internalType": "int256",
+            "name": "cumulativeFundingFee",
+            "type": "int256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "entryBorrowingFeePerToken",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "cumulativeBorrowingFee",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "maxProfitRatio",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "cumulativeTeamFee",
+            "type": "uint256"
+          }
+        ],
+        "internalType": "struct Struct.Position",
+        "name": "position",
+        "type": "tuple"
+      },
+      {
+        "internalType": "uint256",
+        "name": "_price",
+        "type": "uint256"
+      }
+    ],
+    "name": "getNetValue",
+    "outputs": [
+      {
+        "internalType": "int256",
+        "name": "netValueUSD",
+        "type": "int256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "_futureId",
+        "type": "uint256"
+      },
+      {
+        "components": [
+          {
+            "internalType": "uint256",
+            "name": "openCost",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "tokenSize",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "collateral",
+            "type": "uint256"
+          },
+          {
+            "internalType": "int256",
+            "name": "entryFundingFeePerToken",
+            "type": "int256"
+          },
+          {
+            "internalType": "int256",
+            "name": "cumulativeFundingFee",
+            "type": "int256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "entryBorrowingFeePerToken",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "cumulativeBorrowingFee",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "maxProfitRatio",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "cumulativeTeamFee",
+            "type": "uint256"
+          }
+        ],
+        "internalType": "struct Struct.Position",
+        "name": "position",
+        "type": "tuple"
+      },
+      {
+        "internalType": "uint256",
+        "name": "_price",
+        "type": "uint256"
+      }
+    ],
+    "name": "getPositionPnl",
+    "outputs": [
+      {
+        "internalType": "int256",
+        "name": "pnl",
+        "type": "int256"
+      },
+      {
+        "internalType": "bool",
+        "name": "maxProfitReached",
+        "type": "bool"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "_futureId",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "_tokenSize",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "_price",
+        "type": "uint256"
+      }
+    ],
+    "name": "getUSDValue",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "_futureId",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "_price",
+        "type": "uint256"
+      }
+    ],
+    "name": "getUnrealizedPnlInUSD",
+    "outputs": [
+      {
+        "internalType": "int256",
+        "name": "",
+        "type": "int256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "_user",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "_futureId",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "_price",
+        "type": "uint256"
+      },
+      {
+        "components": [
+          {
+            "internalType": "uint256",
+            "name": "txFeeRatio",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "priceImpactRatio",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "availableUserBalance",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "availableLp",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "predictedLiquidateFeeRatio",
+            "type": "uint256"
+          }
+        ],
+        "internalType": "struct Struct.FutureFeeInfo",
+        "name": "_feeInfo",
+        "type": "tuple"
+      },
+      {
+        "internalType": "uint256",
+        "name": "_increaseCollateral",
+        "type": "uint256"
+      },
+      {
+        "internalType": "bytes32",
+        "name": "label",
+        "type": "bytes32"
+      }
+    ],
+    "name": "increaseCollateral",
+    "outputs": [
+      {
+        "components": [
+          {
+            "internalType": "uint256",
+            "name": "userBalanceToTeam",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "userBalanceToCollateral",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "collateralToLp",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "collateralToTeam",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "collateralToUserBalance",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "lpToUserBalance",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "lpToTeam",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "lockedTokenSize",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "unlockedTokenSize",
+            "type": "uint256"
+          },
+          {
+            "internalType": "bool",
+            "name": "success",
+            "type": "bool"
+          }
+        ],
+        "internalType": "struct Struct.UpdatePositionResult",
+        "name": "result",
+        "type": "tuple"
+      }
+    ],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "_user",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "_futureId",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "_price",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "_increaseTokenSize",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "_increaseCollateral",
+        "type": "uint256"
+      },
+      {
+        "components": [
+          {
+            "internalType": "uint256",
+            "name": "txFeeRatio",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "priceImpactRatio",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "availableUserBalance",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "availableLp",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "predictedLiquidateFeeRatio",
+            "type": "uint256"
+          }
+        ],
+        "internalType": "struct Struct.FutureFeeInfo",
+        "name": "_feeInfo",
+        "type": "tuple"
+      },
+      {
+        "internalType": "bytes32",
+        "name": "label",
+        "type": "bytes32"
+      }
+    ],
+    "name": "increasePosition",
+    "outputs": [
+      {
+        "components": [
+          {
+            "internalType": "uint256",
+            "name": "userBalanceToTeam",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "userBalanceToCollateral",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "collateralToLp",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "collateralToTeam",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "collateralToUserBalance",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "lpToUserBalance",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "lpToTeam",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "lockedTokenSize",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "unlockedTokenSize",
+            "type": "uint256"
+          },
+          {
+            "internalType": "bool",
+            "name": "success",
+            "type": "bool"
+          }
+        ],
+        "internalType": "struct Struct.UpdatePositionResult",
+        "name": "result",
+        "type": "tuple"
+      }
+    ],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint8",
+        "name": "_feeDecimal",
+        "type": "uint8"
+      }
+    ],
+    "name": "initialize",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "_user",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "_futureId",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "_price",
+        "type": "uint256"
+      },
+      {
+        "components": [
+          {
+            "internalType": "uint256",
+            "name": "txFeeRatio",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "priceImpactRatio",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "availableUserBalance",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "availableLp",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "predictedLiquidateFeeRatio",
+            "type": "uint256"
+          }
+        ],
+        "internalType": "struct Struct.FutureFeeInfo",
+        "name": "_feeInfo",
+        "type": "tuple"
+      }
+    ],
+    "name": "liquidatePosition",
+    "outputs": [
+      {
+        "components": [
+          {
+            "internalType": "uint256",
+            "name": "userBalanceToTeam",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "userBalanceToCollateral",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "collateralToLp",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "collateralToTeam",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "collateralToUserBalance",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "lpToUserBalance",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "lpToTeam",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "lockedTokenSize",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "unlockedTokenSize",
+            "type": "uint256"
+          },
+          {
+            "internalType": "bool",
+            "name": "success",
+            "type": "bool"
+          }
+        ],
+        "internalType": "struct Struct.UpdatePositionResult",
+        "name": "result",
+        "type": "tuple"
+      }
+    ],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "maxBorrowingFee",
+    "outputs": [
+      {
+        "internalType": "uint64",
+        "name": "",
+        "type": "uint64"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "maxFundingFee",
+    "outputs": [
+      {
+        "internalType": "uint64",
+        "name": "",
+        "type": "uint64"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "maxPriceImpactFee",
+    "outputs": [
+      {
+        "internalType": "uint64",
+        "name": "",
+        "type": "uint64"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "name": "maxProfitRatio",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "maxTxFee",
+    "outputs": [
+      {
+        "internalType": "uint64",
+        "name": "",
+        "type": "uint64"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "minimumCollateralUSD",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "nextFutureId",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "owner",
+    "outputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "paused",
+    "outputs": [
+      {
+        "internalType": "bool",
+        "name": "",
+        "type": "bool"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "name": "pausedSubproduct",
+    "outputs": [
+      {
+        "internalType": "bool",
+        "name": "",
+        "type": "bool"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      },
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "name": "positionOffset",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "name": "priceDecimal",
+    "outputs": [
+      {
+        "internalType": "uint8",
+        "name": "",
+        "type": "uint8"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "proxiableUUID",
+    "outputs": [
+      {
+        "internalType": "bytes32",
+        "name": "",
+        "type": "bytes32"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "name": "reaminCollateralRatio",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "renounceOwnership",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      },
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "name": "s_position",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "openCost",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "tokenSize",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "collateral",
+        "type": "uint256"
+      },
+      {
+        "internalType": "int256",
+        "name": "entryFundingFeePerToken",
+        "type": "int256"
+      },
+      {
+        "internalType": "int256",
+        "name": "cumulativeFundingFee",
+        "type": "int256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "entryBorrowingFeePerToken",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "cumulativeBorrowingFee",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "maxProfitRatio",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "cumulativeTeamFee",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "_interval",
+        "type": "uint256"
+      }
+    ],
+    "name": "setBorrowingFeeUpdateInterval",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint8",
+        "name": "_decimal",
+        "type": "uint8"
+      }
+    ],
+    "name": "setFeeDecimal",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "_interval",
+        "type": "uint256"
+      }
+    ],
+    "name": "setFundingFeeUpdateInterval",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "_manager",
+        "type": "address"
+      }
+    ],
+    "name": "setFutureManager",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint64",
+        "name": "_maxFee",
+        "type": "uint64"
+      }
+    ],
+    "name": "setMaxBorrowingFee",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint64",
+        "name": "_maxFee",
+        "type": "uint64"
+      }
+    ],
+    "name": "setMaxFundingFee",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint64",
+        "name": "_maxFee",
+        "type": "uint64"
+      }
+    ],
+    "name": "setMaxPriceImpactFee",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "_futureId",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "_maxProfitRatio",
+        "type": "uint256"
+      }
+    ],
+    "name": "setMaxProfitRatio",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint64",
+        "name": "_maxFee",
+        "type": "uint64"
+      }
+    ],
+    "name": "setMaxTxFee",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "_collateral",
+        "type": "uint256"
+      }
+    ],
+    "name": "setMinimumCollateralUSD",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "bool",
+        "name": "_paused",
+        "type": "bool"
+      }
+    ],
+    "name": "setPause",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "futureId",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "_reaminCollateralRatio",
+        "type": "uint256"
+      }
+    ],
+    "name": "setRemainCollateralRatio",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "product",
+        "type": "uint256"
+      },
+      {
+        "internalType": "bool",
+        "name": "paused",
+        "type": "bool"
+      }
+    ],
+    "name": "setSubproductPaused",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "name": "sizeGlobal",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "_token",
+        "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "_dist",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "_tokenAmount",
+        "type": "uint256"
+      }
+    ],
+    "name": "transfer",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "newOwner",
+        "type": "address"
+      }
+    ],
+    "name": "transferOwnership",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "futureId",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "rate",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "_price",
+        "type": "uint256"
+      }
+    ],
+    "name": "updateBorrowingFeePerToken",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "_futureId",
+        "type": "uint256"
+      },
+      {
+        "internalType": "int256",
+        "name": "_totalFundingFees",
+        "type": "int256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "_price",
+        "type": "uint256"
+      }
+    ],
+    "name": "updateFundingFees",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "newImplementation",
+        "type": "address"
+      }
+    ],
+    "name": "upgradeTo",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "newImplementation",
+        "type": "address"
+      },
+      {
+        "internalType": "bytes",
+        "name": "data",
+        "type": "bytes"
+      }
+    ],
+    "name": "upgradeToAndCall",
+    "outputs": [],
+    "stateMutability": "payable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "_logic",
+        "type": "address"
+      },
+      {
+        "internalType": "bytes",
+        "name": "_data",
+        "type": "bytes"
+      }
+    ],
+    "stateMutability": "nonpayable",
+    "type": "constructor"
+  }
+]

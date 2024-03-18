@@ -1,3 +1,7 @@
+@font-face {
+  font-family: "Arial";
+  src: url("/Arial.ttf") format("truetype");
+}
 :root {
   --max-width: 1100px;
   --border-radius: 12px;
@@ -38,6 +42,32 @@
   --callout-border-rgb: 172, 175, 176;
   --card-rgb: 180, 185, 188;
   --card-border-rgb: 131, 134, 135;
+}
+
+/* Customize website's scrollbar like Mac OS
+Not supports in Firefox and IE */
+
+/* total width */
+body::-webkit-scrollbar {
+  background-color: #fff;
+  width: 8px;
+}
+
+/* background of the scrollbar except button or resizer */
+body::-webkit-scrollbar-track {
+  background-color: #fff;
+}
+
+/* scrollbar itself */
+body::-webkit-scrollbar-thumb {
+  background-color: #babac0;
+  border-radius: 16px;
+  border: 2px solid #fff;
+}
+
+/* set button(top and bottom of the scrollbar) */
+body::-webkit-scrollbar-button {
+  display:none;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -98,4 +128,13 @@ a {
   html {
     color-scheme: dark;
   }
+}
+
+
+.pointer {
+  cursor: pointer;
+}
+
+.full {
+  width: 100%;
 }

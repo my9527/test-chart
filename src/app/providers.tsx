@@ -7,18 +7,26 @@ import { AppConfigProvider } from "./context/AppConfigProvider";
 import ThemeConfigProvider from "./context/ThemeProvider";
 import GlobalMessage from "@/app/components/Message";
 import { RecoilRoot } from "recoil";
-import dynamic from 'next/dynamic';
+import { GlobalEffects } from "./components/GlobalEffects";
+import { UserSignedProvider } from "./context/UserSignedProvider";
+
+
+
 // import GlobalMessaged 
 type ProvidersProps = {};
 
 export const Providers: FCC<ProvidersProps> = (props) => {
+
   return (
     <RecoilRoot>
       <RainbowProvider>
         <AppConfigProvider>
           <ThemeConfigProvider>
-            <GlobalMessage />
-            {props.children}
+            <UserSignedProvider>
+              <GlobalMessage />
+              <GlobalEffects />
+              {props.children}
+            </UserSignedProvider>
           </ThemeConfigProvider>
         </AppConfigProvider>
       </RainbowProvider>

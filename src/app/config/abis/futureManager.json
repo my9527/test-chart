@@ -1,0 +1,879 @@
+[
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "address",
+        "name": "previousAdmin",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "address",
+        "name": "newAdmin",
+        "type": "address"
+      }
+    ],
+    "name": "AdminChanged",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "beacon",
+        "type": "address"
+      }
+    ],
+    "name": "BeaconUpgraded",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "implementation",
+        "type": "address"
+      }
+    ],
+    "name": "Upgraded",
+    "type": "event"
+  },
+  {
+    "stateMutability": "payable",
+    "type": "fallback"
+  },
+  {
+    "stateMutability": "payable",
+    "type": "receive"
+  },
+  {
+    "inputs": [],
+    "name": "Delegatable__CallerIsNotOperator",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "FutureManager__InvalidFutureId",
+    "type": "error"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "uint8",
+        "name": "version",
+        "type": "uint8"
+      }
+    ],
+    "name": "Initialized",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "previousOwner",
+        "type": "address"
+      },
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "newOwner",
+        "type": "address"
+      }
+    ],
+    "name": "OwnershipTransferred",
+    "type": "event"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "_future",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "_futureId",
+        "type": "uint256"
+      },
+      {
+        "internalType": "address",
+        "name": "_user",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "increaseCollateral",
+        "type": "uint256"
+      }
+    ],
+    "name": "checkFutureLockedSizeEnough",
+    "outputs": [
+      {
+        "internalType": "bool",
+        "name": "",
+        "type": "bool"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "futureConfig",
+    "outputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "futureLong",
+    "outputs": [
+      {
+        "internalType": "contract IFuture",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "futureShort",
+    "outputs": [
+      {
+        "internalType": "contract IFuture",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256[]",
+        "name": "_futureLongPrices",
+        "type": "uint256[]"
+      },
+      {
+        "internalType": "uint256[]",
+        "name": "_futureShortPrices",
+        "type": "uint256[]"
+      }
+    ],
+    "name": "getAllFuturesUnrealizedProfit",
+    "outputs": [
+      {
+        "internalType": "int256",
+        "name": "",
+        "type": "int256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "startFutureLongId",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "startFutureShortId",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256[]",
+        "name": "_futureLongPrices",
+        "type": "uint256[]"
+      },
+      {
+        "internalType": "uint256[]",
+        "name": "_futureShortPrices",
+        "type": "uint256[]"
+      }
+    ],
+    "name": "getCheckedAllUpl",
+    "outputs": [
+      {
+        "internalType": "int256",
+        "name": "upl",
+        "type": "int256"
+      },
+      {
+        "internalType": "bool",
+        "name": "settledAll",
+        "type": "bool"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "user",
+        "type": "address"
+      },
+      {
+        "internalType": "bool",
+        "name": "includeUserBalance",
+        "type": "bool"
+      },
+      {
+        "components": [
+          {
+            "internalType": "uint256",
+            "name": "txFeeRatio",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "priceImpactRatio",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "predictedLiquidateFeeRatio",
+            "type": "uint256"
+          },
+          {
+            "internalType": "address",
+            "name": "feeReceiver",
+            "type": "address"
+          }
+        ],
+        "internalType": "struct Struct.OrderFeeInfo",
+        "name": "info",
+        "type": "tuple"
+      }
+    ],
+    "name": "getFeeInfoWithAvailableToken",
+    "outputs": [
+      {
+        "components": [
+          {
+            "internalType": "uint256",
+            "name": "txFeeRatio",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "priceImpactRatio",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "availableUserBalance",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "availableLp",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "predictedLiquidateFeeRatio",
+            "type": "uint256"
+          }
+        ],
+        "internalType": "struct Struct.FutureFeeInfo",
+        "name": "fee",
+        "type": "tuple"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "enum Struct.FutureType",
+        "name": "_futureType",
+        "type": "uint8"
+      }
+    ],
+    "name": "getFutureByType",
+    "outputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "user",
+        "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "future",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "amount",
+        "type": "uint256"
+      }
+    ],
+    "name": "giveUserFund",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "hub",
+    "outputs": [
+      {
+        "internalType": "contract IDelegationHub",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "contract IUserBalance",
+        "name": "_userBalance",
+        "type": "address"
+      },
+      {
+        "internalType": "contract ILiquidityPool",
+        "name": "_liquidityPool",
+        "type": "address"
+      },
+      {
+        "internalType": "contract IFuture",
+        "name": "_long",
+        "type": "address"
+      },
+      {
+        "internalType": "contract IFuture",
+        "name": "_short",
+        "type": "address"
+      },
+      {
+        "internalType": "contract IPriceOracle",
+        "name": "_oracle",
+        "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "_futureConfig",
+        "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "_teamAddress",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "_minExecutionFee",
+        "type": "uint256"
+      }
+    ],
+    "name": "initialize",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "_futureId",
+        "type": "uint256"
+      },
+      {
+        "internalType": "address",
+        "name": "_user",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "_curPrice",
+        "type": "uint256"
+      },
+      {
+        "components": [
+          {
+            "internalType": "uint256",
+            "name": "txFeeRatio",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "priceImpactRatio",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "predictedLiquidateFeeRatio",
+            "type": "uint256"
+          },
+          {
+            "internalType": "address",
+            "name": "feeReceiver",
+            "type": "address"
+          }
+        ],
+        "internalType": "struct Struct.OrderFeeInfo",
+        "name": "_feeInfo",
+        "type": "tuple"
+      },
+      {
+        "internalType": "enum Struct.FutureType",
+        "name": "_futureType",
+        "type": "uint8"
+      }
+    ],
+    "name": "liquidatePosition",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "liquidityPool",
+    "outputs": [
+      {
+        "internalType": "contract ILiquidityPool",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "minExecutionFee",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "oracle",
+    "outputs": [
+      {
+        "internalType": "contract IPriceOracle",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "name": "orderImpl",
+    "outputs": [
+      {
+        "internalType": "bool",
+        "name": "",
+        "type": "bool"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "owner",
+    "outputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "proxiableUUID",
+    "outputs": [
+      {
+        "internalType": "bytes32",
+        "name": "",
+        "type": "bytes32"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "renounceOwnership",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "hub",
+        "type": "address"
+      }
+    ],
+    "name": "setHub",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "_fee",
+        "type": "uint256"
+      }
+    ],
+    "name": "setMinExecutionFee",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address[]",
+        "name": "impls",
+        "type": "address[]"
+      },
+      {
+        "internalType": "bool[]",
+        "name": "status",
+        "type": "bool[]"
+      }
+    ],
+    "name": "setOrderImpl",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "_teamAddress",
+        "type": "address"
+      }
+    ],
+    "name": "setTeamAddress",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "user",
+        "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "future",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "amount",
+        "type": "uint256"
+      }
+    ],
+    "name": "takeUserFund",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "teamAddress",
+    "outputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "tokenUSD",
+    "outputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "newOwner",
+        "type": "address"
+      }
+    ],
+    "name": "transferOwnership",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "components": [
+          {
+            "internalType": "enum Struct.FutureType",
+            "name": "futureType",
+            "type": "uint8"
+          },
+          {
+            "internalType": "uint256",
+            "name": "borrowingFeePerToken",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "futureId",
+            "type": "uint256"
+          }
+        ],
+        "internalType": "struct FutureManager.BorrowingFeeUpdateInfo[]",
+        "name": "data",
+        "type": "tuple[]"
+      }
+    ],
+    "name": "updateBorrowingFeePerToken",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "_future",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "_futureId",
+        "type": "uint256"
+      },
+      {
+        "internalType": "address",
+        "name": "_user",
+        "type": "address"
+      },
+      {
+        "components": [
+          {
+            "internalType": "uint256",
+            "name": "userBalanceToTeam",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "userBalanceToCollateral",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "collateralToLp",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "collateralToTeam",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "collateralToUserBalance",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "lpToUserBalance",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "lpToTeam",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "lockedTokenSize",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "unlockedTokenSize",
+            "type": "uint256"
+          },
+          {
+            "internalType": "bool",
+            "name": "success",
+            "type": "bool"
+          }
+        ],
+        "internalType": "struct Struct.UpdatePositionResult",
+        "name": "_result",
+        "type": "tuple"
+      }
+    ],
+    "name": "updateExchangeByUpdatePositionResult",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "components": [
+          {
+            "internalType": "string",
+            "name": "name",
+            "type": "string"
+          },
+          {
+            "internalType": "uint256",
+            "name": "rate",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "price",
+            "type": "uint256"
+          }
+        ],
+        "internalType": "struct FutureManager.OiUpdateInfo[]",
+        "name": "data",
+        "type": "tuple[]"
+      }
+    ],
+    "name": "updateFundingFee",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "newImplementation",
+        "type": "address"
+      }
+    ],
+    "name": "upgradeTo",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "newImplementation",
+        "type": "address"
+      },
+      {
+        "internalType": "bytes",
+        "name": "data",
+        "type": "bytes"
+      }
+    ],
+    "name": "upgradeToAndCall",
+    "outputs": [],
+    "stateMutability": "payable",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "userBalance",
+    "outputs": [
+      {
+        "internalType": "contract IUserBalance",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "_logic",
+        "type": "address"
+      },
+      {
+        "internalType": "bytes",
+        "name": "_data",
+        "type": "bytes"
+      }
+    ],
+    "stateMutability": "nonpayable",
+    "type": "constructor"
+  }
+]

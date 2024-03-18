@@ -1,5 +1,10 @@
 
 import { FC, PropsWithChildren } from "react";
+import { type Address, type Chain } from 'viem';
+
+
+
+// export 
 
 
 declare global {
@@ -15,6 +20,11 @@ declare global {
 
 
     type AnyObjec = { [key: string]: any } 
+
+
+    type Addr = Address | undefined
+
+    type StringNum = number | string
 
 
     interface Window {

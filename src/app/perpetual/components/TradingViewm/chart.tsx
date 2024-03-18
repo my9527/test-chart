@@ -25,6 +25,7 @@ import { tokens } from "@/app/config/tokens";
 import { tradingviewSocketIns } from "./socket";
 import { useParams } from "next/navigation";
 import styled from "styled-components";
+import { useChainId } from "wagmi";
 
 
 
@@ -44,6 +45,16 @@ const WrapperTradingView = styled.div`
 
 
 
+function generatePattern(n: number) {
+    if (n < 0 || typeof n !== 'number' || !Number.isInteger(n)) {
+      return 'Invalid input';
+    }
+    let pattern = '1';
+    for (let i = 0; i < n; i++) {
+      pattern += '0';
+    }
+    return Number(pattern);
+  }
 
 
 export const CmptTradingView: FCC<{
@@ -58,6 +69,8 @@ export const CmptTradingView: FCC<{
 
     const { symbol }= params;
 
+    const chainId = useChainId();
+
 
 
     const _widget = useRef<null | IChartingLibraryWidget>(null);
@@ -66,7 +79,7 @@ export const CmptTradingView: FCC<{
 
     const initChart = useCallback((_symbol: string) => {
 
-        const symbols = tokens.reduce((result, token) => {
+        const symbols = (tokens[chainId] || []).reduce((result, token) => {            
 
             return {
                 ...result,
@@ -79,7 +92,7 @@ export const CmptTradingView: FCC<{
                     session: '24x7',
                     timezone: 'UTC',
                     minmov: 1, // 最小波动
-                    pricescale: token.displayDecimal || 1000,
+                    pricescale: generatePattern(token.displayDecimal) || 1000,
                     has_intraday: true, // 是否提供日内分钟数据
                     has_weekly_and_monthly: false,
                     exchange: '',
@@ -92,13 +105,29 @@ export const CmptTradingView: FCC<{
             autosize: true,
             theme: 'Dark',
             timezone: dayjs.tz.guess() as Timezone,
-            interval: '1' as ResolutionString,
+            interval: '15' as ResolutionString,
             library_path: '/charting_library/',
             symbol,
             overrides,
             datafeed: new DataFeed({
               symbols,
             }),
+            // settings_overrides: {
+            //     symbolWatermark: "{\"visibility\":true,\"color\":\"rgba(80, 83, 94, 0.25)\"}"
+            // },
+            // settings_adapter: {
+
+            //     initialSettings: {
+            //         symbolWatermark: "{\"visibility\":true,\"color\":\"rgba(80, 83, 94, 0.25)\"}"
+            //     },
+            //     setValue(key, value) {
+            //         localStorage.setItem(`tradingview.${key}`, value);
+            //     },
+            //     removeValue(key) {
+            //         localStorage.removeItem(`tradingview.${key}`);
+            //     },
+            // },
+            
             favorites: {
                 intervals: ["1", "15", "30", "60", "120", "4h", "1D"] as ResolutionString[],
             },
@@ -124,6 +153,14 @@ export const CmptTradingView: FCC<{
               'iframe_loading_compatibility_mode',
             ],
             // IntervalWidget.quicks
+        });
+
+        _widget.current.onChartReady(() => {
+            _widget.current?.applyOverrides({
+                symbolWatermark: "{\"visibility\":true,\"color\":\"rgba(80, 83, 94, 0.25)\"}"
+            });
+            // const priceScale = (_widget.current as IChartingLibraryWidget).activeChart().getPanes()[0].getMainSourcePriceScale();
+            // priceScale?.setAutoScale(true);
         });
     }, []);
 
