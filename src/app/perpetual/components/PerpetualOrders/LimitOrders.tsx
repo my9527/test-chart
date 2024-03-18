@@ -1,19 +1,15 @@
 import { Col } from "@/app/components/Col";
 import { Row } from "@/app/components/Row";
 import { TokenById } from "@/app/components/Token";
-import { useIndexPricesById } from "@/app/hooks/useIndexPrices";
 import { useTokenByFutureId } from "@/app/hooks/useTokens";
-import { PositionType, recoilPositions } from "@/app/models";
+import { recoilFutureLimitOrMarketOrders } from "@/app/models";
 import { filterPrecision } from "@/app/utils/tools";
-import BigNumber from "bignumber.js";
-import { ThHTMLAttributes, useMemo } from "react";
+import { FC, ThHTMLAttributes } from "react";
 import { useRecoilValue } from "recoil";
 import styled from "styled-components";
-import { getLiqPrice } from "../../lib/getLiqPrice";
-import { useFundingFeeByAddressSide } from "../../hooks/useFundingFees";
 import { FutureType } from "@/app/config/common";
-import { useBorrowingFeeByAddressSide } from "../../hooks/useBorrowingFees";
-import { calcPnl, calcPnlPercentage } from "../../lib/getPnl";
+import { formatTime } from "@/app/lib/common";
+import { ethers } from "ethers";
 
 
 
@@ -97,28 +93,22 @@ const Headers: HeaderItem[] = [{
     title: 'Symbol',
     key: 'symbol',
     align: 'left',
+},{
+    title: 'Side',
+    key: 'side',
 }, {
+    title: 'Price',
+    key: 'price'
+},{
     title: 'Size',
     key: 'size',
-}, {
-    title: 'Mark Price',
-    key: 'marketPrice',
-}, {
-    title: 'Entry Price',
-    key: 'entryPrice'
-}, {
-    title: 'Unreallzed PnL(%)',
-    key: 'pnl'
-}, {
+},{
     title: 'Margin',
     key: 'collotral'
 }, {
-    title: 'Est.liq.Price',
-    key: 'liqPrice'
-}, {
-    title: 'TP/SL',
-    key: 'tpsl'
-}, {
+    title: 'Order Time',
+    key: 'orderTime'
+},  {
     title: 'Action',
     key: 'action'
 }];
@@ -192,111 +182,57 @@ const PositionItemWrapper = styled.tr`
     }
 `
 
-const Position: FCC<{ pos: PositionType }> = ({ pos }) => {
+type OrderType = {
+    side: FutureType;
+    createTime: number;
+
+}
+
+
+const LimitOrderItem: FCC<{ pos: any }> = ({ pos }) => {
 
     const token = useTokenByFutureId(pos.futureId);
-
-    const indexPrices = useIndexPricesById(pos.futureId);
-
-    const fundingFee = useFundingFeeByAddressSide(token.address as string, pos.isLong ? FutureType.LONG : FutureType.SHORT);
-
-    const borrowingFee = useBorrowingFeeByAddressSide(token.address as string, pos.isLong ? FutureType.LONG : FutureType.SHORT);
-
-    // const fundingFee = 
-
-    const fundingfeeReadable = BigNumber(pos.tokenSize)
-      .multipliedBy(BigNumber((fundingFee?.fee || '0') / 1e6).minus(pos.entryFundingFeePerTokenReadable))
-      .plus(pos.cumulativeFundingFeeReadable)
-      .multipliedBy(-1)
-      .toString();
-    // tokensize*（BorrowingFeePerToken-entryBorrowingFeePerToken）+ cumulativeBorrowingFee
-    const borrowingfeeReadable = BigNumber(pos.tokenSize)
-      .multipliedBy(BigNumber((borrowingFee?.fee || '0') / 1e6).minus(pos.entryBorrowingFeePerTokenReadable))
-      .plus(pos.cumulativeBorrowingFeeReadable)
-      .multipliedBy(-1)
-      .toString();
-
-    const openingfeeReadable = BigNumber(pos.cumulativeTeamFeeReadable).multipliedBy(-1).toString();
-
-    const feesReadable = BigNumber(fundingfeeReadable).plus(borrowingfeeReadable).plus(openingfeeReadable).toString();
-
-    
-
-    const liqPrice = useMemo(() => {
-
-        // console.log("liqPrice", pos.collateral, feesReadable, pos.entryPriceReadable, pos.tokenSize, pos.isLong, token)
-
-        return getLiqPrice({
-            collateral: pos.collateralReadable,
-            fees: feesReadable,
-            entryPrice: pos.entryPriceReadable,
-            size: pos.tokenSize,
-            isLong: pos.isLong,
-            token: token,
-        })
-    }, [feesReadable, pos.collateral, pos.entryPriceReadable, pos.tokenSize, pos.isLong, token]);
-
-    const tickPrice = useIndexPricesById(pos.futureId);
-
-    const pnl = useMemo(() => {
-        return calcPnl({
-            isLong: pos.isLong,
-            entryPrice: pos.entryPriceReadable,
-            tickPrice: tickPrice?.price,
-            size: pos.tokenSize,
-            pars: token.pars
-        });
-    }, [pos.entryPriceReadable, pos.tokenSize, tickPrice?.price, pos.isLong, token.pars]);
-
-    const pnlPercent = useMemo(() => {
-        return calcPnlPercentage({ pnl, collateral: pos.collateralReadable })
-    }, [pnl, pos.collateralReadable]);
-
-    const hasProfit = useMemo(() => {
-        return BigNumber(pnl).lt(0) ? false : true
-    }, [pnl]);
     
     return (
         <PositionItemWrapper>
             <td align="left" width={140}>
                 <Col gap="6px" align="start" className={`symbol-name ${pos.isLong ? 'long-pos' : 'short-pos'}`}>
                     <div><TokenById futureId={pos.futureId} /></div>
-                    <div className={`pos-dir`}>{pos.isLong ? 'Long' : 'Short'}</div>
                 </Col>
             </td>
             <td {...PositionTdAttrs} width={140}>
                 <div className={`pos-dir ${pos.isLong ? 'pos-long' : 'pos-short'}`}>
-                    {pos.tokenSize}
+                    <div className={`pos-dir`}>{pos.isLong ? 'Long' : 'Short'}</div>
                 </div>
             </td>
             <td {...PositionTdAttrs} width={140}>
-                {filterPrecision(indexPrices?.price, token.displayDecimal)}
+                {/* {filterPrecision(pos?.price, token.displayDecimal)} */}
+                <div >
+                {
+                    filterPrecision(ethers.utils.formatUnits(pos?.price || pos?.executePrice || 0, 6), token.displayDecimal)
+                }
+                </div>
+                
             </td>
             <td {...PositionTdAttrs} width={140}>
-                {filterPrecision(pos.entryPriceReadable, token.displayDecimal)}
+                <div className={`pos-dir ${pos.isLong ? 'pos-long' : 'pos-short'}`}>
+                    {filterPrecision(pos.size, token.displayDecimal)}
+                </div>
             </td>
-            <td {...PositionTdAttrs} width={200}>
-                <Col gap="6px" className={hasProfit ? 'pnl-profit' : 'pnl-loss'} align="flex-start">
-                    <div>${filterPrecision(pnl, 2)}</div>
-                    <div>({pnlPercent}%)</div>
+            <td {...PositionTdAttrs} width={140}>
+                <Col gap="6px" className="margin-col" align="flex-start">
+                    <div>${filterPrecision(pos?.collateralReadable, 6)}</div>
                 </Col>
             </td>
-            <td {...PositionTdAttrs} width={140}>
-                <div className="margin-col">
-                    ${filterPrecision(pos.collateralReadable, 2)}
+            <td {...PositionTdAttrs} width={200}>
+                <div >
+                {
+                    formatTime(pos.createTime, 'YYYY-MM-DD HH:mm:ss')
+                }
                 </div>
-            </td>
-            <td {...PositionTdAttrs} width={140}>
-                {filterPrecision(liqPrice, token.displayDecimal, pos?.isLong ? BigNumber.ROUND_CEIL : BigNumber.ROUND_DOWN)}
-            </td>
-            <td {...PositionTdAttrs} width={140}>
-                <div>button +</div>
             </td>
             <td {...PositionTdAttrs}>
-                <div>
-                    <div>close</div>
-                    <div>share</div>
-                </div>
+                close
             </td>
         </PositionItemWrapper>
     );
@@ -304,17 +240,10 @@ const Position: FCC<{ pos: PositionType }> = ({ pos }) => {
 
 
 
-export const PositionList = () => {
+export const LimitMarketOrderList:FC = () => {
 
 
-    const _openPositions = useRecoilValue(recoilPositions);
-
-    // sort by futureId asc
-    const openPositions = useMemo(() => {
-        if(!_openPositions.length) return [];
-        return [..._openPositions].sort((a: any, b: any) => BigNumber(b.futureId).minus(a.futureId).toNumber());
-    }, [_openPositions]);
-
+    const limitOrMarketOrder = useRecoilValue(recoilFutureLimitOrMarketOrders);
 
     return (
         <Wrapper>
@@ -336,8 +265,8 @@ export const PositionList = () => {
                     </thead>
                     <tbody>
                         {
-                            openPositions.map((pos: any) => {
-                                return <Position key={pos.id} pos={pos} />
+                            limitOrMarketOrder.map((pos: any, index) => {
+                                return <LimitOrderItem key={`${pos.id}-${pos.isLong ? 'long' : 'short'}-${pos.symbol}`} pos={pos} />
                             })
                         }
                     </tbody>

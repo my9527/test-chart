@@ -33,7 +33,6 @@ export const NotAuthed: FCC = ({ children }) => {
         async function _run() {
             const time = Date.now();
             const msgToSign = generateSignApiTokenMessage(address as string, time);
-
             signMessage({
                 message: msgToSign,
                 account: address,

@@ -175,3 +175,63 @@ export const recoilWalletConnectPanel = atom<boolean>({
   key: 'wallet_connect_panel',
   default: false,
 })
+
+
+
+type FutureOrderType = {
+    orders: any[],
+    validOrders: any[],
+    inValidOrders: any[]
+}
+
+export const recoilFutureOrders = atom<FutureOrderType>({
+
+  key: 'future_orders',
+  default: {
+    orders: [],
+    validOrders: [],
+    inValidOrders: []
+  },
+})
+
+export const recoilFutureLimitOrMarketOrders = selector({
+  key: 'future_orders_limit',
+  get: ({get}) => {
+    const { validOrders } = get(recoilFutureOrders);
+
+    return validOrders.filter(order => {
+      return ['increaseMarketOrders', 'increaseLimitOrders', 'decreaseLimitOrders', 'decreaseMarketOrders'].includes(order.type);
+    })
+    // .sort((a, b) => b.futureId - a.futureId);
+  },
+});
+
+export const recoilFutureStopOrders = selector({
+  key: 'future_orders_stop',
+  get: ({get}) => {
+    const { validOrders } = get(recoilFutureOrders);
+
+    return validOrders.filter(order => {
+      return ['futureStopOrders'].includes(order.type);
+    });
+  },
+});
+
+
+
+export const recoilOrdersLen = selector({
+  key: 'future_orders_len',
+  get:({ get }) => {
+    const positionList = get(recoilPositions);
+    const limitList = get(recoilFutureLimitOrMarketOrders);
+    const stopList = get(recoilFutureStopOrders);
+
+    return {
+      position: positionList.length,
+      limit:  limitList.length,
+      stop: stopList.length,
+      history: 0,
+    }
+
+  }
+})

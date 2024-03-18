@@ -13,16 +13,16 @@ export type Token = {
   futureShortId: number;
   pars: number;
   displayDecimal: number;
-  maxProfitRatio: number;
+  maxProfitRatio?: number;
   minLeverage?: number;
-  maxLeverage: number;
-  borrowingFeeRatio: number;
-  maintainMarginRatio: number;
-  fundingFeeRatio: number;
+  maxLeverage?: number;
+  borrowingFeeRatio?: number;
+  maintainMarginRatio?: number;
+  fundingFeeRatio?: number;
   priceTickSize: number;
-  fundingFeeBaseRate: number;
-  fundingFeeLinearRate: number;
-  maxliquidityLockRatio: number;
+  fundingFeeBaseRate?: number;
+  fundingFeeLinearRate?: number;
+  maxliquidityLockRatio?: number;
   hot?: boolean;
   image?: string;
   needCalPriceImpactByUni?: boolean;
@@ -2024,6 +2024,25 @@ const baseTokens: Record<string, Token[]> = {
       "maxliquidityLockRatio": 0.3
     },
     {
+      symbolName: 'BTC',
+      decimal: 6,
+      tag: ['Public Chain', 'PoW', 'Hot'],
+      futureLongId: 9,
+      futureShortId: 9,
+      pars: 0.0001,
+      displayDecimal: 2,
+      priceTickSize: 1e-2,
+      "borrowingFeeRatio": 0,
+      "maintainMarginRatio": 0.005,
+      fundingFeeBaseRate: 0.0008,
+      fundingFeeLinearRate: 0.08,
+      maxliquidityLockRatio: 1, // 100%
+      maxProfitRatio: 10,
+      maxLeverage: 100, 
+      fundingFeeRatio: 0.025
+     
+    },
+    {
       "symbolName": "COMP",
       "decimal": 6,
       "tag": [
@@ -2105,6 +2124,21 @@ const baseTokens: Record<string, Token[]> = {
       "fundingFeeBaseRate": 0.0008,
       "fundingFeeLinearRate": 0.08,
       "maxliquidityLockRatio": 0.3
+    },
+    {
+      symbolName: 'ETH',
+      decimal: 6,
+      tag: ['Public Chain', 'Web3.0', 'Hot'],
+      futureLongId: 14,
+      futureShortId: 14,
+      pars: 0.001,
+      displayDecimal: 2,
+      "borrowingFeeRatio": 0,
+      "maintainMarginRatio": 0.005,
+      priceTickSize: '0.01',
+      fundingFeeBaseRate: 0.0008,
+      fundingFeeLinearRate: 0.08,
+      maxliquidityLockRatio: 1, // 100%
     },
     {
       "symbolName": "FTM",
