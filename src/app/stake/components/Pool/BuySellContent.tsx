@@ -6,6 +6,8 @@ import Image from "next/image"
 import { TwoTabs } from "@/app/components/TwoTabs"
 import BalanceInput from "@/app/components/BalanceInput"
 import Button from '@/app/components/LinearGradientButton'
+import FlexBox from '@/app/components/FlexBox'
+
 enum TradeType {
   Buy = 'buy',
   Sell = 'sell'
@@ -18,13 +20,6 @@ const ImageWrapper = styled.div`
 
 const Content = styled.div`
   padding: 20px 35px 15px;
-`
-
-
-const FlexBox = styled.div<{ justify?: string }>`
-  display: flex;
-  justify-content: ${props => props.justify || "flex-start"};
-  align-items: center;
 `
 
 const Label = styled.div`
@@ -99,7 +94,7 @@ export function BuySellContent() {
             <Value>123,123.00</Value>
           </FlexBox>
         </Form>
-        <FlexBox justify="center"><Button>{type === TradeType.Sell ? 'Sell' : 'Buy'}</Button></FlexBox>
+        <FlexBox><Button>{type === TradeType.Sell ? 'Sell' : 'Buy'}</Button></FlexBox>
       </Content>
     </>
   )
