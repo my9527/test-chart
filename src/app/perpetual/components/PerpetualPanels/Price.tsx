@@ -42,7 +42,6 @@ const Price: React.FC<{
   symbolName: string;
   displayDecimal: number;
 }> = ({ activeOrderTab, price, setPrice, symbolName, displayDecimal }) => {
-    
   const indexPrices = useRecoilValue(recoilIndexPrices);
 
   const getMarketPrice = () => {
@@ -67,11 +66,7 @@ const Price: React.FC<{
         }
         onChange={(e: React.FormEvent<HTMLInputElement>) => {
           const value = e?.currentTarget.value;
-          console.log(
-            "input-value",
-            value,
-            verifyValidNumber(value, displayDecimal)
-          );
+
           if (value && verifyValidNumber(value, displayDecimal)) return;
           setPrice(value);
         }}

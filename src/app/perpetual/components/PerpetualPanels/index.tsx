@@ -17,7 +17,7 @@ import ShortIcon from "@/app/assets/perpetual/short.svg";
 import Modal from "@/app/components/Modal";
 import AdjustLeverage from "./AdjustLeverage";
 import OpenOrder from "./OpenOrder";
-
+import CloseOrder from "./CloseOrder";
 const Wrapper = styled.div`
   position: relative;
   width: 100%;
@@ -284,7 +284,7 @@ const PerpetualPanels = () => {
 
   const [activeTab, setActiveTab] = useState<string>("open");
   const [activeOrderTab, setActiveOrderTab] = useState<string>("limit");
-  const defaultLeverage = 11;
+  const defaultLeverage = 5;
   const [leverage, setLeverage] = useState<number>(defaultLeverage);
   const [confirmedLeverage, setConfirmedLeverage] =
     useState<number>(defaultLeverage);
@@ -339,14 +339,23 @@ const PerpetualPanels = () => {
               setActiveOrderTab(item?.key);
             }}
           />
-          <Leverage onClick={() => setVisible(true)}>
-            <p className="label">{confirmedLeverage}X</p>
-            <Image src={ArrowIcon} width={8} height={6} alt="" />
-          </Leverage>
+          {activeTab === "close" ? null : (
+            <Leverage onClick={() => setVisible(true)}>
+              <p className="label">{confirmedLeverage}X</p>
+              <Image src={ArrowIcon} width={8} height={6} alt="" />
+            </Leverage>
+          )}
         </OrderTypeTabsWrapper>
         <ScrollWrapper>
           {activeTab === "close" ? (
-            <></>
+            <CloseOrder
+              curToken={curToken}
+              leverage={confirmedLeverage}
+              activeOrderTab={activeOrderTab}
+              margin={margin}
+              setMargin={setMargin}
+              symbolName={symbolName}
+            />
           ) : (
             <OpenOrder
               curToken={curToken}
@@ -532,6 +541,7 @@ const PerpetualPanels = () => {
           setLeverage={(v) => {
             setLeverage(v);
           }}
+          max={curToken?.maxLeverage || 5}
         />
       </Modal>
     </Wrapper>
