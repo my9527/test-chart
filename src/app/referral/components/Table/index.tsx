@@ -5,15 +5,16 @@ const TableWrapper = styled.div<{ columnLen: number }>`
   display: grid;
   grid-template-columns: ${props => `repeat(${props.columnLen}, auto)`};
   column-gap: 28px;
-  row-gap: 16px;
+  row-gap: 20px;
   padding: 10px 0;
+  margin-top: 15px;
 `
 const TableHeaderCell = styled.div`
-  font-size: ${props => props.theme.fontSize.small};
+  font-size: ${props => props.theme.fontSize.medium};
   color: ${props => props.theme.colors.text4};
 `
 const TableCell = styled.div`
-  font-size: ${props => props.theme.fontSize.small};
+  font-size: ${props => props.theme.fontSize.medium};
   color: ${props => props.theme.colors.text1};
   align-self: center;
 `

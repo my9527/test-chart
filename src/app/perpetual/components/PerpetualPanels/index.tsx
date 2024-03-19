@@ -16,6 +16,8 @@ import LongIcon from "@/app/assets/perpetual/long.svg";
 import ShortIcon from "@/app/assets/perpetual/short.svg";
 import Modal from "@/app/components/Modal";
 import AdjustLeverage from "./AdjustLeverage";
+import OpenOrder from "./OpenOrder";
+
 const Wrapper = styled.div`
   position: relative;
   width: 100%;
@@ -287,11 +289,12 @@ const PerpetualPanels = () => {
   const [confirmedLeverage, setConfirmedLeverage] =
     useState<number>(defaultLeverage);
   const [price, setPrice] = useState<number | undefined>(undefined);
-  const [margin, SetMargin] = useState<number | undefined>(undefined);
-  const [amount, SetAmount] = useState<number | undefined>(undefined);
+  const [margin, setMargin] = useState<number | undefined>(undefined);
+  const [amount, setAmount] = useState<number | undefined>(undefined);
   const [visible, setVisible] = useState(false);
   const fundsAvailable = 2000;
-  
+  const { curToken } = useCurToken();
+  console.log("curToken", curToken);
   const onClose = () => {
     setVisible(false);
   };
@@ -319,6 +322,7 @@ const PerpetualPanels = () => {
       setLeverage(confirmedLeverage);
     }
   }, [visible]);
+
   return (
     <Wrapper>
       <ActionTabs
@@ -344,7 +348,19 @@ const PerpetualPanels = () => {
           </Leverage>
         </OrderTypeTabsWrapper>
         <ScrollWrapper>
-          <Price>
+          {activeTab === "close" ? (
+            <></>
+          ) : (
+            <OpenOrder
+              displayDecimal={curToken?.displayDecimal}
+              leverage={confirmedLeverage}
+              activeOrderTab={activeOrderTab}
+              margin={margin}
+              setMargin={setMargin}
+              symbolName={symbolName}
+            />
+          )}
+          {/* <Price>
             <p className="title">Price</p>
             <Input
               disabled={activeOrderTab === "market"}
@@ -503,7 +519,7 @@ const PerpetualPanels = () => {
             <Button type="short" btnText="SHORT">
               <Image src={ShortIcon} alt="" width={25} height={18} />
             </Button>
-          </Btns>
+          </Btns> */}
         </ScrollWrapper>
       </Content>
       <DraggableIcon />

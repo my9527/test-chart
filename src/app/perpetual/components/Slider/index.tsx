@@ -125,7 +125,7 @@ const Mark = styled.div<PercentProps>`
 export interface SliderProps {
   className?: string;
   disabled?: boolean;
-  value: number;
+  value?: number;
   min: number;
   max: number;
   step?: number; // 步长，取值必须大于 0，并且可被 (max - min) 整除。
@@ -133,6 +133,7 @@ export interface SliderProps {
   marks?: { label: string; value: number }[];
   tooltip?: React.ReactNode;
   onChange?: (value: number) => void;
+  per: number;
 }
 
 const Slider: React.FC<SliderProps> = ({
@@ -143,22 +144,14 @@ const Slider: React.FC<SliderProps> = ({
   value = 0,
   unit,
   onChange,
+  per,
 }) => {
-  const [selectedValue, setSelectedValue] = useState(0);
   const trackRef = useRef<HTMLDivElement | null>(null);
   const thumbRef = useRef<HTMLDivElement | null>(null);
 
   const [percent, setPercent] = useState<number>(0);
   const [isDragging, setIsDragging] = useState(false);
   const [isChange, setIsChange] = useState(false);
-
-  useEffect(() => {
-    if (value < min) {
-      setPercent(0);
-    } else {
-      setPercent((value - min) / (max - min));
-    }
-  }, [value, min, max]);
 
   const trackWidth = useMemo(() => {
     return trackRef?.current?.clientWidth || 0;
@@ -226,7 +219,7 @@ const Slider: React.FC<SliderProps> = ({
       />
       <SliderThumb
         ref={thumbRef}
-        percent={percent < 0 ? 0 : percent > 1 ? 1 : percent}
+        percent={per < 0 ? 0 : per > 1 ? 1 : per}
         onClick={(e) => {
           if (!isDragging) {
             setIsChange(true);
@@ -235,7 +228,7 @@ const Slider: React.FC<SliderProps> = ({
         }}
       >
         <CurDot
-          percent={percent < 0 ? 0 : percent > 1 ? 1 : percent}
+          percent={per < 0 ? 0 : per > 1 ? 1 : per}
           onMouseDown={(e) => {
             e.nativeEvent.stopImmediatePropagation();
 
@@ -244,7 +237,10 @@ const Slider: React.FC<SliderProps> = ({
           }}
         >
           <p className="value">
-            {Math.floor((max - min) * percent + min)}
+            {(max - min) * per + min < 1
+              ? ((max - min) * per + min).toFixed(1)
+              : Math.floor((max - min) * per + min)}
+            {/* {per} */}
             {unit}
           </p>
         </CurDot>
@@ -262,7 +258,7 @@ const Slider: React.FC<SliderProps> = ({
                 handleDotClick(_left);
               }}
             >
-              {left > percent ? <Dot /> : <SelectedDot />}
+              {left > per ? <Dot /> : <SelectedDot />}
               <p className="label">{i?.label}</p>
             </Mark>
           );
