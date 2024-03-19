@@ -145,7 +145,7 @@ background: ${(props) => props.theme.colors.fill2};
 
 .head-name{
     width: 50%;
-    padding-left: 20px;
+    padding-left: 24px;
 }
 .head-price,.head-change{
     width: 25%;
@@ -173,6 +173,20 @@ background: ${(props) => props.theme.colors.fill2};
     .suffix{
         padding: 0 10px;
     }
+}
+
+.item-tag{
+    border-radius: 999px;
+    border: 1px solid ${(props) => props.theme.colors.primary1};
+    background:${(props) => props.theme.colors.fill3};
+    padding: 3px 15px;
+    color: ${(props) => props.theme.colors.text1};
+    /* small */
+    font-family: Arial;
+    font-size: ${(props) => props.theme.fontSize.small};
+    font-style: normal;
+    font-weight: 400;
+    line-height: 120%; /* 14.4px */
 }
 `
 
@@ -321,23 +335,30 @@ const Panel: FC<{ visible: boolean, followRef: React.RefObject<HTMLDivElement>, 
                     </Row>
                     <Scrollbar
                     >
-                        <Col gap="20px" >
+                        <Col >
                             {
                                 visible && filteredList.map(tk => {
                                     return (
-                                        <Row onClick={() => changeRouteSymbol(tk.symbolName)} className="token-row" key={tk.symbolName} style={{ height: '50px' }}>
-                                            <Row gap="8px" className="token-name">
-                                                <Image onClick={(e) => {
-                                                    e.stopPropagation();
-                                                    e.nativeEvent.stopImmediatePropagation();
-                                                    handelFav(tk.symbolName);
-                                                }} width={16} height={16} className="fav-icon" alt={tk.symbolName} src={favoriateList[tk.symbolName]?.favoriate ? FavoriteIcon : StarIcon} />
-                                                <TokenImage width={20} height={20} name={tk.symbolName} />
-                                                <span>{tk.symbolName}</span>
+                                        <Col gap="10px" onClick={() => changeRouteSymbol(tk.symbolName)}  className="token-row" style={{ paddingTop: '20px', paddingBottom: '10px'  }}>
+                                            <Row  key={tk.symbolName} >
+                                                <Row gap="8px" className="token-name">
+                                                    <Image onClick={(e) => {
+                                                        e.stopPropagation();
+                                                        e.nativeEvent.stopImmediatePropagation();
+                                                        handelFav(tk.symbolName);
+                                                    }} width={16} height={16} className="fav-icon" alt={tk.symbolName} src={favoriateList[tk.symbolName]?.favoriate ? FavoriteIcon : StarIcon} />
+                                                    <TokenImage width={20} height={20} name={tk.symbolName} />
+                                                    <span>{tk.symbolName}</span>
+                                                </Row>
+                                                <div className="token-price">{indexPrices[tk.symbolName]?.price}</div>
+                                                <div className={`token-change ${+indexPrices[tk.symbolName]?.change < 0 ? 'raise' : 'desc'} `}>{indexPrices[tk.symbolName]?.change || 0}%</div>
                                             </Row>
-                                            <div className="token-price">{indexPrices[tk.symbolName]?.price}</div>
-                                            <div className={`token-change ${+indexPrices[tk.symbolName]?.change < 0 ? 'raise' : 'desc'} `}>{indexPrices[tk.symbolName]?.change || 0}%</div>
-                                        </Row>
+                                            <Row gap="6px" style={{ paddingLeft: '24px' }}>
+                                                {tk.tag.map(tag => {
+                                                    return <div className="item-tag" key={`${tk.symbolName}-${tag}`}>{tag}</div>
+                                                })}
+                                            </Row>
+                                        </Col>
                                     );
                                 })
                             }
