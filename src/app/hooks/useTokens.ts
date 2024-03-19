@@ -87,3 +87,38 @@ export const useUSDTokens = () => {
     return tokens.filter(token_ => token_.exchangeStable)
   }, [tokens]);
 }
+
+
+export const useTradeTokens = () => {
+
+  const tokens = useTokens();
+
+  return useMemo(() => {
+    return tokens.filter(token_ => token_.tradeable !== false)
+  }, [tokens]);
+
+}
+
+export const useDepositableTokens = () => {
+  const tokens = useTokens();
+
+  return useMemo(() => {
+    return tokens.filter(token_ => token_.deposit === true)
+  }, [tokens]);
+}
+
+export const useWithdrawableTokens = () => {
+  const tokens = useTokens();
+
+  return useMemo(() => {
+    return tokens.filter(token_ => token_.withdraw === true)
+  }, [tokens]);
+}
+
+
+export const useStableTokens = () => {
+  const tokens = useTokens();
+  return useMemo(() => {
+    return tokens.filter(token_ => token_.stable && token_.address);
+  }, [tokens]);
+}

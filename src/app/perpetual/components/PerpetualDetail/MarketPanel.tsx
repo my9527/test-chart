@@ -9,7 +9,7 @@ import { RemoveScroll } from "react-remove-scroll"
 import { Row } from "@/app/components/Row";
 import { createPortal } from "react-dom";
 import { useIndexPrices } from "@/app/hooks/useIndexPrices";
-import { useTokens } from "@/app/hooks/useTokens";
+import { useTokens, useTradeTokens } from "@/app/hooks/useTokens";
 import { Col } from "@/app/components/Col";
 import TokenImage from "@/app/components/TokenImage";
 import { MacScrollbar } from "mac-scrollbar";
@@ -22,6 +22,8 @@ import Link from 'next/link'
 import FavoriteIcon from "@/app/assets/perpetual/favorite.svg";
 import StarIcon from "@/app/assets/perpetual/star.svg";
 import { useRouter } from "next/navigation";
+import { IconSort } from "@/app/components/IconSort";
+import { sortArrByKey } from "@/app/lib/common";
 // import { useRouter } from "next/navigation";
 
 
@@ -99,7 +101,7 @@ background: ${(props) => props.theme.colors.fill2};
     font-weight: 400;
     line-height: 120%; /* 14.4px */
     background: ${(props) => props.theme.colors.fill2};
-    padding: 4px 8px 4px 22px;
+    padding: 4px 20px;
 }
 
 .token-name{
@@ -123,6 +125,7 @@ background: ${(props) => props.theme.colors.fill2};
     font-weight: 400;
     line-height: 100%; /* 14px */
     width: 25%;
+    text-align: left;
 }
 .token-change{
     text-align: center;
@@ -134,6 +137,8 @@ background: ${(props) => props.theme.colors.fill2};
     font-weight: 400;
     line-height: 100%; /* 14px */
     width: 25%;
+    justify-content: flex-end;
+    text-align: right;
 
     &.raise {
         color: ${(props) => props.theme.colors.text2};
@@ -146,6 +151,13 @@ background: ${(props) => props.theme.colors.fill2};
 .head-name{
     width: 50%;
     padding-left: 24px;
+}
+.head-change{
+    justify-content: flex-end;
+}
+.head-price{
+    text-align: left;
+    justify-content: flex-start;
 }
 .head-price,.head-change{
     width: 25%;
@@ -220,23 +232,40 @@ const Panel: FC<{ visible: boolean, followRef: React.RefObject<HTMLDivElement>, 
 
     const [nameFilter, updateNameFilter] = useState('');
 
+    const [sort, updateSort] = useState<{ sort: string, dir: 'asc' | 'desc' | '' }>({
+        sort: '',
+        dir: '',
+    });
+
     const [favoriateList, updateFavoriateList] = useRecoilState(recoilFavoriateList);
     const updatePerpetualToken = useSetRecoilState(recoilPerpetualToken)
 
     const indexPrices = useIndexPrices();
 
-    const tokens = useTokens();
+    const _tokens = useTradeTokens();
 
-    const router = useRouter()
 
-    const [direction, updateDirection] = useState<{
+    // combine token with price and change
+    const tokens = useMemo(() => {
+        return _tokens.map(tk => {
+            return {
+                ...tk,
+                price: indexPrices[tk.symbolName]?.price || '-',
+                change: +indexPrices[tk.symbolName]?.price || '-',
+            }
+        })
+
+    }, [indexPrices, _tokens]);
+
+    const [panelPos, updatePanelPos] = useState<{
         top: number;
     }>();
+
     useEffect(() => {
         if (!followRef.current) return;
         const { top, height } = followRef.current.getBoundingClientRect();
         const size = { top: top + height + 10 };
-        updateDirection(size);
+        updatePanelPos(size);
     }, [followRef]);
 
 
@@ -264,7 +293,7 @@ const Panel: FC<{ visible: boolean, followRef: React.RefObject<HTMLDivElement>, 
     }, []);
 
     const handleFilter = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-        const val =e.target.value;
+        const val = e.target.value;
 
         updateNameFilter(val);
 
@@ -273,24 +302,17 @@ const Panel: FC<{ visible: boolean, followRef: React.RefObject<HTMLDivElement>, 
     const filteredList = useMemo(() => {
 
         const matchTypeList = tokens.filter(token_ => {
-            if(filterType === 'fav') {
+            if (filterType === 'fav') {
                 return !!favoriateList[token_.symbolName]?.favoriate;
             }
             return filterType === 'all' ? true : token_.tag.some(tg => tg.toLowerCase() === filterType.toLowerCase())
         });
 
 
-        if(!nameFilter) return matchTypeList;
+        if (!nameFilter) return sortArrByKey(matchTypeList, sort.sort, sort.dir);
 
-        return matchTypeList.filter(token_ => token_.symbolName.toLowerCase().includes((nameFilter).toLowerCase()));
-        // if(!nameFilter) return tokens;
-        // return tokens.filter(token_ => {
-        //     const isMatchName = token_.symbolName.toLowerCase().includes((nameFilter).toLowerCase());
-        //     const isMatchType = filterType === 'all' ? true : token_.tag.some(tg => tg.toLowerCase() === filterType.toLowerCase());
-
-        //     return isMatchName && isMatchType;
-        // });
-    }, [tokens, nameFilter, filterType]);
+        return sortArrByKey(matchTypeList.filter(token_ => token_.symbolName.toLowerCase().includes((nameFilter).toLowerCase())), sort.sort, sort.dir);
+    }, [tokens, nameFilter, filterType, sort]);
 
 
     return createPortal(
@@ -298,7 +320,7 @@ const Panel: FC<{ visible: boolean, followRef: React.RefObject<HTMLDivElement>, 
             <MotiveDiv
                 className="global-symbolbar"
                 id={followId}
-                style={direction}
+                style={panelPos}
                 onClick={(e) => {
                     e.stopPropagation();
                     e.preventDefault();
@@ -311,7 +333,6 @@ const Panel: FC<{ visible: boolean, followRef: React.RefObject<HTMLDivElement>, 
                 </div>
                 <div style={{ padding: '0 20px' }}>
                     <Input
-
                         onChange={handleFilter}
                         className="search-input"
                         placeholder="Search"
@@ -327,8 +348,17 @@ const Panel: FC<{ visible: boolean, followRef: React.RefObject<HTMLDivElement>, 
                         {
                             MarketsListHeads.map(h => {
                                 return <Row className={`head-item head-${h.key}`} key={h.key}>
-                                    <div>{h.label}</div>
-                                    {h.sortable && <div>sort</div>}
+                                    {
+                                        h.sortable ? (
+                                            <IconSort
+                                                active={sort.sort === h.key}
+                                                onChange={(nextDir) => updateSort({
+                                                    sort: h.key,
+                                                    dir: nextDir,
+                                                })} label={<div>{h.label}</div>} initial=""
+                                            />) : <div>{h.label}</div>
+                                    }
+
                                 </Row>
                             })
                         }
@@ -339,8 +369,8 @@ const Panel: FC<{ visible: boolean, followRef: React.RefObject<HTMLDivElement>, 
                             {
                                 visible && filteredList.map(tk => {
                                     return (
-                                        <Col gap="10px" onClick={() => changeRouteSymbol(tk.symbolName)}  className="token-row" style={{ paddingTop: '20px', paddingBottom: '10px'  }}>
-                                            <Row  key={tk.symbolName} >
+                                        <Col gap="10px" onClick={() => changeRouteSymbol(tk.symbolName)} className="token-row" style={{ paddingTop: '20px', paddingBottom: '10px' }}>
+                                            <Row key={tk.symbolName} >
                                                 <Row gap="8px" className="token-name">
                                                     <Image onClick={(e) => {
                                                         e.stopPropagation();
@@ -351,10 +381,10 @@ const Panel: FC<{ visible: boolean, followRef: React.RefObject<HTMLDivElement>, 
                                                     <span>{tk.symbolName}</span>
                                                 </Row>
                                                 <div className="token-price">{indexPrices[tk.symbolName]?.price}</div>
-                                                <div className={`token-change ${+indexPrices[tk.symbolName]?.change < 0 ? 'raise' : 'desc'} `}>{indexPrices[tk.symbolName]?.change || 0}%</div>
+                                                <div className={`token-change ${+indexPrices[tk.symbolName]?.change < 0 ? 'desc' : 'raise'} `}>{indexPrices[tk.symbolName]?.change || 0}%</div>
                                             </Row>
                                             <Row gap="6px" style={{ paddingLeft: '24px' }}>
-                                                {tk.tag.map(tag => {
+                                                {tk.tag.map((tag: string) => {
                                                     return <div className="item-tag" key={`${tk.symbolName}-${tag}`}>{tag}</div>
                                                 })}
                                             </Row>
