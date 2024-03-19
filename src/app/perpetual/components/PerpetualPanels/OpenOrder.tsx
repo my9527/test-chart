@@ -11,7 +11,17 @@ import Input from "@/app/components/Input";
 import CheckBox from "@/app/components/CheckBox";
 import Image from "next/image";
 import { verifyValidNumber } from "@/app/utils/tools";
-import { filterPrecision } from "@/app/utils/tools";
+import {
+  filterPrecision,
+  getExponent,
+  filterThousands,
+} from "@/app/utils/tools";
+import { recoilOpenInterests } from "@/app/models";
+import { useRecoilValue } from "recoil";
+import BigNumber from "bignumber.js";
+import { Token } from "@/app/config/tokens";
+import Btns from "./Btns";
+
 const Layout = styled.div`
   display: flex;
   flex-direction: column;
@@ -56,7 +66,13 @@ const MarginAmount = styled.div`
     font-style: normal;
     font-weight: 400;
     line-height: 100%;
-    padding-right: 8px;
+
+    padding: 0 4px;
+    border-radius: 2px;
+    background: ${(props) => props.theme.colors.fill2};
+    display: flex;
+    align-items: center;
+    height: 20px;
   }
 `;
 const StyledLayout = styled(Layout)`
@@ -66,6 +82,10 @@ const StyledCurrencySelect = styled(CurrencySelect)`
   padding: 0 4px;
   border-radius: 2px;
   background: ${(props) => props.theme.colors.fill2};
+  .cur_currency {
+    height: 20px;
+    padding-right: 0px;
+  }
 `;
 const DataItem = styled.div`
   display: flex;
@@ -81,6 +101,49 @@ const DataItem = styled.div`
   }
   .value {
     color: ${(props) => props.theme.colors.text1};
+  }
+  .slippage {
+    border-radius: 999px;
+    background: ${(props) => props.theme.colors.fill2};
+    padding: 3px 8px;
+    color: ${(props) => props.theme.colors.primary1};
+    border: ${(props) => `1px solid transparent`};
+    font-family: Arial;
+    font-size: ${(props) => props.theme.fontSize.small};
+    font-style: normal;
+    font-weight: 400;
+    line-height: 120%;
+
+    box-sizing: border-box;
+    display: flex;
+    align-items: center;
+    &:hover,
+    &:active {
+      border: ${(props) => `1px solid ${props.theme.colors.primary1}`};
+    }
+    span {
+      line-height: 120%;
+      display: inline-block;
+      width: 40px;
+      padding-right: 5px;
+      text-align: right;
+    }
+    .input {
+      background: ${(props) => props.theme.colors.fill2};
+      outline-style: none;
+      width: 40px;
+
+      height: 100%;
+      border: none;
+      color: ${(props) => props.theme.colors.primary1};
+      text-align: right;
+      font-family: Arial;
+      font-size: ${(props) => props.theme.fontSize.small};
+      font-style: normal;
+      font-weight: 400;
+      line-height: 120%;
+      padding-right: 5px;
+    }
   }
 `;
 const Data = styled.div`
@@ -174,73 +237,134 @@ const Fee = styled(DataItem)`
     }
   }
 `;
-const Btns = styled.div`
-  display: flex;
-  align-items: center;
-  gap: 20px;
-  img {
-    width: 25px;
-    height: 18px;
-    flex-shrink: 0;
-    margin-right: 14px;
-  }
-`;
+
 const OpenOrder: React.FC<{
   activeOrderTab: string;
-  margin: number | undefined;
+  margin: string;
   setMargin: Function;
   symbolName: string;
   leverage: number;
-  displayDecimal: number;
+  curToken: Token;
 }> = ({
   activeOrderTab,
   margin,
   setMargin,
   symbolName,
   leverage,
-  displayDecimal,
+  curToken,
 }) => {
-  const [price, setPrice] = useState<number | undefined>(undefined);
+  const [price, setPrice] = useState<string>("");
   const [curCurrency, setCurCurrency] = useState("USD");
-  const [amount, setAmount] = useState<number | undefined | string>(undefined);
+  const [amount, setAmount] = useState<string>("");
 
   const [showStopOrder, setShowStopOrder] = useState<boolean>(false);
-  const [longStopPrice, setLongStopPrice] = useState<
-    number | undefined | string
-  >(undefined);
-  const [shortStopPrice, setShortStopPrice] = useState<
-    number | undefined | string
-  >(undefined);
+  const [longStopPrice, setLongStopPrice] = useState<string>("");
+  const [shortStopPrice, setShortStopPrice] = useState<string>("");
+
+  const { currentTokenAvailableLiq } = useRecoilValue(recoilOpenInterests);
+
+  const [slippage, setSlippage] = useState(
+    localStorage.getItem("slippage") ?? "0.5"
+  );
+
+  const longAvailableTokenForFutureResults = useMemo(() => {
+    const long = currentTokenAvailableLiq?.longReadable || "0";
+
+    return BigNumber(long).toString();
+  }, [currentTokenAvailableLiq?.longReadable]);
+
+  const shortAvailableTokenForFutureResults = useMemo(() => {
+    const short = currentTokenAvailableLiq?.shortReadable || "0";
+
+    return BigNumber(short).toString();
+  }, [currentTokenAvailableLiq?.shortReadable]);
+
   const longPnl = useMemo(() => {
-    return (longStopPrice - price) / amount || "--";
-  }, [amount, price, longStopPrice]);
+    let v = "--";
+    if (amount && price && longStopPrice) {
+      if (!shortStopPrice && shortStopPrice) {
+        v = filterPrecision(
+          BigNumber(
+            curCurrency === "USD"
+              ? ((+longStopPrice - +price) * +amount) / +price
+              : (+longStopPrice - +price) * +amount
+          )
+            .abs()
+            .toString(),
+          curToken?.displayDecimal
+        );
+      } else {
+        v = filterPrecision(
+          BigNumber(
+            curCurrency === "USD"
+              ? ((+longStopPrice - +price) * +amount) / +price
+              : (+longStopPrice - +price) * +amount
+          ).toString(),
+          curToken?.displayDecimal
+        );
+      }
+    }
+    return v;
+  }, [amount, price, longStopPrice, curCurrency, shortStopPrice]);
 
   const shortPnl = useMemo(() => {
-    return (shortStopPrice - price) / amount || "--";
-  }, [amount, price, shortStopPrice]);
+    let v = "--";
+    if (amount && price && shortStopPrice) {
+      if (!longStopPrice) {
+        v = filterPrecision(
+          BigNumber(
+            curCurrency === "USD"
+              ? ((+shortStopPrice - +price) * +amount) / +price
+              : (+shortStopPrice - +price) * +amount
+          )
+            .abs()
+            .toString(),
+          curToken?.displayDecimal
+        );
+        v = "-" + v;
+      } else {
+        v = filterPrecision(
+          BigNumber(
+            curCurrency === "USD"
+              ? ((+price - +shortStopPrice) * +amount) / +price
+              : (+price - +shortStopPrice) * +amount
+          ).toString(),
+          curToken?.displayDecimal
+        );
+      }
+    }
+    return v;
+  }, [amount, price, shortStopPrice, curCurrency, longStopPrice]);
 
-  const [inputAmount, setInputAmount] = useState<number | undefined | string>(
-    undefined
-  );
-  const [marginPercent, setMarginPercent] = useState<number | undefined>();
+  // u本位 amount=margin*leverage ,amount输入变化，leverage不变，margin变化，下面百分比变化，百分比*fund savailable=amount
+  // 币本位 amount=margin*leverage/price，amount输入变化同上
+
+  const [inputAmount, setInputAmount] = useState<string>("");
+  const [marginPercent, setMarginPercent] = useState<number>(0);
   const fundsAvailable = 2000.66;
   const [isInput, setIsInput] = useState(false);
 
-  // u本位 amount=margin*leverage ,amount输入变化，leverage不变，margin变化，下面百分比变化，百分比*fund savailable=amount
-  //币本位 amount=margin*leverage/price，amount输入变化同上
-
   useEffect(() => {
-    if (curCurrency === "USD") {
-      setAmount(
-        filterPrecision(margin * leverage, displayDecimal) || undefined
-      );
-    } else {
-      setAmount(
-        filterPrecision((margin * leverage) / price, displayDecimal) ||
-          undefined
-      );
+    if (!isInput) {
+      if (curCurrency === "USD") {
+        setAmount(
+          +margin * leverage
+            ? filterPrecision(+margin * +leverage, curToken?.displayDecimal)
+            : ""
+        );
+      } else {
+        const decimal = getExponent(
+          Number(curToken?.perpConfig?.contractSize) || 1
+        );
+
+        setAmount(
+          margin && price
+            ? filterPrecision((+margin * leverage) / +price, decimal)
+            : ""
+        );
+      }
     }
-  }, [margin, leverage, curCurrency, price]);
+  }, [margin, leverage, curCurrency, price, isInput, curToken]);
 
   useEffect(() => {
     const arr = (+margin / fundsAvailable + "").split(".");
@@ -256,15 +380,16 @@ const OpenOrder: React.FC<{
     if (isInput) {
       if (curCurrency === "USD") {
         setMargin(
-          filterPrecision(+amount / leverage, displayDecimal) || undefined
+          filterPrecision(+amount / leverage, curToken?.displayDecimal) || ""
         );
       } else {
         setMargin(
-          filterPrecision((+amount * price) / leverage, displayDecimal) ||
-            undefined
+          filterPrecision(
+            (+amount * +price) / leverage,
+            curToken?.displayDecimal
+          ) || ""
         );
       }
-      setIsInput(false);
     }
   }, [inputAmount, isInput, curCurrency, price]);
 
@@ -275,15 +400,7 @@ const OpenOrder: React.FC<{
   ) => {
     const reg = /^\d+(\.\d+)?$/;
     const len = value.length;
-    console.log(
-      "stop_price",
-      value,
-      reg.test(value),
-      value[len - 1] === ".",
-      value.substring(0, len - 1)?.includes("."),
-      reg.test(value) ||
-        (value[len - 1] === "." && !value.substring(0, len - 1)?.includes("."))
-    );
+
     if (!value) {
       setFun(undefined);
       return;
@@ -298,11 +415,21 @@ const OpenOrder: React.FC<{
       setFun(originValue);
     }
   };
-
+  const handleOpen = (type) => {
+    const params = {
+      price,
+      margin,
+      amount,
+      longStopPrice,
+      shortStopPrice,
+      type,
+    };
+    console.log("handleOpen", params);
+  };
   return (
     <>
       <Price
-        displayDecimal={displayDecimal}
+        displayDecimal={curToken?.displayDecimal}
         symbolName={symbolName}
         price={price}
         setPrice={setPrice}
@@ -315,30 +442,22 @@ const OpenOrder: React.FC<{
             <div className="unit">USD</div>
           </div>
           <Input
-            type={margin && margin > fundsAvailable ? "warn" : "normal"}
+            type={
+              (margin && +margin > fundsAvailable) || +margin < 0
+                ? "warn"
+                : "normal"
+            }
             placeholder="input margin"
             value={margin}
             onChange={(e: React.FormEvent<HTMLInputElement>) => {
               const value = e?.currentTarget.value;
 
-              if (value && verifyValidNumber(value, displayDecimal)) return;
+              if (value && verifyValidNumber(value, curToken?.displayDecimal)) {
+                return;
+              }
+
               setMargin(value);
-              return;
-              //   const reg = /^\d+(\.\d+)?$/;
-              //   const len = value.length;
-              //   if (!value) {
-              //     setMargin(undefined);
-              //     return;
-              //   }
-              //   if (
-              //     reg.test(value) ||
-              //     (value[len - 1] === "." &&
-              //       !value.substring(0, len - 1)?.includes("."))
-              //   ) {
-              //     setMargin(value);
-              //   } else {
-              //     setMargin(margin);
-              //   }
+              setIsInput(false);
             }}
           />
         </StyledLayout>
@@ -357,30 +476,25 @@ const OpenOrder: React.FC<{
             placeholder="input amount"
             value={inputAmount}
             onChange={(e: React.FormEvent<HTMLInputElement>) => {
-              const reg = /^\d+(\.\d+)?$/;
               const value = e?.currentTarget.value;
-              const len = value.length;
-              setIsInput(true);
-              if (!value) {
-                setAmount(undefined);
+
+              if (value && verifyValidNumber(value, curToken?.displayDecimal))
                 return;
-              }
-              if (
-                reg.test(value) ||
-                (value[len - 1] === "." &&
-                  !value.substring(0, len - 1)?.includes("."))
-              ) {
-                setAmount(value);
-              } else {
-                setAmount(amount);
-              }
+              setIsInput(true);
+              setAmount(value);
             }}
           />
         </StyledLayout>
       </MarginAmount>
       <Slider
         onChange={(value) => {
-          setMargin((value / 100) * fundsAvailable);
+          setMargin(
+            filterPrecision(
+              (value / 100) * fundsAvailable,
+              curToken?.displayDecimal
+            )
+          );
+          setIsInput(false);
         }}
         per={marginPercent || 0}
         marks={[
@@ -418,11 +532,23 @@ const OpenOrder: React.FC<{
         </DataItem>
         <DataItem className="item">
           <p className="label">Max Long</p>
-          <p className="value">2000.00 USD</p>
+          <p className="value">
+            {" "}
+            {longAvailableTokenForFutureResults
+              ? filterThousands(longAvailableTokenForFutureResults, 2)
+              : ""}
+            USD
+          </p>
         </DataItem>
         <DataItem className="item">
           <p className="label">Max Short</p>
-          <p className="value">2000.00 USD</p>
+          <p className="value">
+            {" "}
+            {shortAvailableTokenForFutureResults
+              ? filterThousands(shortAvailableTokenForFutureResults, 2)
+              : ""}
+            USD
+          </p>
         </DataItem>
       </Data>
       <StopOrder>
@@ -434,23 +560,28 @@ const OpenOrder: React.FC<{
           <div className="input_area">
             <div className="item">
               <Input
+                type={
+                  longStopPrice &&
+                  price &&
+                  (+longStopPrice > +price * (curToken?.maxProfitRatio + 1) ||
+                    +longStopPrice < +price)
+                    ? "warn"
+                    : "normal"
+                }
                 value={longStopPrice}
                 onChange={(e: React.FormEvent<HTMLInputElement>) => {
                   const value = e?.currentTarget.value;
 
-                  if (value && verifyValidNumber(value, displayDecimal)) return;
-                  setLongStopPrice(value);
-                  return;
+                  if (
+                    value &&
+                    verifyValidNumber(value, curToken?.displayDecimal)
+                  )
+                    return;
 
-                  formatPrice(
-                    e?.currentTarget.value,
-                    setLongStopPrice,
-                    longStopPrice
-                  );
-                  //   setLongStopPrice(+e?.currentTarget.value || undefined);
+                  setLongStopPrice(value);
                 }}
                 placeholder="TP Trigger Price"
-                suffix={<div className="unit">USD</div>}
+                // suffix={<div className="unit">USD</div>}
               />
               <div className="pnl">
                 Est.pnl:<span className="long">{longPnl}USD</span>
@@ -458,22 +589,24 @@ const OpenOrder: React.FC<{
             </div>
             <div className="item">
               <Input
+                type={
+                  shortStopPrice && price && +shortStopPrice > +price
+                    ? "warn"
+                    : "normal"
+                }
                 value={shortStopPrice}
                 onChange={(e: React.FormEvent<HTMLInputElement>) => {
                   const value = e?.currentTarget.value;
 
-                  if (value && verifyValidNumber(value, displayDecimal)) return;
+                  if (
+                    value &&
+                    verifyValidNumber(value, curToken?.displayDecimal)
+                  )
+                    return;
                   setShortStopPrice(value);
-                  return;
-                  formatPrice(
-                    e?.currentTarget.value,
-                    setShortStopPrice,
-                    shortStopPrice
-                  );
-                  //   setShortStopPrice(+e?.currentTarget.value || undefined);
                 }}
                 placeholder="SL Trigger Price"
-                suffix={<div className="unit">USD</div>}
+                // suffix={<div className="unit">USD</div>}
               />
               <div className="pnl">
                 Est.pnl:<span className="short">{shortPnl}USD</span>
@@ -482,9 +615,31 @@ const OpenOrder: React.FC<{
           </div>
         )}
       </StopOrder>
+
       <DataItem className="item">
         <p className="label">Slippage tolerance</p>
-        <p className="value">0.5%</p>
+
+        <div className="slippage">
+          <input
+            onBlur={() => {
+              localStorage.setItem("slippage", slippage);
+            }}
+            value={slippage}
+            className="input"
+            onChange={(e: React.FormEvent<HTMLInputElement>) => {
+              const value = e?.currentTarget.value;
+
+              if (value && verifyValidNumber(value, 2)) return;
+
+              if (+value / 100 > curToken?.maxLeverage) {
+                setSlippage(curToken?.maxLeverage * 100 + "");
+                return;
+              }
+              setSlippage(value);
+            }}
+          />
+          %
+        </div>
       </DataItem>
       <Fee>
         <p className="label">
@@ -500,16 +655,34 @@ const OpenOrder: React.FC<{
             </DataItem>
           </div>
         </p>
-        <p className="value">0.05%</p>
+        <p className="value">0.08%</p>
       </Fee>
-      <Btns>
-        <Button type="long" btnText="LONG">
+      <Btns
+        handleClick={handleOpen}
+        longBtnText="LONG"
+        shortBtnText="SHORT"
+        showIcon={true}
+      />
+      {/* <Btns>
+        <Button
+          type="long"
+          btnText="LONG"
+          onClick={() => {
+            handleOpen && handleOpen("long");
+          }}
+        >
           <Image src={LongIcon} alt="" width={25} height={18} />
         </Button>
-        <Button type="short" btnText="SHORT">
+        <Button
+          type="short"
+          btnText="SHORT"
+          onClick={() => {
+            handleOpen && handleOpen("short");
+          }}
+        >
           <Image src={ShortIcon} alt="" width={25} height={18} />
         </Button>
-      </Btns>
+      </Btns> */}
     </>
   );
 };

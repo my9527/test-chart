@@ -1,6 +1,6 @@
 "use client";
 import styled from "styled-components";
-import { useState, useRef, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import useCurToken from "../../hooks/useCurToken";
 import TokenImage from "@/app/components/TokenImage";
 import Input from "@/app/components/Input";
@@ -70,25 +70,34 @@ const Tips = styled.p`
 `;
 const AdjustLeverage: React.FC<{
   leverage: number;
+  max: number;
   setLeverage: (value: number) => any;
-}> = ({ leverage, setLeverage }) => {
+}> = ({ leverage, setLeverage, max }) => {
   const { symbolName } = useCurToken();
-  const [value, setValue] = useState<number | undefined>(leverage);
-  const max = 100;
+  const [value, setValue] = useState<string>(leverage + "");
   const min = 1;
 
   const [percent, setPercent] = useState<number>(0);
 
+  const marks = useMemo(() => {
+    const _step = (max - min + 1) / 4;
+    const arr = Array.from({ length: 5 });
+    return arr.map((item, index) => {
+      const v = Math.ceil(index === 0 ? min : _step * index);
+
+      return {
+        label: `${v}X`,
+        value: v,
+      };
+    });
+  }, [min, max]);
+
   useEffect(() => {
-    if (typeof value === "number") {
-      setLeverage(value);
-      if (value < min) {
-        setPercent(0);
-      } else {
-        setPercent((value - min) / (max - min));
-      }
-    }else{
+    setLeverage(+value);
+    if (+value < min) {
       setPercent(0);
+    } else {
+      setPercent((+value - min) / (max - min));
     }
   }, [value]);
 
@@ -105,24 +114,24 @@ const AdjustLeverage: React.FC<{
           placeholder="input amount"
           value={value}
           onBlur={() => {
-            if (value < min) {
-              setValue(min);
+            if (+value < min) {
+              setValue(min + "");
             }
           }}
-          onChange={(e: React.FormEvent<HTMLInputElement>, type: string) => {
+          onChange={(e: React.FormEvent<HTMLInputElement>) => {
             const reg = /^\+?[1-9][0-9]*$/;
             const flag = reg.test(e?.currentTarget?.value);
-          
+
             if (!e?.currentTarget?.value) {
-              setValue(undefined);
+              setValue("");
               setPercent(0);
               return;
             }
             if (flag) {
               if (+e?.currentTarget.value > max) {
-                setValue(max);
+                setValue(max + "");
               } else {
-                setValue(+e?.currentTarget.value || 0);
+                setValue(e?.currentTarget.value || "");
               }
             }
           }}
@@ -131,31 +140,32 @@ const AdjustLeverage: React.FC<{
       <Slider
         per={percent}
         onChange={(value) => {
-          setValue(value);
+          setValue(value + "");
         }}
-        marks={[
-          {
-            label: "1X",
-            value: 1,
-          },
-          {
-            label: "25X",
-            value: 25,
-          },
-          {
-            label: "50X",
-            value: 50,
-          },
+        marks={marks}
+        // marks={[
+        //   {
+        //     label: "1X",
+        //     value: 1,
+        //   },
+        //   {
+        //     label: "25X",
+        //     value: 25,
+        //   },
+        //   {
+        //     label: "50X",
+        //     value: 50,
+        //   },
 
-          {
-            label: "75X",
-            value: 75,
-          },
-          {
-            label: "100X",
-            value: 100,
-          },
-        ]}
+        //   {
+        //     label: "75X",
+        //     value: 75,
+        //   },
+        //   {
+        //     label: "100X",
+        //     value: 100,
+        //   },
+        // ]}
         min={min}
         max={max}
         unit="X"

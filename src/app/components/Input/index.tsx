@@ -1,6 +1,6 @@
 "use client";
 import styled from "styled-components";
-import { HTMLInputTypeAttribute, useRef } from "react";
+import { useRef } from "react";
 type Props = {
   prefixWidth: number;
   suffixWidth: number;
@@ -37,7 +37,7 @@ const Wrapper = styled.div<Props>`
     line-height: 100%;
     &::-webkit-input-placeholder {
       color: ${(props) => props.theme.colors.text4};
-      font-size: ${(props) => props.theme.fontSize.medium};
+      font-size: ${(props) => props.theme.fontSize.small};
     }
     &:-moz-placeholder {
       color: ${(props) => props.theme.colors.text4};
@@ -78,18 +78,20 @@ const Wrapper = styled.div<Props>`
   }
 `;
 
-const Input: React.FC<{
-  placeholder?: string;
-  value?: string | number;
-  onChange?: Function;
-  suffix?: React.ReactNode;
-  prefix?: React.ReactNode;
-  className?: string;
-  type?: string;
-  onBlur?: Function;
-  disabled?: boolean;
-  maxLength?: number;
-} & React.HTMLProps<HTMLInputElement> > = ({
+const Input: React.FC<
+  {
+    placeholder?: string;
+    value?: string | number;
+    onChange?: Function;
+    suffix?: React.ReactNode;
+    prefix?: React.ReactNode;
+    className?: string;
+    type?: string;
+    onBlur?: Function;
+    disabled?: boolean;
+    maxLength?: number;
+  } & React.HTMLProps<HTMLInputElement>
+> = ({
   placeholder,
   value,
   onChange,

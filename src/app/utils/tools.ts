@@ -34,9 +34,40 @@ export function getExponent(num: number) {
  * @returns
  */
 export const verifyValidNumber = (value: string, decimal = 4) => {
+  console.log('input-value-in',value,decimal)
   const regexp =
     decimal === 0
       ? "(^(0|[1-9]\\d*)$)"
       : `(^(0|([1-9]\\d*))(\\.\\d{0,${decimal}})?$)`;
   return !new RegExp(regexp).test(value);
+};
+/**
+ * 数字千位分割
+ * @param value
+ * @param decimal
+ * @param isCutZero
+ * @returns
+ */
+export const filterThousands = (
+  value: string | number,
+  decimal = 4,
+  options: {
+    isCutZero?: boolean;
+    round?: any;
+    k?: number;
+  } = {
+    isCutZero: false,
+    round: BigNumber.ROUND_DOWN,
+    k: 1,
+  },
+) => {
+  const { isCutZero = false, round = BigNumber.ROUND_DOWN, k = 1 } = options;
+
+  if (new BigNumber(value).isNaN()) return `${value}`;
+  if (isCutZero) return new BigNumber(value).multipliedBy(k).decimalPlaces(decimal, round).toFormat();
+  const result = new BigNumber(filterPrecision(BigNumber(value).multipliedBy(k).toString(), decimal)).toFormat(
+    decimal,
+    round,
+  );
+  return +result === 0 ? '0' : result;
 };

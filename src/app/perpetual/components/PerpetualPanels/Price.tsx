@@ -37,7 +37,7 @@ const Layout = styled.div`
 `;
 const Price: React.FC<{
   activeOrderTab: string;
-  price: number | undefined;
+  price: string;
   setPrice: Function;
   symbolName: string;
   displayDecimal: number;
@@ -66,6 +66,7 @@ const Price: React.FC<{
         }
         onChange={(e: React.FormEvent<HTMLInputElement>) => {
           const value = e?.currentTarget.value;
+
           if (value && verifyValidNumber(value, displayDecimal)) return;
           setPrice(value);
         }}
