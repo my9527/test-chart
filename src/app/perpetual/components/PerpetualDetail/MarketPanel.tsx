@@ -1,7 +1,7 @@
 import styled from "styled-components";
 import Image from "next/image";
 import ArrowIcon from "@/app/assets/header/arrow.svg";
-import { FC, useCallback, useEffect, useId, useRef, useState } from "react";
+import { FC, useCallback, useEffect, useId, useMemo, useRef, useState } from "react";
 import Tabs from "../Tabs";
 import { AnimatePresence, HTMLMotionProps, motion } from "framer-motion"
 import { useClickAway } from "ahooks";
@@ -63,8 +63,8 @@ const FilterTypes = [{
     label: 'Meme',
     key: 'meme'
 }, {
-    label: 'Brc-20',
-    key: 'brc20'
+    label: 'BRC-20',
+    key: 'BRC-20'
 }];
 
 const MotiveDiv = styled(motion.div)`
@@ -161,6 +161,19 @@ background: ${(props) => props.theme.colors.fill2};
         background-color: ${(props) => props.theme.colors.fill1};
     }
 }
+
+.search-input{
+    .input {
+        height: 32px;
+        border-radius: 32px;
+        background: ${(props) => props.theme.colors.fill3};
+        padding: 9px 10px;
+        
+    }
+    .suffix{
+        padding: 0 10px;
+    }
+}
 `
 
 const SymbolWrapper = styled(Row)`
@@ -191,6 +204,8 @@ const Panel: FC<{ visible: boolean, followRef: React.RefObject<HTMLDivElement>, 
 
     const [filterType, updateFilterType] = useState(FilterTypes[1].key);
 
+    const [nameFilter, updateNameFilter] = useState('');
+
     const [favoriateList, updateFavoriateList] = useRecoilState(recoilFavoriateList);
     const updatePerpetualToken = useSetRecoilState(recoilPerpetualToken)
 
@@ -220,7 +235,7 @@ const Panel: FC<{ visible: boolean, followRef: React.RefObject<HTMLDivElement>, 
                     label: token_,
                     favoriate: !preFav[token_]?.favoriate ?? false,
                 },
-            };        
+            };
         })
     }, []);
 
@@ -230,9 +245,38 @@ const Panel: FC<{ visible: boolean, followRef: React.RefObject<HTMLDivElement>, 
         updatePerpetualToken(nextSymbol);
         window.history.replaceState(null, '', `/perpetual/${nextSymbol}`);
         onClose();
-        
+
 
     }, []);
+
+    const handleFilter = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+        const val =e.target.value;
+
+        updateNameFilter(val);
+
+    }, []);
+
+    const filteredList = useMemo(() => {
+
+        const matchTypeList = tokens.filter(token_ => {
+            if(filterType === 'fav') {
+                return !!favoriateList[token_.symbolName]?.favoriate;
+            }
+            return filterType === 'all' ? true : token_.tag.some(tg => tg.toLowerCase() === filterType.toLowerCase())
+        });
+
+
+        if(!nameFilter) return matchTypeList;
+
+        return matchTypeList.filter(token_ => token_.symbolName.toLowerCase().includes((nameFilter).toLowerCase()));
+        // if(!nameFilter) return tokens;
+        // return tokens.filter(token_ => {
+        //     const isMatchName = token_.symbolName.toLowerCase().includes((nameFilter).toLowerCase());
+        //     const isMatchType = filterType === 'all' ? true : token_.tag.some(tg => tg.toLowerCase() === filterType.toLowerCase());
+
+        //     return isMatchName && isMatchType;
+        // });
+    }, [tokens, nameFilter, filterType]);
 
 
     return createPortal(
@@ -248,20 +292,30 @@ const Panel: FC<{ visible: boolean, followRef: React.RefObject<HTMLDivElement>, 
                 }}
                 {...drawerConfig}
             >
-                <div style={{ padding: '0 20px'}}>
+                <div style={{ padding: '0 20px' }}>
                     <Tabs initial={1} list={FilterTypes} handleClick={(fil: typeof FilterTypes[0]) => updateFilterType(fil.key)} />
                 </div>
-                <div style={{ padding: '0 20px'}}>
-                   <Input placeholder="search" /> 
+                <div style={{ padding: '0 20px' }}>
+                    <Input
+
+                        onChange={handleFilter}
+                        className="search-input"
+                        placeholder="Search"
+                        suffix={
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none">
+                                <path d="M14.2125 13.3516L10.1547 9.29375C10.7844 8.47969 11.125 7.48438 11.125 6.4375C11.125 5.18438 10.6359 4.00937 9.75156 3.12344C8.86719 2.2375 7.68906 1.75 6.4375 1.75C5.18594 1.75 4.00781 2.23906 3.12344 3.12344C2.2375 4.00781 1.75 5.18438 1.75 6.4375C1.75 7.68906 2.23906 8.86719 3.12344 9.75156C4.00781 10.6375 5.18438 11.125 6.4375 11.125C7.48438 11.125 8.47813 10.7844 9.29219 10.1562L13.35 14.2125C13.3619 14.2244 13.376 14.2338 13.3916 14.2403C13.4071 14.2467 13.4238 14.2501 13.4406 14.2501C13.4575 14.2501 13.4741 14.2467 13.4897 14.2403C13.5052 14.2338 13.5194 14.2244 13.5312 14.2125L14.2125 13.5328C14.2244 13.5209 14.2338 13.5068 14.2403 13.4912C14.2467 13.4757 14.2501 13.459 14.2501 13.4422C14.2501 13.4254 14.2467 13.4087 14.2403 13.3931C14.2338 13.3776 14.2244 13.3635 14.2125 13.3516ZM8.9125 8.9125C8.25 9.57344 7.37187 9.9375 6.4375 9.9375C5.50312 9.9375 4.625 9.57344 3.9625 8.9125C3.30156 8.25 2.9375 7.37187 2.9375 6.4375C2.9375 5.50312 3.30156 4.62344 3.9625 3.9625C4.625 3.30156 5.50312 2.9375 6.4375 2.9375C7.37187 2.9375 8.25156 3.3 8.9125 3.9625C9.57344 4.625 9.9375 5.50312 9.9375 6.4375C9.9375 7.37187 9.57344 8.25156 8.9125 8.9125Z" fill="white" fill-opacity="0.5" />
+                            </svg>
+                        }
+                    />
                 </div>
                 <Col className="list-wrapper" gap="20px">
                     <Row className="list-header">
                         {
                             MarketsListHeads.map(h => {
                                 return <Row className={`head-item head-${h.key}`} key={h.key}>
-                                        <div>{h.label}</div>
-                                        {h.sortable && <div>sort</div>}
-                                    </Row>
+                                    <div>{h.label}</div>
+                                    {h.sortable && <div>sort</div>}
+                                </Row>
                             })
                         }
                     </Row>
@@ -269,27 +323,31 @@ const Panel: FC<{ visible: boolean, followRef: React.RefObject<HTMLDivElement>, 
                     >
                         <Col gap="20px" >
                             {
-                                visible && tokens.map(tk => {
+                                visible && filteredList.map(tk => {
                                     return (
-                                        <Row onClick={() =>  changeRouteSymbol(tk.symbolName)} className="token-row" key={tk.symbolName} style={{ height: '50px' }}>
-                                         <Row gap="8px" className="token-name">
-                                            <Image onClick={() => handelFav(tk.symbolName)} width={16} height={16} className="fav-icon" alt={tk.symbolName} src={favoriateList[tk.symbolName]?.favoriate ? FavoriteIcon : StarIcon } />
-                                            <TokenImage width={20} height={20} name={tk.symbolName} />
-                                            <span>{tk.symbolName}</span>
+                                        <Row onClick={() => changeRouteSymbol(tk.symbolName)} className="token-row" key={tk.symbolName} style={{ height: '50px' }}>
+                                            <Row gap="8px" className="token-name">
+                                                <Image onClick={(e) => {
+                                                    e.stopPropagation();
+                                                    e.nativeEvent.stopImmediatePropagation();
+                                                    handelFav(tk.symbolName);
+                                                }} width={16} height={16} className="fav-icon" alt={tk.symbolName} src={favoriateList[tk.symbolName]?.favoriate ? FavoriteIcon : StarIcon} />
+                                                <TokenImage width={20} height={20} name={tk.symbolName} />
+                                                <span>{tk.symbolName}</span>
                                             </Row>
-                                        <div className="token-price">{indexPrices[tk.symbolName]?.price}</div>
-                                        <div className={`token-change ${+indexPrices[tk.symbolName]?.change < 0 ? 'raise' : 'desc'} `}>{indexPrices[tk.symbolName]?.change || 0}%</div>
-                                    </Row>
+                                            <div className="token-price">{indexPrices[tk.symbolName]?.price}</div>
+                                            <div className={`token-change ${+indexPrices[tk.symbolName]?.change < 0 ? 'raise' : 'desc'} `}>{indexPrices[tk.symbolName]?.change || 0}%</div>
+                                        </Row>
                                     );
                                 })
                             }
                         </Col>
                     </Scrollbar>
-                    
+
                 </Col>
             </MotiveDiv>
         </RemoveScroll>,
-         window.document.body
+        window.document.body
     );
 }
 
@@ -311,9 +369,9 @@ export const MarketPanel: FCC = ({ children }) => {
         <>
             <SymbolWrapper gap="10px" className="pointer" ref={ref} onClick={() => switchPanelShow(!showPanel)} style={{ display: 'inline-flex' }}>
                 {children}
-                <Image className={`icon-arrow ${showPanel ? 'active-icon-arrow' : ''}`} src={ArrowIcon}  width={12} height={12} alt=""  />
+                <Image className={`icon-arrow ${showPanel ? 'active-icon-arrow' : ''}`} src={ArrowIcon} width={12} height={12} alt="" />
             </SymbolWrapper>
-            
+
             <AnimatePresence>
                 {showPanel && <Panel visible={showPanel} followRef={ref} followId={uuid} onClose={() => switchPanelShow(false)} />}
             </AnimatePresence>
