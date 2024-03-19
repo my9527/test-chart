@@ -280,7 +280,7 @@ export const UserWalletInfo: FC<{ address: `0x${string}` | undefined }> = ({ add
         <Wrapper align="flex-start" gap="10px">
             <WalletStatus>
                 {
-                    walletsMap[connector?.name as string].icon
+                    walletsMap[connector?.name as string]?.icon
                 }
                 <span>{shortenString(address as string)}</span>
                 <CopyBtn content={address as string} />

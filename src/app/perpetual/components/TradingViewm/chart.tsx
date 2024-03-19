@@ -26,6 +26,8 @@ import { tradingviewSocketIns } from "./socket";
 import { useParams } from "next/navigation";
 import styled from "styled-components";
 import { useChainId } from "wagmi";
+import useCurToken from "../../hooks/useCurToken";
+import { sleep } from "@/app/lib/sleep";
 
 
 
@@ -57,6 +59,11 @@ function generatePattern(n: number) {
   }
 
 
+  const saveChart = (data: any) => {
+    window.localStorage.setItem('sexTvSetting', JSON.stringify(data));
+  };
+
+
 export const CmptTradingView: FCC<{
     // disabled_features?: ChartingLibraryFeatureset[];
     // symbol: string;
@@ -68,6 +75,7 @@ export const CmptTradingView: FCC<{
     const params = useParams<{ symbol: string }>();
 
     const { symbol }= params;
+    const curToken = useCurToken();
 
     const chainId = useChainId();
 
@@ -166,22 +174,19 @@ export const CmptTradingView: FCC<{
 
 
     useEffect(() => {
-        if(symbol) {
-            initChart(symbol);
-            // tradingviewSocketIns.init();
+        if(curToken.symbolName && !_widget.current) {
+            initChart(curToken.symbolName);
+        } else if(curToken.symbolName && _widget.current) {
+            // 切换之后，移除原始数据
+            tradingviewSocketIns.pause();
+            setTimeout(() => {
+                tradingviewSocketIns.clearData();
+                _widget.current?.activeChart().setSymbol(curToken.symbolName);
+                tradingviewSocketIns.resume();
+            }, 100);
+           
         }
-    }, [symbol]);
-
-    // useEffect(() => {
-
-    //     if(_symbol.current !== symbol) {
-    //         // _widget.current.sy
-    //         _widget.current?.setSymbol(symbol, '1' as ResolutionString, () => {});
-    //         _symbol.current = symbol;
-    //     }
-
-       
-    // }, [ symbol]);
+    }, [curToken.symbolName]);
 
     useEffect(() => {
         return () => {

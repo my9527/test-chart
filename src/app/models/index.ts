@@ -234,4 +234,10 @@ export const recoilOrdersLen = selector({
     }
 
   }
-})
+});
+
+
+export const recoilPerpetualToken = atom<string>({
+  key: 'perpetual_token',
+  default: ''
+});

@@ -1,6 +1,6 @@
 "use client";
 import styled from "styled-components";
-import { useRef } from "react";
+import { HTMLInputTypeAttribute, useRef } from "react";
 type Props = {
   prefixWidth: number;
   suffixWidth: number;
@@ -77,7 +77,7 @@ const Input: React.FC<{
   type?: string;
   onBlur?: Function;
   disabled?: boolean;
-}> = ({
+} & React.HTMLProps<HTMLInputElement> > = ({
   placeholder,
   value,
   onChange,

@@ -23,7 +23,12 @@ import { useOpenInterests, useOpenInterestsByAddressId, useOpenInterestsBySideId
 import { FutureType } from "@/app/config/common";
 import { FundingFeeCountDown } from "./FundingFeeCountDown";
 import { FundingFeeRate } from "./FundingFeeRate";
-import { MarketPanel } from "./MarketPanel";
+import dynamic from "next/dynamic";
+// import { MarketPanel } from "./MarketPanel";
+
+const MarketPanel = dynamic(() => import("./MarketPanel").then(mod => mod.MarketPanel), {
+  ssr: false,
+});
 
 const Wrapper = styled.div`
   width: 100%;
@@ -235,9 +240,11 @@ const PerpetualDetail = memo((props) => {
     <Wrapper>
       <Layout>
         <Symbol>
-          <h3 className="label">{symbolName}/USDT</h3>
+          
           {/* <Image src={ArrowIcon} width={11} height={6} alt="" /> */}
-          <MarketPanel />
+          <MarketPanel>
+            <h3 className="label">{symbolName}/USDT</h3>
+          </MarketPanel>
           <ChangPrice symbolName={symbolName} />
         </Symbol>
         <Favorite

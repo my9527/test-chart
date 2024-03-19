@@ -66,13 +66,13 @@ export const OpenInterestsEffects: FC = memo(() => {
     
 
     const availableTokens = useMemo(() => {
-        return [...positionTokens, currentToken.token]
-    }, [positionTokens, currentToken.token]);
+        return [...positionTokens, currentToken?.token]
+    }, [positionTokens, currentToken?.token]);
 
 
     // 用于监听仓位或当前 token 的变化，一遍重新请求相关数据
     const availableTokensString = useMemo(() => {
-        return availableTokens.map(t => t.symbolName).join("_");
+        return availableTokens.map(t => t?.symbolName).join("_");
     }, [availableTokens]);
 
 
