@@ -1,6 +1,6 @@
 "use client";
 import styled from "styled-components";
-import { useRef } from "react";
+import { useRef, useEffect } from "react";
 type Props = {
   prefixWidth: number;
   suffixWidth: number;
@@ -37,7 +37,7 @@ const Wrapper = styled.div<Props>`
     line-height: 100%;
     &::-webkit-input-placeholder {
       color: ${(props) => props.theme.colors.text4};
-      font-size: ${(props) => props.theme.fontSize.medium};
+      font-size: ${(props) => props.theme.fontSize.small};
     }
     &:-moz-placeholder {
       color: ${(props) => props.theme.colors.text4};

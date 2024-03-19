@@ -238,7 +238,7 @@ const PerpetualDetail = memo((props) => {
           <h3 className="label">{symbolName}/USDT</h3>
           {/* <Image src={ArrowIcon} width={11} height={6} alt="" /> */}
           <MarketPanel />
-          <ChangPrice symbolName={symbolName} />
+          <ChangPrice symbolName={symbolName}  displayDecimal={curToken?.displayDecimal}/>
         </Symbol>
         <Favorite
           onClick={() => {

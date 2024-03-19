@@ -1,6 +1,6 @@
 "use client";
 import styled from "styled-components";
-import { useState, useRef, useEffect } from "react";
+import { useState, useEffect } from "react";
 import useCurToken from "../../hooks/useCurToken";
 import TokenImage from "@/app/components/TokenImage";
 import Input from "@/app/components/Input";
@@ -73,22 +73,18 @@ const AdjustLeverage: React.FC<{
   setLeverage: (value: number) => any;
 }> = ({ leverage, setLeverage }) => {
   const { symbolName } = useCurToken();
-  const [value, setValue] = useState<number | undefined>(leverage);
+  const [value, setValue] = useState<number>(leverage);
   const max = 100;
   const min = 1;
 
   const [percent, setPercent] = useState<number>(0);
 
   useEffect(() => {
-    if (typeof value === "number") {
-      setLeverage(value);
-      if (value < min) {
-        setPercent(0);
-      } else {
-        setPercent((value - min) / (max - min));
-      }
-    }else{
+    setLeverage(value);
+    if (value < min) {
       setPercent(0);
+    } else {
+      setPercent((value - min) / (max - min));
     }
   }, [value]);
 
@@ -112,9 +108,9 @@ const AdjustLeverage: React.FC<{
           onChange={(e: React.FormEvent<HTMLInputElement>, type: string) => {
             const reg = /^\+?[1-9][0-9]*$/;
             const flag = reg.test(e?.currentTarget?.value);
-          
+
             if (!e?.currentTarget?.value) {
-              setValue(undefined);
+              setValue(0);
               setPercent(0);
               return;
             }

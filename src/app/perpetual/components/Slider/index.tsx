@@ -178,7 +178,8 @@ const Slider: React.FC<SliderProps> = ({
 
       if (distanceX) {
         setIsChange(true);
-        setPercent((distanceX - 5) / trackWidth);
+        const _per = (distanceX - 5) / trackWidth;
+        setPercent(_per > 1 ? 1 : _per < 0 ? 0 : _per);
       }
     }
   }, [startX, zeroX, isDragging]);
