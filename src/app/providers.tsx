@@ -12,6 +12,8 @@ import { UserSignedProvider } from "./context/UserSignedProvider";
 
 
 
+
+
 // import GlobalMessaged 
 type ProvidersProps = {};
 
@@ -23,6 +25,7 @@ export const Providers: FCC<ProvidersProps> = (props) => {
         <AppConfigProvider>
           <ThemeConfigProvider>
             <UserSignedProvider>
+             
               <GlobalMessage />
               <GlobalEffects />
               {props.children}

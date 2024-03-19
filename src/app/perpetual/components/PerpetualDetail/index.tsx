@@ -19,11 +19,23 @@ import ChangPrice from "./ChangPrice";
 import { useIndexPricesById } from "@/app/hooks/useIndexPrices";
 import BigNumber from "bignumber.js";
 import useTickerPrice from "@/app/hooks/useTickerPrice";
-import { useOpenInterests, useOpenInterestsByAddressId, useOpenInterestsBySideId } from "../../hooks/useOpenInterest";
+import {
+  useOpenInterests,
+  useOpenInterestsByAddressId,
+  useOpenInterestsBySideId,
+} from "../../hooks/useOpenInterest";
 import { FutureType } from "@/app/config/common";
 import { FundingFeeCountDown } from "./FundingFeeCountDown";
 import { FundingFeeRate } from "./FundingFeeRate";
-import { MarketPanel } from "./MarketPanel";
+import dynamic from "next/dynamic";
+// import { MarketPanel } from "./MarketPanel";
+
+const MarketPanel = dynamic(
+  () => import("./MarketPanel").then((mod) => mod.MarketPanel),
+  {
+    ssr: false,
+  }
+);
 
 const Wrapper = styled.div`
   width: 100%;
@@ -152,31 +164,36 @@ const PerpetualDetail = memo((props) => {
     );
   }, [favoriateList]);
 
-
   const tickerPrice = useTickerPrice();
 
-  const [currentTokenOpenLongInterest] = useOpenInterestsBySideId(FutureType.LONG, curToken.futureLongId);
-  const [currentTokenOpenShortInterest] = useOpenInterestsBySideId(FutureType.SHORT, curToken.futureShortId);
-
+  const [currentTokenOpenLongInterest] = useOpenInterestsBySideId(
+    FutureType.LONG,
+    curToken.futureLongId
+  );
+  const [currentTokenOpenShortInterest] = useOpenInterestsBySideId(
+    FutureType.SHORT,
+    curToken.futureShortId
+  );
 
   // long open interest
   const longIO = useMemo(() => {
-
-    const _long = BigNumber(currentTokenOpenLongInterest?.tokenSize).multipliedBy(curToken.pars).toString()
+    const _long = BigNumber(currentTokenOpenLongInterest?.tokenSize)
+      .multipliedBy(curToken.pars)
+      .toString();
     return BigNumber(tickerPrice?.currentTickerPrice)
-      .multipliedBy(_long || '0')
-      .toFixed(2, BigNumber.ROUND_DOWN)
+      .multipliedBy(_long || "0")
+      .toFixed(2, BigNumber.ROUND_DOWN);
   }, [currentTokenOpenLongInterest, tickerPrice?.currentTickerPrice]);
-
 
   // short open interest
   const shortIO = useMemo(() => {
-    const _long = BigNumber(currentTokenOpenShortInterest?.tokenSize).multipliedBy(curToken.pars).toString()
+    const _long = BigNumber(currentTokenOpenShortInterest?.tokenSize)
+      .multipliedBy(curToken.pars)
+      .toString();
     return BigNumber(tickerPrice?.currentTickerPrice)
-      .multipliedBy(_long || '0')
-      .toFixed(2, BigNumber.ROUND_DOWN)
+      .multipliedBy(_long || "0")
+      .toFixed(2, BigNumber.ROUND_DOWN);
   }, [currentTokenOpenShortInterest, tickerPrice?.currentTickerPrice]);
-
 
   const ifZeroOI = 0,
     longPie = longIO,
@@ -219,7 +236,7 @@ const PerpetualDetail = memo((props) => {
                   stroke="transparent"
                   fill={
                     [theme.colors.text2, theme.colors.text5][
-                    index % [theme.colors.text2, theme.colors.text5].length
+                      index % [theme.colors.text2, theme.colors.text5].length
                     ]
                   }
                 />
@@ -235,10 +252,15 @@ const PerpetualDetail = memo((props) => {
     <Wrapper>
       <Layout>
         <Symbol>
-          <h3 className="label">{symbolName}/USDT</h3>
           {/* <Image src={ArrowIcon} width={11} height={6} alt="" /> */}
-          <MarketPanel />
-          <ChangPrice symbolName={symbolName}  displayDecimal={curToken?.displayDecimal}/>
+
+          <MarketPanel>
+            <h3 className="label">{symbolName}/USDT</h3>
+          </MarketPanel>
+          <ChangPrice
+            symbolName={symbolName}
+            displayDecimal={curToken?.displayDecimal}
+          />
         </Symbol>
         <Favorite
           onClick={() => {
@@ -274,8 +296,13 @@ const PerpetualDetail = memo((props) => {
             <div className="pie_chart">{oiChart}</div>
           </div>
           <div className="content">
-            <p className="long">${filterPrecision(longIO, curToken.displayDecimal)}</p>/
-            <p className="short">${filterPrecision(shortIO, curToken.displayDecimal)}</p>
+            <p className="long">
+              ${filterPrecision(longIO, curToken.displayDecimal)}
+            </p>
+            /
+            <p className="short">
+              ${filterPrecision(shortIO, curToken.displayDecimal)}
+            </p>
           </div>
         </OpenInterest>
         <Line />
@@ -284,14 +311,23 @@ const PerpetualDetail = memo((props) => {
             <p>Funding Rate L/S(D) | Countdown</p>
           </div>
           <div className="content">
-            <p className="rate"><FundingFeeRate /> / -0.1% </p>
-            <p className="short">|<FundingFeeCountDown /></p>
+            <p className="rate">
+              <FundingFeeRate /> / -0.1%{" "}
+            </p>
+            <p className="short">
+              |<FundingFeeCountDown />
+            </p>
           </div>
         </FundingRate>
         <Line />
         <InfoItem>
           <p className="label">Max Profit Ratio</p>
-          <p className="content">{BigNumber(curToken.maxProfitRatio as number).multipliedBy(100).toFixed(2, BigNumber.ROUND_DOWN)}%</p>
+          <p className="content">
+            {BigNumber(curToken.maxProfitRatio as number)
+              .multipliedBy(100)
+              .toFixed(2, BigNumber.ROUND_DOWN)}
+            %
+          </p>
         </InfoItem>
       </Layout>
       <Layout>

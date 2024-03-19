@@ -1,6 +1,8 @@
 
 import "./globals.css";
 import "@rainbow-me/rainbowkit/styles.css";
+import 'mac-scrollbar/dist/mac-scrollbar.css';
+
 import type { Metadata } from "next";
 import dynamic from 'next/dynamic';
 
@@ -34,9 +36,12 @@ export default function RootLayout({
     <html lang="en">
       <body className={inter.className}>
         <Providers>
+
+          
           <Header />
           {children}
         </Providers>
+        
       </body>
     </html>
   );
