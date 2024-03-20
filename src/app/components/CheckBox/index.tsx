@@ -8,7 +8,7 @@ type Props = {
 const Wrapper = styled.div<Props>`
   width: 14px;
   height: 14px;
-  border: ${(props) => `1px solid ${props.theme.colors.border1}`};
+  border: ${(props) => `1px solid ${props.theme.colors.primary1}`};
   background: ${(props) => {
     return props?.isChecked
       ? "linear-gradient(90deg, #634AFF 0%, #7E73FF 100%)"

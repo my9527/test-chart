@@ -14,6 +14,10 @@ import {
   filterThousands,
 } from "@/app/utils/tools";
 import Btns from "./Btns";
+import Modal from "@/app/components/Modal";
+import OrderConfirm from "./OrderConfirm";
+import { ParamsProps } from "./OrderConfirm";
+import BigNumber from "bignumber.js";
 const Layout = styled.div`
   display: flex;
   flex-direction: column;
@@ -110,6 +114,21 @@ const CloseOrder: React.FC<{
   const [clickType, setClickType] = useState("");
   const longPosition = 2323;
   const shortPosition = 2003;
+
+  const [visible, setVisible] = useState(false);
+  const [confirmedParams, setConfirmedParams] = useState<
+    ParamsProps | undefined
+  >();
+  const onClose = () => {
+    setVisible(false);
+  };
+  const onConfirm = () => {
+    setVisible(false);
+  };
+  const onCancel = () => {
+    setVisible(false);
+  };
+
   useEffect(() => {
     // const arr = (+amount / fundsAvailable + "").split(".");
     // const per = +(arr[0] + "." + (arr[1] ? arr[1].substring(0, 4) : "00"));
@@ -121,6 +140,17 @@ const CloseOrder: React.FC<{
     inputAmount && setAmountPercent(0);
   }, [inputAmount]);
 
+  useEffect(() => {
+    if (clickType && inputAmount) {
+      if (clickType === "long") {
+        setInputType(+inputAmount > longPosition ? "warn" : "normal");
+      }
+      if (clickType === "short") {
+        setInputType(+inputAmount > shortPosition ? "warn" : "normal");
+      }
+    }
+  }, [inputAmount, clickType, longPosition, shortPosition]);
+
   const handleOpen = (type: string) => {
     console.log("close", type);
     setClickType(type);
@@ -130,19 +160,25 @@ const CloseOrder: React.FC<{
     if (type === "short") {
       setInputType(+inputAmount > shortPosition ? "warn" : "normal");
     }
+
+    const _amount = inputAmount || amountPercent * longPosition;
+    const params = {
+      symbolName,
+      price,
+      margin,
+      amount: _amount + "",
+      futureType: type,
+      orderType: activeOrderTab,
+      fees: filterPrecision(
+        BigNumber(+price * +_amount * 0.0008).toString(),
+        curToken?.displayDecimal
+      ),
+      pnl:''
+    };
+    console.log("handleOpen", params);
+    setConfirmedParams(params);
+    setVisible(true);
   };
-  useEffect(() => {
-   
-    if (clickType && inputAmount) {
-      if (clickType === "long") {
-        setInputType(+inputAmount > longPosition ? "warn" : "normal");
-      }
-      if (clickType === "short") {
-        setInputType(+inputAmount > shortPosition ? "warn" : "normal");
-      }
-   
-    }
-  }, [inputAmount, clickType, longPosition, shortPosition]);
 
   return (
     <>
@@ -251,6 +287,18 @@ const CloseOrder: React.FC<{
           ) : null
         }
       />
+      <Modal
+        height={500}
+        onClose={onClose}
+        visible={visible}
+        title="Close Position"
+        onConfirm={onConfirm}
+        onCancel={onCancel}
+      >
+        {confirmedParams && (
+          <OrderConfirm params={confirmedParams} actionType="close" />
+        )}
+      </Modal>
     </>
   );
 };

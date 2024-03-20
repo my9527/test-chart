@@ -17,15 +17,16 @@ const ModalWrapper = styled(motion.div)`
   bottom: 0;
 `;
 type Props = {
-  width?: number;
-  height?: number;
+  width?: number | string;
+  height?: number | string;
 };
 const ModalBody = styled.div<Props>`
   border-radius: 8px;
   border: ${(props) => `1px solid ${props.theme.colors.fill2}`};
   background: ${(props) => props.theme.colors.fill2};
-  width: ${(props) => props?.width + "px"};
-  height: ${(props) => props?.height + "px"};
+  width: ${(props) => (props?.width === "auto" ? "auto" : props?.width + "px")};
+  height: ${(props) =>
+    props?.height === "auto" ? "auto" : props?.height + "px"};
   padding: 15px 20px;
   display: flex;
   flex-direction: column;
@@ -99,8 +100,8 @@ const CancelBtn = styled(Button)`
 `;
 const Modal: React.FC<{
   className?: string;
-  width?: number;
-  height?: number;
+  width?: number|string;
+  height?: number|string;
   visible: boolean;
   onClose?: Function;
   showHeader?: boolean;

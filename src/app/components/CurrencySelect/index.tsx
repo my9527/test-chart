@@ -62,7 +62,13 @@ const CurrencySelect: React.FC<{
   handleClick?: Function;
   className?: string;
   showSelect?: boolean;
-}> = ({ list, curCurrency, handleClick, className, showSelect = true }) => {
+}> = ({
+  list = [],
+  curCurrency,
+  handleClick,
+  className,
+  showSelect = true,
+}) => {
   const [showList, setShowList] = useState(false);
   return (
     <Wrapper className={className}>
@@ -78,7 +84,7 @@ const CurrencySelect: React.FC<{
                 key={item}
                 className={`item ${curCurrency === item ? "active" : ""}`}
                 onClick={() => {
-                  handleClick(item);
+                  handleClick && handleClick(item);
                   setShowList(false);
                 }}
               >
