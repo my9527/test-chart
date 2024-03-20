@@ -477,6 +477,13 @@ const OpenOrder: React.FC<{
       );
       _amount = filterPrecision(+amount / +price, decimal);
     }
+
+    const tradeFee = filterPrecision(
+      BigNumber(+price * +_amount * 0.0008).toString(),
+      curToken?.displayDecimal
+    );
+    const impactFee = "0";
+
     const params = {
       symbolName,
       price,
@@ -487,10 +494,9 @@ const OpenOrder: React.FC<{
       futureType: type,
       orderType: activeOrderTab,
       slippage,
-      fees: filterPrecision(
-        BigNumber(+price * +_amount * 0.0008).toString(),
-        curToken?.displayDecimal
-      ),
+      tradeFee,
+      impactFee,
+      fees: tradeFee + impactFee,
     };
     console.log("handleOpen", params);
     setConfirmedParams(params);
@@ -632,7 +638,7 @@ const OpenOrder: React.FC<{
       <StopOrder>
         <div className="title_area">
           <p className="title_text">Stop Order</p>
-          <CheckBox handleClick={() => setShowStopOrder(true)} />
+          <CheckBox handleClick={() => setShowStopOrder(!showStopOrder)} />
         </div>
         {showStopOrder && (
           <div className="input_area">
@@ -731,7 +737,7 @@ const OpenOrder: React.FC<{
         />
       ) : (
         <DefaultBtn>
-          {!BigNumber(currencyAmount).gt(10)
+          {price && margin && leverage && !BigNumber(currencyAmount).gt(10)
             ? "Amount should over 10 USD"
             : "Please enter the price"}
         </DefaultBtn>

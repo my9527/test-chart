@@ -132,6 +132,8 @@ export type ParamsProps = {
   amount: string;
   slippage?: string;
   fees: string;
+  tradeFee: string;
+  impactFee: string;
   longStopPrice?: string;
   shortStopPrice?: string;
   price: string;
@@ -188,11 +190,11 @@ const OrderConfirm: React.FC<{ params: ParamsProps; actionType: string }> = ({
         </div>
         <div className="item">
           <p className="label">--- Trading fee</p>
-          <p className="value">{params?.fees} USD</p>
+          <p className="value">{params?.tradeFee} USD</p>
         </div>
         <div className="item">
           <p className="label">--- Price impact fee</p>
-          <p className="value">{params?.fees} USD</p>
+          <p className="value">{params?.impactFee} USD</p>
         </div>
       </OrderInfo>
       {actionType === "close" ? (

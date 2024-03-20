@@ -162,6 +162,11 @@ const CloseOrder: React.FC<{
     }
 
     const _amount = inputAmount || amountPercent * longPosition;
+    const tradeFee = filterPrecision(
+      BigNumber(+price * +_amount * 0.0008).toString(),
+      curToken?.displayDecimal
+    );
+    const impactFee = "0";
     const params = {
       symbolName,
       price,
@@ -169,10 +174,9 @@ const CloseOrder: React.FC<{
       amount: _amount + "",
       futureType: type,
       orderType: activeOrderTab,
-      fees: filterPrecision(
-        BigNumber(+price * +_amount * 0.0008).toString(),
-        curToken?.displayDecimal
-      ),
+      tradeFee,
+      impactFee,
+      fees: tradeFee + impactFee,
       pnl: "",
     };
     console.log("handleOpen", params);
