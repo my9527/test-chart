@@ -13,11 +13,11 @@ enum StakeTabType {
 const Wrapper = styled.div`
   background-color: ${props => props.theme.colors.fill1};
   padding: 50px 0;
+  height: calc(100vh - 50px);
 `
 
 const Content = styled.div`
   width: 1420px;
-  height: 100%;
   margin: 0 auto;
 `
 
