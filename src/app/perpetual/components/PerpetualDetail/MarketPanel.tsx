@@ -251,7 +251,7 @@ const Panel: FC<{ visible: boolean, followRef: React.RefObject<HTMLDivElement>, 
             return {
                 ...tk,
                 price: indexPrices[tk.symbolName]?.price || '-',
-                change: +indexPrices[tk.symbolName]?.price || '-',
+                change: +indexPrices[tk.symbolName]?.change || 0,
             }
         })
 

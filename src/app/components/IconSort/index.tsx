@@ -41,9 +41,17 @@ export const IconSort: FC<{  initial?: SortDirection, onChange?: AnyFunc, label:
     const sortRef = useRef<SortDirection>(sort);
 
 
+    // 引用，避免闭包
     useEffect(() => {
         sortRef.current = sort;
     }, [sort]);
+
+    // 当不在使用该排序时，重置
+    useEffect(() => {
+        if(!active) {
+            updateSort(initial);
+        }
+    }, [active]);
     
     
     const handleChangeSort = useCallback((nextSort: SortDirection) => {
@@ -55,10 +63,11 @@ export const IconSort: FC<{  initial?: SortDirection, onChange?: AnyFunc, label:
     const Label = useMemo(() => {
         return cloneElement(label, {
             onClick: () => {
+                // 当前的排序序号
                 const curIndex = sortDirectionArr.findIndex((s) => s === sortRef.current);
-
+                // 将要执行的排序
                 const nextSort = sortDirectionArr[(curIndex + 1) % sortDirectionArr.length];
-                console.log('nextsort', nextSort);
+
                 handleChangeSort(nextSort);
 
             }

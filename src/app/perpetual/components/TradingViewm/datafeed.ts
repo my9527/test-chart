@@ -126,7 +126,6 @@ class Datafeed {
         tradingviewSocketIns.setOnRealtimeCallback(onTick);
 
         (async()=>{
-            console.log("subscribeBars", symbolInfo, resolution);
             await tradingviewSocketIns.unsubscribeLast();
             // tradingviewSocketIns.clearData();
             await tradingviewSocketIns.subscribe(symbolInfo, interval, 1, onTick);

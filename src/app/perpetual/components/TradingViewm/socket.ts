@@ -344,7 +344,7 @@ class TradingViewSocket {
                 param: this.curSubscriptionInfo?.interval
             });
             this.curSubscriptionInfo = undefined;
-
+            // 更新订阅topic 时，清空历史数据，避免出现数据错乱的情况
             await sleep(1000);
 
             this.clearData();
@@ -381,7 +381,6 @@ class TradingViewSocket {
         onHistoryCallback?: HistoryCallback,
     ) {
 
-        console.log("initHistoryKline", symbolInfo);
         // if (!this.connection || !this.inited) return;
 
         const result = await getHistoryChartData({
