@@ -4,9 +4,9 @@ import { createPortal } from "react-dom";
 import { motion } from "framer-motion";
 import CloseIcon from "./CloseIcon";
 
-const ModalWrapper = styled(motion.div)`
+const ModalWrapper = styled(motion.div)<{ $overlayColor?: string }>`
   position: fixed;
-  background: transparent;
+  background: ${props => props.$overlayColor || "transparent"};
   display: flex;
   justify-content: center;
   align-items: center;
@@ -58,6 +58,7 @@ const Header = styled.div`
 `;
 const Content = styled.div`
   flex: 1;
+  overflow: auto;
 `;
 const Footer = styled.div`
   border-top: ${(props) => `1px solid ${props.theme.colors.border1}`};
@@ -114,6 +115,8 @@ const Modal: React.FC<{
   showCancelBtn?: boolean;
   onConfirm?: Function;
   onCancel?: Function;
+  /** 遮罩颜色 */
+  overlayColor?: string;
 }> = ({
   width = 400,
   height = 400,
@@ -129,10 +132,11 @@ const Modal: React.FC<{
   showCancelBtn = true,
   onConfirm,
   onCancel,
+  overlayColor,
 }) => {
   return visible
     ? createPortal(
-        <ModalWrapper>
+        <ModalWrapper $overlayColor={overlayColor}>
           <ModalBody width={width} height={height}>
             {showHeader && (
               <Header>

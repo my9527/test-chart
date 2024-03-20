@@ -2,6 +2,7 @@ import styled, { keyframes } from "styled-components"
 import Image from "next/image";
 import DotBg from "@/app/assets/stake/breath-light.png";
 import RoundImg from "@/app/assets/stake/round.svg"
+import RoundBgGif from "@/app/assets/stake/round-bg.gif"
 
 const Wrapper = styled.div`
   position: relative;
@@ -87,8 +88,8 @@ const SharePanel = styled.div`
   justify-content: center;
   flex-direction: column;
   gap: 45px;
-  border: 1px solid ${props => props.theme.colors.primary1};
   border-radius: 50%;
+  position: relative;
 `
 
 export function ChartContent() {
@@ -98,6 +99,7 @@ export function ChartContent() {
       <BreathLight alt="" src={DotBg} />
       <ChartWrapper>
         <SharePanel>
+          <StyledImage src={RoundBgGif} alt="" />
           <FlexItem>
             <Label>Your Score</Label>
             <Share>123,123.00</Share>

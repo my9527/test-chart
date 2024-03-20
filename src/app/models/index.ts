@@ -237,7 +237,21 @@ export const recoilOrdersLen = selector({
 });
 
 
+/**
+ * 交易页面当前的币种, 如果没有，将默认为ETH
+ */
 export const recoilPerpetualToken = atom<string>({
   key: 'perpetual_token',
   default: ''
 });
+
+
+
+export const recoilBalanceAndPool = atom<any>({
+  key: 'balance_pool',
+  default: {
+    epoch: '',
+    walletBalance: {},
+  
+  }
+})

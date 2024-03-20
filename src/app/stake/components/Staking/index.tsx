@@ -19,12 +19,18 @@ const Wrapper = styled.div`
 const Box = styled.div`
   background-color: ${props => props.theme.colors.fill2};
   border-radius: 8px;
+  &:hover {
+    box-shadow: 0px 0px 20px 0px rgba(124, 103, 255, 0.25);
+  }
 `
 
 const StakeForm = styled.div`
   grid-area: stake-form;
   background-color: ${props => props.theme.colors.fill2};
   border-radius: 0 0 8px 8px;
+  &:hover {
+    box-shadow: 0px 0px 20px 0px rgba(124, 103, 255, 0.25);
+  }
 `
 
 const Claim = styled(Box)`
@@ -42,7 +48,7 @@ const Chart = styled(Box)`
 
 const Assets = styled(Box)`
   grid-area: assets;
-  padding: 21px 35px;
+  padding: 0 35px;
 `
 
 function StakingContent () {

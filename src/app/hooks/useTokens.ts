@@ -103,7 +103,7 @@ export const useDepositableTokens = () => {
   const tokens = useTokens();
 
   return useMemo(() => {
-    return tokens.filter(token_ => token_.deposit === true)
+    return tokens.filter(token_ => token_.deposit === true);
   }, [tokens]);
 }
 

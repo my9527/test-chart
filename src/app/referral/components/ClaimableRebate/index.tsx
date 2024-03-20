@@ -4,15 +4,19 @@ import Image from "next/image";
 import { FC } from "react";
 import styled from "styled-components";
 import ArrowRightIcon from "@/app/assets/referral/arrow-right.svg"
+import LinearGradientButton from '@/app/components/LinearGradientButton'
 
 const Wrapper = styled.div`
-  grid-area: claimable-rebate;
+  flex-grow: 1;
   background: ${(props) => props.theme.colors.fill2};
   border-radius: 8px;
   padding: 16px 20px;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
+  &:hover {
+    box-shadow: 0px 0px 20px 0px rgba(124, 103, 255, 0.25);
+  }
 `
 
 const Title = styled.h2`
@@ -47,26 +51,15 @@ const HistoryBtn = styled.div`
 
 const RebateNumber = styled.strong`
   font-size: ${(props) => props.theme.fontSize.header0};
-  color: ${(props) => props.theme.colors.primary1};
-`
-
-const Button = styled.button`
   background: ${(props) => props.theme.colors.primary3};
-  border-radius: 999px;
-  width: 100px;
-  line-height: 32px;
-  outline: none;
-  border: none;
-  color: ${(props) => props.theme.colors.text1};
-  font-weight: 700;
-  cursor: pointer;
-
-  &:hover {
-    background: ${(props) => props.theme.colors.primary1};
-  }
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
 `
 
-const ClaimableRebate: FC = () => {
+interface IClaimableRebateProps {
+  onClickHistory: () => void;
+}
+const ClaimableRebate: FC<IClaimableRebateProps> = ({ onClickHistory }) => {
 
   return (
     <Wrapper>
@@ -74,15 +67,15 @@ const ClaimableRebate: FC = () => {
         <Title>Total Claimable Rebate</Title>
         <Label>Data will be updated every Monday at 00:00 AM UTC.</Label>
       </Top>
-      <FlexBox justify="space-between">
+      <FlexBox justify="space-between" align="flex-end">
         <Left>
-          <HistoryBtn>
+          <HistoryBtn onClick={onClickHistory}>
             History
             <Image src={ArrowRightIcon} alt="" />
           </HistoryBtn>
           <RebateNumber>123,123.00 USD</RebateNumber>
         </Left>
-        <Button>Claim</Button>
+        <LinearGradientButton height={32} minWidth={100}>Claim</LinearGradientButton>
       </FlexBox>
     </Wrapper>
   )

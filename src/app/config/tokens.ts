@@ -104,7 +104,8 @@ export const USDTokensSymbols = ['USDX'];
 
 export const WithdrawableSymbols = ['USDX', 'HPX', 'HLP'];
 
-export const DepositableSymbols = ['USDX', 'WUSDC', 'HPX', 'HLP'];
+// 增加多链配置，每个链可能不一样
+export const DepositableSymbols = ['USDX', 'WUSDC', 'USDX', 'HPX', 'HLP','ETH', 'BTC', 'xHPX'];
 
 export const ProjectSymbols = ['HPX', 'HLP'];
 
@@ -220,6 +221,7 @@ const baseTokens: Record<string, Token[]> = {
       symbolName: 'USDC',      
       decimal: 18,
       disabled: false,
+      deposit: true,
       displayDecimal: 2,
       tag: [],
       "futureLongId": 10000000_5, // 这里设置一个很大的数，避免被重复使用
@@ -258,7 +260,7 @@ const baseTokens: Record<string, Token[]> = {
       "fundingFeeLinearRate": 0,
       "maxliquidityLockRatio": 0,
       "tradeable": false,
-      deposit: false,
+      deposit: true,
       withdraw: false,
       onChain: true,
     },
@@ -450,6 +452,7 @@ const baseTokens: Record<string, Token[]> = {
       "fundingFeeBaseRate": 0.0008,
       "fundingFeeLinearRate": 0.08,
       "maxliquidityLockRatio": 1,
+      deposit: true,
       optionConfig: {
         minimalOpenSize: '1 Contract',
         priceTickSize: '0.01',
@@ -559,6 +562,7 @@ const baseTokens: Record<string, Token[]> = {
       "fundingFeeBaseRate": 0.0008,
       "fundingFeeLinearRate": 0.08,
       "maxliquidityLockRatio": 1,
+      deposit: true,
       optionConfig: {
         minimalOpenSize: '1 Contract',
         priceTickSize: '0.01',
@@ -2113,7 +2117,7 @@ const baseTokens: Record<string, Token[]> = {
       "fundingFeeLinearRate": 0,
       "maxliquidityLockRatio": 0,
       "tradeable": false,
-      deposit: false,
+      deposit: true,
       withdraw: false,
       onChain: true,
     },
@@ -2300,7 +2304,8 @@ const baseTokens: Record<string, Token[]> = {
       maxliquidityLockRatio: 1, // 100%
       maxProfitRatio: 10,
       maxLeverage: 100, 
-      fundingFeeRatio: 0.025
+      fundingFeeRatio: 0.025,
+      deposit: true,
      
     },
     {
@@ -2400,6 +2405,7 @@ const baseTokens: Record<string, Token[]> = {
       fundingFeeBaseRate: 0.0008,
       fundingFeeLinearRate: 0.08,
       maxliquidityLockRatio: 1, // 100%
+      deposit: true,
     },
     {
       "symbolName": "FTM",
@@ -3972,7 +3978,8 @@ const baseTokens: Record<string, Token[]> = {
       "priceTickSize": 0.01,
       "fundingFeeBaseRate": 0.0008,
       "fundingFeeLinearRate": 0.08,
-      "maxliquidityLockRatio": 1
+      "maxliquidityLockRatio": 1,
+      deposit: true,
     },
     {
       "symbolName": "COMP",
@@ -4077,7 +4084,8 @@ const baseTokens: Record<string, Token[]> = {
       "priceTickSize": 0.01,
       "fundingFeeBaseRate": 0.0008,
       "fundingFeeLinearRate": 0.08,
-      "maxliquidityLockRatio": 1
+      "maxliquidityLockRatio": 1,
+      deposit: true,
     },
     {
       "symbolName": "FTM",

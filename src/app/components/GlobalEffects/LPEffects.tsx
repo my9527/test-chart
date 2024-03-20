@@ -82,7 +82,7 @@ export const LPEffects: FC = memo(() => {
 
     const { run, cancel } = useRequest(requestInfo, {
         manual: true,
-        pollingInterval: 15 * 1000,
+        pollingInterval: 150_000,
     });
 
     useEffect(() => {

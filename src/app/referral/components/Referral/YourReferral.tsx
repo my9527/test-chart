@@ -28,7 +28,10 @@ const Progress = styled.div`
   padding-top: 35px;
 `
 
-const YourReferral: FC = () => {
+interface IYourReferralProps {
+  onClickRankDetail: () => void;
+}
+const YourReferral: FC<IYourReferralProps> = ({ onClickRankDetail }) => {
 
   return (
     <Wrapper>
@@ -36,7 +39,7 @@ const YourReferral: FC = () => {
         <FlexBox justify="space-between">
           <Label>Your Referral Rank:</Label>
           <FlexBox gap="20px">
-            <Button padding="2px 10px" primary>Rank Details</Button>
+            <Button onClick={onClickRankDetail} padding="2px 10px" primary>Rank Details</Button>
             <Label>Rank 1</Label>
           </FlexBox>
         </FlexBox>
