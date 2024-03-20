@@ -50,7 +50,7 @@ const Price: React.FC<{
   useEffect(() => {
     setPrice("");
   }, [activeOrderTab]);
-  
+
   useEffect(() => {
     if (activeOrderTab === "market") {
       setPrice(filterPrecision(indexPrices[symbolName]?.price, displayDecimal));
@@ -67,6 +67,9 @@ const Price: React.FC<{
             ? filterPrecision(price, displayDecimal)
             : price
         }
+        onBlur={() => {
+          setPrice(filterPrecision(price, displayDecimal));
+        }}
         onChange={(e: React.FormEvent<HTMLInputElement>) => {
           const value = e?.currentTarget.value;
 
