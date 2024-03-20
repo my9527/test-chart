@@ -13,6 +13,10 @@ const PrimaryText = styled.span`
   color: ${props => props.theme.colors.primary1};
 `
 
+const Content = styled.div`
+  overflow: auto;
+  flex-grow: 1;
+`
 const token = 'QLP'
 
 enum TabType {
@@ -115,11 +119,13 @@ function StakeAssets () {
     }
   ]
   return (
+    <Content>
       <Table
         data={data}
         columns={columns}
         bodyCellHeight={35}
       />
+    </Content>
   )
 }
 
@@ -174,10 +180,12 @@ function UnstakedAssets () {
     }
   ]
   return (
+    <Content>
       <Table
         data={data}
         columns={columns}
         bodyCellHeight={35}
       />
+    </Content>
   )
 }

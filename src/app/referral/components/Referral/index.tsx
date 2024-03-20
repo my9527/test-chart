@@ -16,6 +16,9 @@ const Wrapper = styled.div`
   display: flex;
   flex-direction: column;
   position: relative;
+  &:hover {
+    box-shadow: 0px 0px 20px 0px rgba(124, 103, 255, 0.25);
+  }
 `
 
 

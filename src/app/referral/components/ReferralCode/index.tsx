@@ -12,6 +12,9 @@ const Wrapper = styled.div`
   border-radius: 8px;
   padding: 16px 20px;
   flex-shrink: 0;
+  &:hover {
+    box-shadow: 0px 0px 20px 0px rgba(124, 103, 255, 0.25);
+  }
 `
 
 const Row = styled.div`

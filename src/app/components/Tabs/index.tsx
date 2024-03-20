@@ -35,11 +35,6 @@ const Hilight = styled(motion.div)`
   width: 100%;
 `
 
-const Content = styled.div`
-  overflow: auto;
-  flex-grow: 1;
-`
-
 
 type TabType = {
   title: string,
@@ -76,7 +71,7 @@ const Tabs: FC<ITabsProps> = ({ tabs, tab: activeTab, onTabChange }) => {
           })
         }
       </Header>
-      <Content>{ activeTabContent }</Content>
+      { activeTabContent }
     </Wrapper>
   )
 };

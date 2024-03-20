@@ -14,6 +14,9 @@ const Wrapper = styled.div`
   display: flex;
   flex-direction: column;
   justify-content: space-between;
+  &:hover {
+    box-shadow: 0px 0px 20px 0px rgba(124, 103, 255, 0.25);
+  }
 `
 
 const Title = styled.h2`

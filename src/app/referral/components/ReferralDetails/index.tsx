@@ -14,6 +14,9 @@ const Wrapper = styled.div`
   border-radius: 8px;
   padding: 0 20px;
   position: relative;
+  &:hover {
+    box-shadow: 0px 0px 20px 0px rgba(124, 103, 255, 0.25);
+  }
 `
 const Title = styled.h2`
   font-size: ${props => props.theme.fontSize.header2};
