@@ -77,13 +77,15 @@ const ScrollWrapper = styled.div`
 `;
 const Leverage = styled.div`
   position: absolute;
-  top: 50%;
+  bottom: 0;
   right: 14px;
-  transform: translateY(-50%);
+
   cursor: pointer;
   display: flex;
   align-items: center;
   gap: 5px;
+  padding: 3px 10px;
+  background: ${(props) => props.theme.colors.border1};
   .label {
     color: ${(props) => props.theme.colors.text1};
     font-family: Arial;
@@ -140,6 +142,7 @@ const PerpetualPanels = () => {
     }
   }, [visible]);
 
+  useEffect;
   return (
     <Wrapper>
       <ActionTabs

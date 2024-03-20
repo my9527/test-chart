@@ -47,7 +47,10 @@ const Price: React.FC<{
   const getMarketPrice = () => {
     setPrice(filterPrecision(indexPrices[symbolName]?.price, displayDecimal));
   };
-
+  useEffect(() => {
+    setPrice("");
+  }, [activeOrderTab]);
+  
   useEffect(() => {
     if (activeOrderTab === "market") {
       setPrice(filterPrecision(indexPrices[symbolName]?.price, displayDecimal));

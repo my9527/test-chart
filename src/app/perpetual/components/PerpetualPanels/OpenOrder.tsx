@@ -236,7 +236,20 @@ const Fee = styled(DataItem)`
     }
   }
 `;
-
+const DefaultBtn = styled.div`
+  border-radius: 40px;
+  background: ${(props) => props.theme.colors.fill2};
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: ${(props) => props.theme.colors.text4};
+  font-family: Arial;
+  font-size: ${(props) => props.theme.fontSize.medium};
+  font-style: normal;
+  font-weight: 400;
+  line-height: 100%;
+`;
 const OpenOrder: React.FC<{
   activeOrderTab: string;
   margin: string;
@@ -355,27 +368,31 @@ const OpenOrder: React.FC<{
   const fundsAvailable = 2000.66;
   const [isInput, setIsInput] = useState(false);
 
+  const amountDecimal = useMemo(() => {
+    if (curCurrency === "USD") {
+      return 6;
+    } else {
+      return getExponent(Number(curToken?.perpConfig?.contractSize) || 1);
+    }
+  }, [curCurrency, curToken]);
+
   useEffect(() => {
     if (!isInput) {
       if (curCurrency === "USD") {
         setAmount(
           +margin * leverage
-            ? filterPrecision(+margin * +leverage, curToken?.displayDecimal)
+            ? filterPrecision(+margin * +leverage, amountDecimal)
             : ""
         );
       } else {
-        const decimal = getExponent(
-          Number(curToken?.perpConfig?.contractSize) || 1
-        );
-
         setAmount(
           margin && price
-            ? filterPrecision((+margin * leverage) / +price, decimal)
+            ? filterPrecision((+margin * leverage) / +price, amountDecimal)
             : ""
         );
       }
     }
-  }, [margin, leverage, curCurrency, price, isInput, curToken]);
+  }, [margin, leverage, curCurrency, price, isInput, curToken, amountDecimal]);
 
   useEffect(() => {
     const arr = (+margin / fundsAvailable + "").split(".");
@@ -385,7 +402,7 @@ const OpenOrder: React.FC<{
 
   useEffect(() => {
     setInputAmount(amount);
-  }, [amount]);
+  }, [amount, amountDecimal]);
 
   useEffect(() => {
     if (isInput) {
@@ -403,10 +420,56 @@ const OpenOrder: React.FC<{
       }
     }
   }, [inputAmount, isInput, curCurrency, price]);
+
   const [confirmedParams, setConfirmedParams] = useState<
     ParamsProps | undefined
   >();
+  const [longStopPriceInputType, setLongStopPriceInputType] =
+    useState("normal");
+  const [shortStopPriceInputType, setShortStopPriceInputType] =
+    useState("normal");
+
+  const currencyAmount = useMemo(() => {
+    let _amount = amount;
+    if (curCurrency !== "USD") {
+      _amount = BigNumber(amount).multipliedBy(price).toString();
+    }
+
+    return _amount;
+  }, [amount, curCurrency, curToken]);
+
   const handleOpen = (type: string) => {
+    setLongStopPriceInputType("normal");
+    setShortStopPriceInputType("normal");
+    if (showStopOrder) {
+      //判断止盈止损价格是否超出
+      let longFlag = false,
+        shortFlag = false;
+      if (type === "long") {
+        longFlag =
+          !!longStopPrice &&
+          !!price &&
+          (+longStopPrice > +price * ((curToken?.maxProfitRatio || 0) + 1) ||
+            +longStopPrice < +price);
+
+        shortFlag = !!shortStopPrice && !!price && +shortStopPrice > +price;
+      } else {
+        longFlag =
+          !!longStopPrice &&
+          !!price &&
+          (+longStopPrice < +price / ((curToken?.maxProfitRatio || 0) + 1) ||
+            +longStopPrice > +price);
+
+        shortFlag = !!shortStopPrice && !!price && +shortStopPrice < +price;
+      }
+
+      setLongStopPriceInputType(longFlag ? "warn" : "normal");
+      setShortStopPriceInputType(shortFlag ? "warn" : "normal");
+
+      if (longFlag || shortFlag) {
+        return;
+      }
+    }
     let _amount = amount;
     if (curCurrency === "USD") {
       const decimal = getExponent(
@@ -433,6 +496,7 @@ const OpenOrder: React.FC<{
     setConfirmedParams(params);
     setVisible(true);
   };
+
   return (
     <>
       <Price
@@ -456,6 +520,11 @@ const OpenOrder: React.FC<{
             }
             placeholder="input margin"
             value={margin}
+            onBlur={() => {
+              setMargin(
+                margin ? filterPrecision(margin, curToken?.displayDecimal) : ""
+              );
+            }}
             onChange={(e: React.FormEvent<HTMLInputElement>) => {
               const value = e?.currentTarget.value;
 
@@ -480,13 +549,15 @@ const OpenOrder: React.FC<{
             />
           </div>
           <Input
+            onBlur={() => {
+              setAmount(amount ? filterPrecision(amount, amountDecimal) : "");
+            }}
             placeholder="input amount"
             value={inputAmount}
             onChange={(e: React.FormEvent<HTMLInputElement>) => {
               const value = e?.currentTarget.value;
 
-              if (value && verifyValidNumber(value, curToken?.displayDecimal))
-                return;
+              if (value && verifyValidNumber(value, amountDecimal)) return;
               setIsInput(true);
               setAmount(value);
             }}
@@ -567,15 +638,7 @@ const OpenOrder: React.FC<{
           <div className="input_area">
             <div className="item">
               <Input
-                type={
-                  longStopPrice &&
-                  price &&
-                  (+longStopPrice >
-                    +price * ((curToken?.maxProfitRatio || 0) + 1) ||
-                    +longStopPrice < +price)
-                    ? "warn"
-                    : "normal"
-                }
+                type={longStopPriceInputType}
                 value={longStopPrice}
                 onChange={(e: React.FormEvent<HTMLInputElement>) => {
                   const value = e?.currentTarget.value;
@@ -589,7 +652,6 @@ const OpenOrder: React.FC<{
                   setLongStopPrice(value);
                 }}
                 placeholder="TP Trigger Price"
-                // suffix={<div className="unit">USD</div>}
               />
               <div className="pnl">
                 Est.pnl:<span className="long">{longPnl}USD</span>
@@ -597,11 +659,7 @@ const OpenOrder: React.FC<{
             </div>
             <div className="item">
               <Input
-                type={
-                  shortStopPrice && price && +shortStopPrice > +price
-                    ? "warn"
-                    : "normal"
-                }
+                type={shortStopPriceInputType}
                 value={shortStopPrice}
                 onChange={(e: React.FormEvent<HTMLInputElement>) => {
                   const value = e?.currentTarget.value;
@@ -614,7 +672,6 @@ const OpenOrder: React.FC<{
                   setShortStopPrice(value);
                 }}
                 placeholder="SL Trigger Price"
-                // suffix={<div className="unit">USD</div>}
               />
               <div className="pnl">
                 Est.pnl:<span className="short">{shortPnl}USD</span>
@@ -665,12 +722,20 @@ const OpenOrder: React.FC<{
         </p>
         <p className="value">0.08%</p>
       </Fee>
-      <Btns
-        handleClick={handleOpen}
-        longBtnText="LONG"
-        shortBtnText="SHORT"
-        showIcon={true}
-      />
+      {price && margin && leverage && BigNumber(currencyAmount).gt(10) ? (
+        <Btns
+          handleClick={handleOpen}
+          longBtnText="LONG"
+          shortBtnText="SHORT"
+          showIcon={true}
+        />
+      ) : (
+        <DefaultBtn>
+          {!BigNumber(currencyAmount).gt(10)
+            ? "Amount should over 10 USD"
+            : "Please enter the price"}
+        </DefaultBtn>
+      )}
       <Modal
         height={500}
         onClose={onClose}
@@ -679,7 +744,9 @@ const OpenOrder: React.FC<{
         onConfirm={onConfirm}
         onCancel={onCancel}
       >
-        {confirmedParams && <OrderConfirm params={confirmedParams} actionType='open'/>}
+        {confirmedParams && (
+          <OrderConfirm params={confirmedParams} actionType="open" />
+        )}
       </Modal>
     </>
   );

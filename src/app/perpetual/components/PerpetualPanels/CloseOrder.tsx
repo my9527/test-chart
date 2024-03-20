@@ -173,7 +173,7 @@ const CloseOrder: React.FC<{
         BigNumber(+price * +_amount * 0.0008).toString(),
         curToken?.displayDecimal
       ),
-      pnl:''
+      pnl: "",
     };
     console.log("handleOpen", params);
     setConfirmedParams(params);

@@ -67,6 +67,7 @@ const Tips = styled.p`
   font-style: normal;
   font-weight: 400;
   line-height: 120%;
+  margin-top: 30px;
 `;
 const AdjustLeverage: React.FC<{
   leverage: number;
@@ -143,41 +144,15 @@ const AdjustLeverage: React.FC<{
           setValue(value + "");
         }}
         marks={marks}
-        // marks={[
-        //   {
-        //     label: "1X",
-        //     value: 1,
-        //   },
-        //   {
-        //     label: "25X",
-        //     value: 25,
-        //   },
-        //   {
-        //     label: "50X",
-        //     value: 50,
-        //   },
-
-        //   {
-        //     label: "75X",
-        //     value: 75,
-        //   },
-        //   {
-        //     label: "100X",
-        //     value: 100,
-        //   },
-        // ]}
         min={min}
         max={max}
         unit="X"
       />
-      <Desc>
-        The maximum opening after adjusting the leverage ratio is{" "}
-        <span className="highlight">0.00BTC</span>
-        Required deposit of <span className="highlight">0 USD</span>
-      </Desc>
-      <Tips>
-        The current leverage ratio is high, please be aware of the risk
-      </Tips>
+      {+value > 20 && (
+        <Tips>
+          The current leverage ratio is high, please be aware of the risk
+        </Tips>
+      )}
     </Wrapper>
   );
 };
