@@ -22,7 +22,17 @@ const Btns: React.FC<{
   longBtnText: string;
   shortBtnText: string;
   showIcon?: boolean;
-}> = ({ handleClick, className, longBtnText, shortBtnText, showIcon }) => {
+  longSuffixChildren?: React.ReactNode;
+  shortSuffixChildren?: React.ReactNode;
+}> = ({
+  handleClick,
+  className,
+  longBtnText,
+  shortBtnText,
+  showIcon,
+  longSuffixChildren,
+  shortSuffixChildren,
+}) => {
   return (
     <Wrapper className={className}>
       <Button
@@ -31,6 +41,7 @@ const Btns: React.FC<{
         onClick={() => {
           handleClick && handleClick("long");
         }}
+        suffixChildren={longSuffixChildren}
       >
         {showIcon && <Image src={LongIcon} alt="" width={25} height={18} />}
       </Button>
@@ -40,6 +51,7 @@ const Btns: React.FC<{
         onClick={() => {
           handleClick && handleClick("short");
         }}
+        suffixChildren={shortSuffixChildren}
       >
         {showIcon && <Image src={ShortIcon} alt="" width={25} height={18} />}
       </Button>
