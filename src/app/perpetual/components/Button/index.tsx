@@ -10,6 +10,7 @@ const Wrapper = styled.div<Props>`
   flex: 1;
   border-radius: 999px;
   height: 41px;
+  box-sizing: border-box;
   background: ${(props) => {
     return props?.type === "long"
       ? props.theme.colors.text2
@@ -19,6 +20,8 @@ const Wrapper = styled.div<Props>`
   align-items: center;
   justify-content: center;
   cursor: pointer;
+  .content {
+  }
   .title {
     color: ${(props) => props.theme.colors.text1};
     font-family: Arial;
@@ -35,11 +38,15 @@ const Button: React.FC<{
   className?: string;
   type: string;
   children?: React.ReactNode;
-}> = ({ className, btnText, type, children, onClick }) => {
+  suffixChildren?: React.ReactNode;
+}> = ({ className, btnText, type, children, onClick, suffixChildren }) => {
   return (
     <Wrapper className={className} type={type} onClick={onClick}>
       {children}
-      <p className="title">{btnText}</p>
+      <div className="content">
+        <p className="title">{btnText}</p>
+        {suffixChildren}
+      </div>
     </Wrapper>
   );
 };

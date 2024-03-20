@@ -79,6 +79,15 @@ const DataItem = styled.div`
   line-height: 120%;
   color: ${(props) => props.theme.colors.text1};
 `;
+const EstPosition = styled.p`
+  color: ${(props) => props.theme.colors.text1};
+  font-family: Arial;
+  font-size: ${(props) => props.theme.fontSize.min};
+  font-style: normal;
+  font-weight: 700;
+  line-height: 100%;
+  text-transform: uppercase;
+`;
 const CloseOrder: React.FC<{
   activeOrderTab: string;
   margin: string;
@@ -95,19 +104,46 @@ const CloseOrder: React.FC<{
   curToken,
 }) => {
   const [price, setPrice] = useState<string>("");
-  const [curCurrency, setCurCurrency] = useState("USD");
   const [amountPercent, setAmountPercent] = useState<number>(0);
-  const [isInput, setIsInput] = useState(false);
-  const [amount, setAmount] = useState<string>("");
-  const fundsAvailable = 2323;
+  const [inputAmount, setInputAmount] = useState<string>("");
+  const [inputType, setInputType] = useState("normal");
+  const [clickType, setClickType] = useState("");
+  const longPosition = 2323;
+  const shortPosition = 2003;
   useEffect(() => {
-    const arr = (+amount / fundsAvailable + "").split(".");
-    const per = +(arr[0] + "." + (arr[1] ? arr[1].substring(0, 4) : "00"));
-    setAmountPercent(+per > 1 ? 1 : +per);
-  }, [amount, fundsAvailable]);
-  const handleOpen = () => {
-    console.log("close");
+    // const arr = (+amount / fundsAvailable + "").split(".");
+    // const per = +(arr[0] + "." + (arr[1] ? arr[1].substring(0, 4) : "00"));
+    // setAmountPercent(+per > 1 ? 1 : +per);
+    amountPercent && setInputAmount("");
+  }, [amountPercent]);
+
+  useEffect(() => {
+    inputAmount && setAmountPercent(0);
+  }, [inputAmount]);
+
+  const handleOpen = (type: string) => {
+    console.log("close", type);
+    setClickType(type);
+    if (type === "long") {
+      setInputType(+inputAmount > longPosition ? "warn" : "normal");
+    }
+    if (type === "short") {
+      setInputType(+inputAmount > shortPosition ? "warn" : "normal");
+    }
   };
+  useEffect(() => {
+   
+    if (clickType && inputAmount) {
+      if (clickType === "long") {
+        setInputType(+inputAmount > longPosition ? "warn" : "normal");
+      }
+      if (clickType === "short") {
+        setInputType(+inputAmount > shortPosition ? "warn" : "normal");
+      }
+   
+    }
+  }, [inputAmount, clickType, longPosition, shortPosition]);
+
   return (
     <>
       <Price
@@ -121,35 +157,40 @@ const CloseOrder: React.FC<{
         <p className="title">Amount</p>
         <div className="input_area">
           <StyledInput
+            type={inputType}
             placeholder="input amount"
-            value={amount}
+            value={inputAmount}
             onChange={(e: React.FormEvent<HTMLInputElement>) => {
               const value = e?.currentTarget.value;
 
               if (value && verifyValidNumber(value, curToken?.displayDecimal))
                 return;
-              setIsInput(true);
-              setAmount(value);
+              //   setIsInput(true);
+              setInputAmount(value);
             }}
           />
           <StyledCurrencySelect
-            curCurrency={curCurrency}
-            list={["USD", symbolName]}
-            handleClick={(item: string) => {
-              setCurCurrency(item);
-            }}
+            showSelect={false}
+            curCurrency={symbolName}
+            // list={["USD", symbolName]}
+            // handleClick={(item: string) => {
+            //   setCurCurrency(item);
+            // }}
           />
         </div>
       </Layout>
       <Slider
         onChange={(value) => {
-          setAmount(
-            filterPrecision(
-              (value / 100) * fundsAvailable,
-              curToken?.displayDecimal
-            )
+          setAmountPercent(
+            +filterPrecision(value / 100, curToken?.displayDecimal)
           );
-          setIsInput(false);
+          // setAmount(
+          //   filterPrecision(
+          //     (value / 100) * fundsAvailable,
+          //     curToken?.displayDecimal
+          //   )
+          //   );
+          //   setIsInput(false);
         }}
         per={amountPercent || 0}
         marks={[
@@ -183,11 +224,11 @@ const CloseOrder: React.FC<{
       <Data>
         <DataItem>
           <p>Long Position:</p>
-          <p>2000 USD</p>
+          <p>{longPosition} USD</p>
         </DataItem>
         <DataItem>
           <p>Short Position:</p>
-          <p>6000 USD</p>
+          <p>{shortPosition} USD</p>
         </DataItem>
       </Data>
       <Btns
@@ -195,6 +236,20 @@ const CloseOrder: React.FC<{
         longBtnText="CLOSE LONG"
         shortBtnText="CLOSE SHORT"
         showIcon={false}
+        longSuffixChildren={
+          inputAmount || amountPercent ? (
+            <EstPosition>
+              ≈{inputAmount || amountPercent * longPosition} {symbolName}
+            </EstPosition>
+          ) : null
+        }
+        shortSuffixChildren={
+          inputAmount || amountPercent ? (
+            <EstPosition>
+              ≈{inputAmount || amountPercent * shortPosition} {symbolName}
+            </EstPosition>
+          ) : null
+        }
       />
     </>
   );

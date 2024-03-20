@@ -57,11 +57,12 @@ const Wrapper = styled.div`
 `;
 
 const CurrencySelect: React.FC<{
-  list: string[];
+  list?: string[];
   curCurrency: string;
-  handleClick: Function;
+  handleClick?: Function;
   className?: string;
-}> = ({ list, curCurrency, handleClick, className }) => {
+  showSelect?: boolean;
+}> = ({ list, curCurrency, handleClick, className, showSelect = true }) => {
   const [showList, setShowList] = useState(false);
   return (
     <Wrapper className={className}>
@@ -69,7 +70,7 @@ const CurrencySelect: React.FC<{
         <p className="label">{curCurrency}</p>
         <Image src={ArrowIcon} width={10} height={5} alt="" />
       </div>
-      {showList && (
+      {showList && showSelect && (
         <div className="currency_list">
           {list.map((item: string) => {
             return (
