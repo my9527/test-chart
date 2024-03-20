@@ -4,6 +4,9 @@ import { motion } from 'framer-motion'
 
 const Wrapper = styled.div`
   color: ${props => props.theme.colors.text1};
+  display: flex;
+  flex-direction: column;
+  height: 100%;
 `
 
 const Text = styled.div<{ active: boolean }>`
@@ -30,6 +33,11 @@ const Hilight = styled(motion.div)`
   bottom: 0;
   left: 0;
   width: 100%;
+`
+
+const Content = styled.div`
+  overflow: auto;
+  flex-grow: 1;
 `
 
 
@@ -68,7 +76,7 @@ const Tabs: FC<ITabsProps> = ({ tabs, tab: activeTab, onTabChange }) => {
           })
         }
       </Header>
-      { activeTabContent }
+      <Content>{ activeTabContent }</Content>
     </Wrapper>
   )
 };

@@ -8,15 +8,17 @@ import dayjs from "dayjs";
 const Title = styled.h2`
   font-size: ${props => props.theme.fontSize.header0};
   color: ${props => props.theme.colors.text4};
+  line-height: 20px;
 `
 
 const Header = styled.div`
   display: flex;
   gap: 20px;
   align-items: flex-end;
+  height: 20px;
 `
 
-const SubTitle = styled.h2`
+const SubTitle = styled.span`
   font-size: ${props => props.theme.fontSize.small};
   color: ${props => props.theme.colors.primary1};
 `

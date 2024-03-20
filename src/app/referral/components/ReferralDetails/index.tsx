@@ -5,7 +5,7 @@ import FlexBox from '@/app/components/FlexBox'
 import Tabs from "@/app/components/Tabs";
 import SRDetails from "./SRDetails";
 import Details from "./Details";
-import { SearchInput } from "./SearchInput";
+import { SearchInput } from "../SearchInput";
 
 
 const Wrapper = styled.div`

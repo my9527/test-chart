@@ -1,15 +1,13 @@
 "use client";
-import { FC, useState } from "react";
+import { FC, useRef, useState } from "react";
 import styled from "styled-components";
 import FlexBox from '@/app/components/FlexBox'
-import ClaimableRebate from "./components/ClaimableRebate";
-import ReferralCode from "./components/ReferralCode";
 import ReferralDetails from "./components/ReferralDetails";
 import ReferralTab from "./components/Referral";
-import Button from "@/app/components/Button";
-import TwitterIcon from "@/app/assets/referral/twitter.svg";
-import TelegramIcon from "@/app/assets/referral/telegram.svg";
-import Image from "next/image";
+import Button from "./components/Button";
+import { RebateArea } from "./components/RebateArea";
+import { SelectReferralCode } from "./components/SelectReferralCode";
+
 
 const Wrapper = styled.div`
   background-color: ${props => props.theme.colors.fill1};
@@ -43,11 +41,11 @@ const Value = styled.div`
 
 const MainContent = styled.div`
   display: grid;
-  grid-template-columns: 330px 330px 1fr;
+  grid-template-columns: 670px 1fr;
   grid-template-rows: 200px 290px;
   grid-template-areas: 
-    "claimable-rebate referral-code referral-details"
-    "your-referral your-referral referral-details";
+    "rebate-area referral-details"
+    "your-referral referral-details";
   gap: 10px;
 `
 
@@ -79,13 +77,20 @@ const ReferralLinkWrapper = styled.div`
 `
 
 const IconButton = styled.div`
-  padding: 6px 18px;
+  padding: 0 18px;
+  height: 32px;
+  display: flex;
+  align-items: center;
   border-radius: 12px;
   background: ${(props) => props.theme.colors.fill1};
   cursor: pointer;
 
   &:hover {
     background: ${(props) => props.theme.colors.primary3};
+
+    path {
+      fill: ${(props) => props.theme.colors.fill1};
+    }
   }
 `
 
@@ -115,7 +120,9 @@ const CopyButton = styled.div`
 
 
 const Referral: FC = () => {
+  const ref = useRef<HTMLDivElement>(null);
 
+  const [visible, setVisible] = useState(false);
   return (
     <Wrapper>
       <InnerWrapper>
@@ -129,25 +136,33 @@ const Referral: FC = () => {
             <Label>Rebate ratio split: </Label>
             <Value>10% / 15%</Value>
           </FlexBox>
-          <Button padding="1px 10px" primary>Choose another code</Button>
+          <Button onClick={() => setVisible(true)}>Choose another code</Button>
         </FlexBox>
         <ReferralLinkWrapper>
           <ReferralLinkBox>
             <ReferralLink placeholder="Referral Link" />
             <Actions>
-              <IconButton><Image src={TwitterIcon} alt="" /></IconButton>
-              <IconButton><Image src={TelegramIcon} alt="" /></IconButton>
+              <IconButton>
+                <svg width="24" height="20" viewBox="0 0 24 20" fill="none">
+                  <path d="M24 2.36772C23.117 2.76969 22.168 3.0404 21.172 3.16243C22.189 2.53794 22.97 1.5484 23.337 0.369155C22.386 0.947498 21.332 1.36792 20.21 1.59454C19.313 0.613208 18.032 0 16.616 0C13.437 0 11.101 3.04143 11.819 6.19873C7.728 5.98851 4.1 3.97867 1.671 0.923913C0.381 3.19319 1.002 6.16181 3.194 7.66509C2.388 7.63843 1.628 7.41181 0.965 7.03343C0.911 9.37244 2.546 11.5607 4.914 12.0478C4.221 12.2406 3.462 12.2857 2.69 12.1339C3.316 14.1397 5.134 15.5988 7.29 15.6399C5.22 17.3041 2.612 18.0476 0 17.7317C2.179 19.1643 4.768 20 7.548 20C16.69 20 21.855 12.0826 21.543 4.98154C22.505 4.26887 23.34 3.37982 24 2.36772Z" fill="#7C67FF" fill-opacity="0.5"/>
+                </svg>
+              </IconButton>
+              <IconButton>
+                <svg width="24" height="20" viewBox="0 0 24 20" fill="none">
+                  <path d="M9.0288 18.79L9.40165 13.1963L19.6283 4.04528C20.081 3.63534 19.535 3.43698 18.9358 3.79403L6.31236 11.7152L0.852845 9.99607C-0.318954 9.66547 -0.33227 8.85881 1.11916 8.27696L22.3846 0.130983C23.3567 -0.305408 24.2888 0.369015 23.916 1.8501L20.294 18.79C20.041 19.9934 19.3087 20.2843 18.2967 19.7289L12.7839 15.6824L10.134 18.2346C9.82776 18.5388 9.57475 18.79 9.0288 18.79Z" fill="#7C67FF" fill-opacity="0.5"/>
+                </svg>
+              </IconButton>
             </Actions>
           </ReferralLinkBox>
           <CopyButton>Copy</CopyButton>
         </ReferralLinkWrapper>
-        <MainContent>
-          <ClaimableRebate />
-          <ReferralCode />
+        <MainContent ref={ref}>
+          <RebateArea />
           <ReferralTab />
           <ReferralDetails />
         </MainContent>
       </InnerWrapper>
+      <SelectReferralCode visible={visible} onClose={() => setVisible(false)} />
     </Wrapper>
   )
 };

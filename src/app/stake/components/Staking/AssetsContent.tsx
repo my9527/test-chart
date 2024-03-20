@@ -1,7 +1,7 @@
 import Tabs from "@/app/components/Tabs"
 import { useState } from "react"
 import styled from "styled-components"
-import Table from "../Table"
+import Table from "@/app/components/Table"
 import Button from "@/app/components/Button"
 
 const Text = styled.div`
@@ -52,6 +52,34 @@ function StakeAssets () {
       duration: '1M',
       score: '123,123',
       maturity: '26 Mar 2024',
+    },
+    {
+      token: 'QLP',
+      amount: '123,123.00',
+      duration: '1M',
+      score: '123,123',
+      maturity: '26 Mar 2024',
+    },
+    {
+      token: 'QLP',
+      amount: '123,123.00',
+      duration: '1M',
+      score: '123,123',
+      maturity: '26 Mar 2024',
+    },
+    {
+      token: 'QLP',
+      amount: '123,123.00',
+      duration: '1M',
+      score: '123,123',
+      maturity: '26 Mar 2024',
+    },
+    {
+      token: 'QLP',
+      amount: '123,123.00',
+      duration: '1M',
+      score: '123,123',
+      maturity: '26 Mar 2024',
     }
   ]
 
@@ -59,6 +87,7 @@ function StakeAssets () {
     {
       title: 'Token',
       dataKey: 'token',
+      primary: true,
     },
     {
       title: 'Amount',
@@ -89,6 +118,7 @@ function StakeAssets () {
       <Table
         data={data}
         columns={columns}
+        bodyCellHeight={35}
       />
   )
 }
@@ -111,6 +141,7 @@ function UnstakedAssets () {
     {
       title: 'Token',
       dataKey: 'token',
+      primary: true,
     },
     {
       title: 'Amount',
@@ -137,7 +168,7 @@ function UnstakedAssets () {
       title: 'Action',
       render: () => {
         return (
-          <Button secondary padding="5px 24px">Claim</Button>
+          <Button secondary padding="5px 24px">Unstake</Button>
         )
       }
     }
@@ -146,6 +177,7 @@ function UnstakedAssets () {
       <Table
         data={data}
         columns={columns}
+        bodyCellHeight={35}
       />
   )
 }

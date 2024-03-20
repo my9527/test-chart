@@ -5,6 +5,8 @@ import FlexBox from '@/app/components/FlexBox'
 import { TwoTabs } from "@/app/components/TwoTabs";
 import YourReferral from "./YourReferral";
 import SubReferral from "./SubReferral";
+import { Sidebar } from "../Sidebar";
+import { RankDetail } from "./RankDetail";
 
 
 const Wrapper = styled.div`
@@ -13,43 +15,15 @@ const Wrapper = styled.div`
   border-radius: 8px;
   display: flex;
   flex-direction: column;
+  position: relative;
 `
 
-const InnerWrapper = styled.div`
-  display: flex;
-  flex-direction: column;
-  width: 1400px;
-  margin: 0 auto;
-`
 
-const Title = styled.h2`
-  font-size: 30px;
-  color: ${(props) => props.theme.colors.text1};
-  margin-bottom: 28px;
-`
-
-const Label = styled.label`
-  font-size: ${props => props.theme.fontSize.medium};
-  color: ${(props) => props.theme.colors.text4};
-`
-
-const Value = styled.div`
-  font-size: ${props => props.theme.fontSize.medium};
-  color: ${(props) => props.theme.colors.text1};
-`
-
-const MainContent = styled.div`
-  display: grid;
-  grid-template-columns: 330px 330px 1fr;
-  grid-template-rows: 200px 290px;
-  grid-tempate-areas: 
-    "claimable-rebate referral-code referral-details"
-    "your-referral your-referral referral-details"
-`
-
-const token = 'QLP'
 const Referral: FC = () => {
   const [tab, setTab] = useState('SR')
+
+  // ranking detail visibility
+  const [visible, setVisible] = useState(false)
   return (
     <Wrapper>
       <TwoTabs 
@@ -70,9 +44,13 @@ const Referral: FC = () => {
         tab === 'SR' ? (
           <SubReferral /> 
         ) : (
-          <YourReferral  />
+          <YourReferral onClickRankDetail={() => setVisible(true)} />
         )
       }
+      <RankDetail
+        visible={visible}
+        onHide={() => setVisible(false)}
+      />
     </Wrapper>
   )
 };

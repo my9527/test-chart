@@ -1,4 +1,4 @@
-import { useCallback } from "react"
+import { useCallback, useState } from "react"
 import styled from "styled-components"
 
 const Wrapper = styled.div`
@@ -12,7 +12,8 @@ const FlexBox = styled.div`
   gap: 10px;
 `
 const Item = styled.div<{ active: boolean }>`
-  padding: 9px 32.5px;
+  line-height: 32px;
+  padding: 0 26px;
   background: ${props => props.active ? props.theme.colors.primary2 : props.theme.colors.fill3 };
   border-radius: 30px;
   color: ${props => props.active ? props.theme.colors.primary : props.theme.colors.text4};
@@ -58,44 +59,57 @@ const Suffix = styled.span`
 `
 
 const durationOptions = [
-  { label: "1M", value: '30' },
-  { label: "3M", value: '90' },
-  { label: "6M", value: '180' },
-  { label: "1Y", value: '365' },
+  { label: "30D", value: '30' },
+  { label: "90D", value: '90' },
+  { label: "180D", value: '180' },
+  { label: "360D", value: '360' },
 ]
 
 interface IDurationProps {
   value: string
   onChange: (value: string) => void
 }
+
+const minCustomDuration = 30
+const maxCustomDuration = 360
+
 const Duration = ({ value, onChange }: IDurationProps) => {
+  const [customDuration, setCustomDuration] = useState('')
+  const [quickSelect, setQuickSelect] = useState('')
+
   const handleQuickSelect = (v: string) => () => {
+    setQuickSelect(v)
     onChange && onChange(v)
   }
 
   const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const input = event.target.value;
-    
+    setQuickSelect('')
     const numericValue = input.replace(/[^0-9]/g, '');
     //filter non-numeric input
     if (numericValue !== input) {
       event.preventDefault();
     }
-    onChange(numericValue);
+    setCustomDuration((Math.min(maxCustomDuration, +numericValue)).toString());
   }
+
+  const handleInputBlur = () => {
+    onChange && onChange(`${Math.max(minCustomDuration, +customDuration)}`);
+  }
+
   return (
     <Wrapper>
       <FlexBox>
         {
           durationOptions.map((item) => {
             return (
-              <Item active={value === item.value} key={item.value} onClick={handleQuickSelect(item.value)}>{item.label}</Item>
+              <Item active={item.value === quickSelect} key={item.value} onClick={handleQuickSelect(item.value)}>{item.label}</Item>
             )
           })
         }
       </FlexBox>
       <InputWrapper>
-        <Input placeholder="Customize" value={value} onChange={handleInputChange} />
+        <Input placeholder="Customize" value={customDuration} onBlur={handleInputBlur} onChange={handleInputChange} />
         <DisplayInput>
           <Suffix>{ +value > 1 ? 'Days' : 'Day' }</Suffix>
         </DisplayInput>
