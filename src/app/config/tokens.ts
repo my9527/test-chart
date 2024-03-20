@@ -37,6 +37,13 @@ export type Token = {
   deposit?: boolean;
   withdraw?: boolean;
   disabled?: boolean;
+  tradeable?: boolean;
+  onChain?: boolean;
+  optionConfig?: {
+    minimalOpenSize?: string,
+    priceTickSize?: string | number,
+  };
+  withdrawDecimal?: number;
 
   perpConfig?: {
     longToken: string;
@@ -93,6 +100,22 @@ const extendToken = (token_: Token): Token => {
 
 
 
+export const USDTokensSymbols = ['USDX'];
+
+export const WithdrawableSymbols = ['USDX', 'HPX', 'HLP'];
+
+export const DepositableSymbols = ['USDX', 'WUSDC', 'HPX', 'HLP'];
+
+export const ProjectSymbols = ['HPX', 'HLP'];
+
+export const ExchangeStableTokens = ['USDX'];
+
+export const StableToken = ['WUSDC'];
+
+export const NativeToken = ['USDC'];
+
+export const OnChainTokens = ['xHPX'];
+
 
 
 // 基础配置，不直接使用
@@ -105,9 +128,7 @@ const baseTokens: Record<string, Token[]> = {
       // coinType: 1,
       displayDecimal: 2,
       address: addressMap[CHAINS_ID.zkfair].USDAddress,
-      // favoriate: false,
       tag: [],
-      // type: 'ERC20',
       exchangeStable: true,
       withdraw: true,
       deposit: true,
@@ -122,7 +143,124 @@ const baseTokens: Record<string, Token[]> = {
       "priceTickSize": 0,
       "fundingFeeBaseRate": 0,
       "fundingFeeLinearRate": 0,
-      "maxliquidityLockRatio": 0
+      "maxliquidityLockRatio": 0,
+      "tradeable": false,
+    },
+    {
+      symbolName: 'HPX',      
+      decimal: 18,
+      disabled: false,
+      displayDecimal: 2,
+      address: addressMap[CHAINS_ID.zkfair].SEXAddress,
+      tag: [],
+      deposit: true,
+      withdraw: true,
+      "futureLongId": 10000000_2, // 这里设置一个很大的数，避免被重复使用
+      "futureShortId": 10000000_2,
+      "pars": 0,
+      "maxProfitRatio": 1,
+      "maxLeverage": 1,
+      "borrowingFeeRatio": 0,
+      "maintainMarginRatio": 0,
+      "fundingFeeRatio": 0,
+      "priceTickSize": 0,
+      "fundingFeeBaseRate": 0,
+      "fundingFeeLinearRate": 0,
+      "maxliquidityLockRatio": 0,
+      "tradeable": false,
+    },
+    {
+      symbolName: 'HLP',      
+      decimal: 18,
+      disabled: false,
+      displayDecimal: 2,
+      address: addressMap[CHAINS_ID.zkfair].SLPAddress,
+      tag: [],
+      deposit: true,
+      withdraw: true,
+      "futureLongId": 10000000_3, // 这里设置一个很大的数，避免被重复使用
+      "futureShortId": 10000000_3,
+      "pars": 0,
+      "maxProfitRatio": 1,
+      "maxLeverage": 1,
+      "borrowingFeeRatio": 0,
+      "maintainMarginRatio": 0,
+      "fundingFeeRatio": 0,
+      "priceTickSize": 0,
+      "fundingFeeBaseRate": 0,
+      "fundingFeeLinearRate": 0,
+      "maxliquidityLockRatio": 0,
+      "tradeable": false,
+    },
+    {
+      symbolName: 'WUSDC',      
+      decimal: 18,
+      disabled: false,
+      displayDecimal: 2,
+      address: addressMap[CHAINS_ID.zkfair].USDCAddress,
+      tag: [],
+      deposit: true,
+      stable: true,
+      "futureLongId": 10000000_4, // 这里设置一个很大的数，避免被重复使用
+      "futureShortId": 10000000_4,
+      "pars": 0,
+      "maxProfitRatio": 1,
+      "maxLeverage": 1,
+      "borrowingFeeRatio": 0,
+      "maintainMarginRatio": 0,
+      "fundingFeeRatio": 0,
+      "priceTickSize": 0,
+      "fundingFeeBaseRate": 0,
+      "fundingFeeLinearRate": 0,
+      "maxliquidityLockRatio": 0,
+      "tradeable": false,
+      withdrawDecimal: 6,
+    },
+    {
+      symbolName: 'USDC',      
+      decimal: 18,
+      disabled: false,
+      displayDecimal: 2,
+      tag: [],
+      "futureLongId": 10000000_5, // 这里设置一个很大的数，避免被重复使用
+      "futureShortId": 10000000_5,
+      "pars": 0,
+      "maxProfitRatio": 1,
+      "maxLeverage": 1,
+      "borrowingFeeRatio": 0,
+      "maintainMarginRatio": 0,
+      "fundingFeeRatio": 0,
+      "priceTickSize": 0,
+      "fundingFeeBaseRate": 0,
+      "fundingFeeLinearRate": 0,
+      "maxliquidityLockRatio": 0,
+      "tradeable": false,
+      native: true,
+     
+    },
+    {
+      symbolName: 'xHPX',      
+      decimal: 18,
+      disabled: false,
+      displayDecimal: 2,
+      tag: [],
+      address: addressMap[CHAINS_ID.zkfair].xHPX,
+      "futureLongId": 10000000_6, // 这里设置一个很大的数，避免被重复使用
+      "futureShortId": 10000000_6,
+      "pars": 0,
+      "maxProfitRatio": 1,
+      "maxLeverage": 1,
+      "borrowingFeeRatio": 0,
+      "maintainMarginRatio": 0,
+      "fundingFeeRatio": 0,
+      "priceTickSize": 0,
+      "fundingFeeBaseRate": 0,
+      "fundingFeeLinearRate": 0,
+      "maxliquidityLockRatio": 0,
+      "tradeable": false,
+      deposit: false,
+      withdraw: false,
+      onChain: true,
     },
     {
       "symbolName": "AAVE",
@@ -311,7 +449,11 @@ const baseTokens: Record<string, Token[]> = {
       "priceTickSize": 0.01,
       "fundingFeeBaseRate": 0.0008,
       "fundingFeeLinearRate": 0.08,
-      "maxliquidityLockRatio": 1
+      "maxliquidityLockRatio": 1,
+      optionConfig: {
+        minimalOpenSize: '1 Contract',
+        priceTickSize: '0.01',
+      },
     },
     {
       "symbolName": "COMP",
@@ -416,7 +558,11 @@ const baseTokens: Record<string, Token[]> = {
       "priceTickSize": 0.01,
       "fundingFeeBaseRate": 0.0008,
       "fundingFeeLinearRate": 0.08,
-      "maxliquidityLockRatio": 1
+      "maxliquidityLockRatio": 1,
+      optionConfig: {
+        minimalOpenSize: '1 Contract',
+        priceTickSize: '0.01',
+      },
     },
     {
       "symbolName": "FTM",
@@ -1837,9 +1983,7 @@ const baseTokens: Record<string, Token[]> = {
       // coinType: 1,
       displayDecimal: 2,
       address: addressMap[CHAINS_ID.zkfairtest].USDAddress,
-      // favoriate: false,
       tag: [],
-      // type: 'ERC20',
       exchangeStable: true,
       withdraw: true,
       deposit: true,
@@ -1854,7 +1998,124 @@ const baseTokens: Record<string, Token[]> = {
       "priceTickSize": 0,
       "fundingFeeBaseRate": 0,
       "fundingFeeLinearRate": 0,
-      "maxliquidityLockRatio": 0
+      "maxliquidityLockRatio": 0,
+      "tradeable": false,
+    },
+    {
+      symbolName: 'HPX',      
+      decimal: 18,
+      disabled: false,
+      displayDecimal: 2,
+      address: addressMap[CHAINS_ID.zkfairtest].SEXAddress,
+      tag: [],
+      deposit: true,
+      withdraw: true,
+      "futureLongId": 10000000_2, // 这里设置一个很大的数，避免被重复使用
+      "futureShortId": 10000000_2,
+      "pars": 0,
+      "maxProfitRatio": 1,
+      "maxLeverage": 1,
+      "borrowingFeeRatio": 0,
+      "maintainMarginRatio": 0,
+      "fundingFeeRatio": 0,
+      "priceTickSize": 0,
+      "fundingFeeBaseRate": 0,
+      "fundingFeeLinearRate": 0,
+      "maxliquidityLockRatio": 0,
+      "tradeable": false,
+    },
+    {
+      symbolName: 'HLP',      
+      decimal: 18,
+      disabled: false,
+      displayDecimal: 2,
+      address: addressMap[CHAINS_ID.zkfairtest].SLPAddress,
+      tag: [],
+      deposit: true,
+      withdraw: true,
+      "futureLongId": 10000000_3, // 这里设置一个很大的数，避免被重复使用
+      "futureShortId": 10000000_3,
+      "pars": 0,
+      "maxProfitRatio": 1,
+      "maxLeverage": 1,
+      "borrowingFeeRatio": 0,
+      "maintainMarginRatio": 0,
+      "fundingFeeRatio": 0,
+      "priceTickSize": 0,
+      "fundingFeeBaseRate": 0,
+      "fundingFeeLinearRate": 0,
+      "maxliquidityLockRatio": 0,
+      "tradeable": false,
+    },
+    {
+      symbolName: 'WUSDC',      
+      decimal: 18,
+      disabled: false,
+      displayDecimal: 2,
+      address: addressMap[CHAINS_ID.zkfairtest].USDCAddress,
+      tag: [],
+      deposit: true,
+      stable: true,
+      "futureLongId": 10000000_4, // 这里设置一个很大的数，避免被重复使用
+      "futureShortId": 10000000_4,
+      "pars": 0,
+      "maxProfitRatio": 1,
+      "maxLeverage": 1,
+      "borrowingFeeRatio": 0,
+      "maintainMarginRatio": 0,
+      "fundingFeeRatio": 0,
+      "priceTickSize": 0,
+      "fundingFeeBaseRate": 0,
+      "fundingFeeLinearRate": 0,
+      "maxliquidityLockRatio": 0,
+      "tradeable": false,
+      withdrawDecimal: 6,
+    },
+    {
+      symbolName: 'USDC',      
+      decimal: 18,
+      disabled: false,
+      displayDecimal: 2,
+      tag: [],
+      "futureLongId": 10000000_5, // 这里设置一个很大的数，避免被重复使用
+      "futureShortId": 10000000_5,
+      "pars": 0,
+      "maxProfitRatio": 1,
+      "maxLeverage": 1,
+      "borrowingFeeRatio": 0,
+      "maintainMarginRatio": 0,
+      "fundingFeeRatio": 0,
+      "priceTickSize": 0,
+      "fundingFeeBaseRate": 0,
+      "fundingFeeLinearRate": 0,
+      "maxliquidityLockRatio": 0,
+      "tradeable": false,
+      native: true,
+     
+    },
+    {
+      symbolName: 'xHPX',      
+      decimal: 18,
+      disabled: false,
+      displayDecimal: 2,
+      tag: [],
+      address: addressMap[CHAINS_ID.zkfairtest].xHPX,
+      "futureLongId": 10000000_6, // 这里设置一个很大的数，避免被重复使用
+      "futureShortId": 10000000_6,
+      "pars": 0,
+      "maxProfitRatio": 1,
+      "maxLeverage": 1,
+      "borrowingFeeRatio": 0,
+      "maintainMarginRatio": 0,
+      "fundingFeeRatio": 0,
+      "priceTickSize": 0,
+      "fundingFeeBaseRate": 0,
+      "fundingFeeLinearRate": 0,
+      "maxliquidityLockRatio": 0,
+      "tradeable": false,
+      deposit: false,
+      withdraw: false,
+      onChain: true,
     },
     {
       "symbolName": "AAVE",

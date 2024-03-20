@@ -2,7 +2,7 @@ import { FC, memo, useCallback, useEffect, useRef } from "react";
 
 import { MarketSocket } from "./socket";
 import { SOCKET_MSG_TYPE } from "../../constant";
-import { useRecoilState } from "recoil";
+import { useRecoilState, useSetRecoilState } from "recoil";
 import { recoilMarkets } from "../../models/market";
 import { useAppConfig } from "@/app/hooks/useAppConfig";
 import { useParams } from "next/navigation";
@@ -29,7 +29,8 @@ export const CmptMarketSocket: FC = memo(() => {
     const routeParams = useParams<{ symbol: string }>();
     const lastSymbol = useRef<string | null>(null);
 
-    const [, updateIndexPrices] = useRecoilState(recoilIndexPrices);
+    // const [, updateIndexPrices] = useRecoilState(recoilIndexPrices);
+    const updateIndexPrices = useSetRecoilState(recoilIndexPrices);
 
     const appConfig = useAppConfig();
 

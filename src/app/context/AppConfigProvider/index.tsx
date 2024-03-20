@@ -27,7 +27,9 @@ export type AppConfigType = {
   };
 
     executionFee: string | number | BigNumber;
-    contract_address: typeof addressMap[CHAINS_ID.zkfair];
+    contract_address: {
+      [key in keyof typeof addressMap[CHAINS_ID.zkfair]]: `0x${string}`
+    };
     epoch_duration: number; // 每个epoch 的周期 ， h 为单位
 
 }
