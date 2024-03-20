@@ -1,6 +1,6 @@
 import { motion } from "framer-motion"
 import styled from "styled-components"
-import Button from "../Button"
+import Button from "@/app/components/Button"
 
 const FlexBox = styled.div<{ justify?: string }>`
   display: flex;
@@ -45,15 +45,15 @@ const TextField = styled.input`
 
 const DisplayInput = styled.div`
   background-color: ${props => props.theme.colors.fill3};
-  padding: 10px 16px;
+  padding: 8px 16px;
   border-radius: 8px;
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 8px;
   border: 1px solid transparent;
   ${TextField}:focus + &&,
   ${Wrapper}:hover > && {
-    border-color: ${props => props.theme.colors.primary1};}
+    border-color: ${props => props.theme.colors.primary1};
   }
   transition: border-color 0.2s ease-in-out;
 `
@@ -95,7 +95,7 @@ function BalanceInput ({ title, balance, currency, action, value, onChange }: II
           </FlexBox>
         </FlexBox>
         <FlexBox justify="flex-end">
-          { action ? <Button primary padding="2px 14px" onClick={action.onClick}>{action.text}</Button> : null }
+          { action ? <Button primary padding="2px 18px" onClick={action.onClick}>{action.text}</Button> : null }
           <Currency>{currency}</Currency>
         </FlexBox>
       </DisplayInput>

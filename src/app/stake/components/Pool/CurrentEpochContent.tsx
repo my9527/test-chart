@@ -1,5 +1,5 @@
 import { motion } from "framer-motion"
-import styled from "styled-components"
+import styled, { css } from "styled-components"
 
 const Fields = styled.div`
   display: flex;
@@ -10,7 +10,7 @@ const Fields = styled.div`
 const FieldColumn = styled.div`
   display: flex;
   flex-direction: column;
-  gap: 26px;
+  gap: 20px;
 `
 
 const FieldItem = styled.div`
@@ -44,9 +44,13 @@ const FieldAnimateItem = styled.div`
   }
 `
 
-const FieldLabel= styled.div`
+const FieldLabel= styled.div<{ width?: number }>`
   color: ${props => props.theme.colors.text4};
   font-size: ${props => props.theme.fontSize.small};
+  white-space: nowrap;
+  ${props => props.width && css`
+    width: ${props.width}px;
+  `}
 `
 
 const FieldTime = styled.div`
@@ -115,7 +119,7 @@ export function CurrentEpochContent () {
           {
             epochFieldsLeft.map(field => (
               <FieldItem key={field.key}>
-                <FieldLabel>{field.label}</FieldLabel>
+                <FieldLabel width={39}>{field.label}</FieldLabel>
                 <FieldTime>{field.value}</FieldTime>
               </FieldItem>
             ))
@@ -126,7 +130,7 @@ export function CurrentEpochContent () {
           {
             epochFieldsMiddle.map(field => (
               <FieldAnimateItem key={field.key}>
-                <FieldLabel className="label">{field.label}</FieldLabel>
+                <FieldLabel width={53} className="label">{field.label}</FieldLabel>
                 <FieldValue className="value">{field.value}</FieldValue>
               </FieldAnimateItem>
             ))
@@ -137,7 +141,7 @@ export function CurrentEpochContent () {
           {
             epochFieldsRight.map(field => (
               <FieldAnimateItem key={field.key}>
-                <FieldLabel className="label">{field.label}</FieldLabel>
+                <FieldLabel width={95} className="label">{field.label}</FieldLabel>
                 <FieldValue className="value">{field.value}</FieldValue>
               </FieldAnimateItem>
             ))

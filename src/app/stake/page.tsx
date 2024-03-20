@@ -30,7 +30,7 @@ const Title = styled.h2`
 
 const token = 'QLP'
 const Stake: FC = () => {
-  const [tab, setTab] = useState(StakeTabType.Staking as string)
+  const [tab, setTab] = useState(StakeTabType.Pool as string)
 
   return (
     <Wrapper>

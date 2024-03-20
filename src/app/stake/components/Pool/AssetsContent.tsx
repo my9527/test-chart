@@ -1,13 +1,14 @@
-import styled from "styled-components"
+import styled, { css } from "styled-components"
 
 const Title = styled.h2`
   font-size: ${props => props.theme.fontSize.header2};
   color: ${props => props.theme.colors.text1};
   margin-bottom: 10px;
 `
-const FieldFlex = styled.div`
+const FieldFlex = styled.div<{ pr?: number }>`
   display: flex;
   justify-content: space-between;
+  ${props => props.pr && css`padding-right: ${props.pr}px;`}
 `
 
 const FieldBox = styled.div`
@@ -19,7 +20,7 @@ const FieldBox = styled.div`
 const FieldLabel = styled.div`
   font-size: ${props => props.theme.fontSize.small};
   color: ${props => props.theme.colors.text4};
-  line-height: 20px;
+  line-height: 14px;
 `
 
 const FieldValue = styled.div`
@@ -34,6 +35,7 @@ const Button = styled.div`
   padding: 0 14px;
   background: ${props => props.theme.colors.fill3};
   border-radius: 99px;
+  min-width: 60px;
   &:hover {
     background: ${props => props.theme.colors.primary1};
     color: ${props => props.theme.colors.text1};
@@ -71,7 +73,7 @@ export function AssetsContent() {
             <Button>Claim</Button>
           </Actions>
         </FieldFlex>
-        <FieldFlex>
+        <FieldFlex pr={80}>
           <FieldLabel>{`Returned ${token}`}</FieldLabel>
           <FieldValue>0</FieldValue>
         </FieldFlex>
