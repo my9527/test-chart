@@ -23,11 +23,15 @@ const FlexBox = styled.div`
   border-bottom: 1px solid ${(props) => props.theme.colors.border1};
 `
 
+const Forms = styled.div`
+  border-top: 1px solid ${(props) => props.theme.colors.border1};
+`
+
 const SubReferral: FC = () => {
 
   return (
     <Wrapper>
-      <div>
+      <Forms>
         <FlexBox>
           <Label>SR ratio:</Label>
           <Label>5%</Label>
@@ -44,7 +48,7 @@ const SubReferral: FC = () => {
           <Label>SR active friends:</Label>
           <Label>1,234</Label>
         </FlexBox>
-      </div>
+      </Forms>
       <Label>Expiration date  2024/03/07</Label>
     </Wrapper>
   )

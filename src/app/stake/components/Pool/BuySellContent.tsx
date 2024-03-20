@@ -4,7 +4,7 @@ import styled from "styled-components"
 import ArrowDownIcon from "@/app/assets/stake/arrow-down.svg"
 import Image from "next/image"
 import { TwoTabs } from "@/app/components/TwoTabs"
-import BalanceInput from "@/app/components/BalanceInput"
+import BalanceInput from "../BalanceInput"
 import Button from '@/app/components/LinearGradientButton'
 import FlexBox from '@/app/components/FlexBox'
 
@@ -14,8 +14,10 @@ enum TradeType {
 }
 
 const ImageWrapper = styled.div`
-  margin: 10px 0;
+  margin: 10px auto;
   text-align: center;
+  width: 40px;
+  height: 40px;
 `
 
 const Content = styled.div`
@@ -37,7 +39,7 @@ const Form = styled.div`
   display: flex;
   flex-direction: column;
   gap: 12px;
-  margin: 20px 0;
+  margin: 18px 0;
 `
 
 const token = 'QLP'
@@ -94,7 +96,7 @@ export function BuySellContent() {
             <Value>123,123.00</Value>
           </FlexBox>
         </Form>
-        <FlexBox><Button>{type === TradeType.Sell ? 'Sell' : 'Buy'}</Button></FlexBox>
+        <FlexBox justify="center"><Button>{type === TradeType.Sell ? 'Sell' : 'Buy'}</Button></FlexBox>
       </Content>
     </>
   )

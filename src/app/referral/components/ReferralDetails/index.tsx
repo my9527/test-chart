@@ -5,7 +5,7 @@ import FlexBox from '@/app/components/FlexBox'
 import Tabs from "@/app/components/Tabs";
 import SRDetails from "./SRDetails";
 import Details from "./Details";
-import { SearchInput } from "./SearchInput";
+import { SearchInput } from "../SearchInput";
 
 
 const Wrapper = styled.div`
@@ -14,6 +14,9 @@ const Wrapper = styled.div`
   border-radius: 8px;
   padding: 0 20px;
   position: relative;
+  &:hover {
+    box-shadow: 0px 0px 20px 0px rgba(124, 103, 255, 0.25);
+  }
 `
 const Title = styled.h2`
   font-size: ${props => props.theme.fontSize.header2};

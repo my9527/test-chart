@@ -1,13 +1,8 @@
-import styled from "styled-components";
-import Table from "../Table";
+import styled, { useTheme } from "styled-components";
+import Table from "@/app/components/Table";
 
-
-const PrimaryText = styled.div`
-  font-size: ${props => props.theme.fontSize.medium};
-  color: ${props => props.theme.colors.primary1};
-`
 const Details = () => {
-
+  const theme = useTheme()
   const data = [
     {
       account: '0x12·····1234',
@@ -24,7 +19,7 @@ const Details = () => {
     {
       dataKey: 'rebate',
       title: "Contributed rebate",
-      render: (row: {[key: string]: any}) => <PrimaryText>{row.rebate}</PrimaryText>
+      primary: true,
     },
     {
       dataKey: 'volume',
@@ -33,10 +28,12 @@ const Details = () => {
     {
       dataKey: 'date',
       title: "Invitation date",
+      align: 'right',
+      secondary: true,
     },
   ]
   return (
-    <Table data={data} columns={columns} />
+    <Table hasThBorder hasTdBorder data={data} columns={columns} />
   )
 }
 

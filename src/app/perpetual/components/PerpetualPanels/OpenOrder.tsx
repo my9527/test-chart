@@ -2,14 +2,10 @@
 import styled from "styled-components";
 import Price from "./Price";
 import CurrencySelect from "@/app/components/CurrencySelect";
-import Button from "../Button";
 import Slider from "../Slider";
-import LongIcon from "@/app/assets/perpetual/long.svg";
-import ShortIcon from "@/app/assets/perpetual/short.svg";
 import { useEffect, useState, useRef, useMemo } from "react";
 import Input from "@/app/components/Input";
 import CheckBox from "@/app/components/CheckBox";
-import Image from "next/image";
 import { verifyValidNumber } from "@/app/utils/tools";
 import {
   filterPrecision,
@@ -21,6 +17,9 @@ import { useRecoilValue } from "recoil";
 import BigNumber from "bignumber.js";
 import { Token } from "@/app/config/tokens";
 import Btns from "./Btns";
+import Modal from "@/app/components/Modal";
+import OrderConfirm from "./OrderConfirm";
+import { ParamsProps } from "./OrderConfirm";
 
 const Layout = styled.div`
   display: flex;
@@ -267,6 +266,18 @@ const OpenOrder: React.FC<{
     localStorage.getItem("slippage") ?? "0.5"
   );
 
+  const [visible, setVisible] = useState(false);
+
+  const onClose = () => {
+    setVisible(false);
+  };
+  const onConfirm = () => {
+    setVisible(false);
+  };
+  const onCancel = () => {
+    setVisible(false);
+  };
+
   const longAvailableTokenForFutureResults = useMemo(() => {
     const long = currentTokenAvailableLiq?.longReadable || "0";
 
@@ -392,39 +403,35 @@ const OpenOrder: React.FC<{
       }
     }
   }, [inputAmount, isInput, curCurrency, price]);
-
-  const formatPrice = (
-    value: string,
-    setFun: Function,
-    originValue: string | number
-  ) => {
-    const reg = /^\d+(\.\d+)?$/;
-    const len = value.length;
-
-    if (!value) {
-      setFun(undefined);
-      return;
+  const [confirmedParams, setConfirmedParams] = useState<
+    ParamsProps | undefined
+  >();
+  const handleOpen = (type: string) => {
+    let _amount = amount;
+    if (curCurrency === "USD") {
+      const decimal = getExponent(
+        Number(curToken?.perpConfig?.contractSize) || 1
+      );
+      _amount = filterPrecision(+amount / +price, decimal);
     }
-    if (
-      reg.test(value) ||
-      (value[len - 1] === "." && !value.substring(0, len - 1)?.includes("."))
-    ) {
-      setFun(value);
-    } else {
-      console.log("in");
-      setFun(originValue);
-    }
-  };
-  const handleOpen = (type) => {
     const params = {
+      symbolName,
       price,
       margin,
-      amount,
+      amount: _amount,
       longStopPrice,
       shortStopPrice,
-      type,
+      futureType: type,
+      orderType: activeOrderTab,
+      slippage,
+      fees: filterPrecision(
+        BigNumber(+price * +_amount * 0.0008).toString(),
+        curToken?.displayDecimal
+      ),
     };
     console.log("handleOpen", params);
+    setConfirmedParams(params);
+    setVisible(true);
   };
   return (
     <>
@@ -563,7 +570,8 @@ const OpenOrder: React.FC<{
                 type={
                   longStopPrice &&
                   price &&
-                  (+longStopPrice > +price * (curToken?.maxProfitRatio + 1) ||
+                  (+longStopPrice >
+                    +price * ((curToken?.maxProfitRatio || 0) + 1) ||
                     +longStopPrice < +price)
                     ? "warn"
                     : "normal"
@@ -631,8 +639,8 @@ const OpenOrder: React.FC<{
 
               if (value && verifyValidNumber(value, 2)) return;
 
-              if (+value / 100 > curToken?.maxLeverage) {
-                setSlippage(curToken?.maxLeverage * 100 + "");
+              if (+value / 100 > (curToken?.maxLeverage as number)) {
+                setSlippage((curToken?.maxLeverage as number) * 100 + "");
                 return;
               }
               setSlippage(value);
@@ -663,26 +671,16 @@ const OpenOrder: React.FC<{
         shortBtnText="SHORT"
         showIcon={true}
       />
-      {/* <Btns>
-        <Button
-          type="long"
-          btnText="LONG"
-          onClick={() => {
-            handleOpen && handleOpen("long");
-          }}
-        >
-          <Image src={LongIcon} alt="" width={25} height={18} />
-        </Button>
-        <Button
-          type="short"
-          btnText="SHORT"
-          onClick={() => {
-            handleOpen && handleOpen("short");
-          }}
-        >
-          <Image src={ShortIcon} alt="" width={25} height={18} />
-        </Button>
-      </Btns> */}
+      <Modal
+        height={500}
+        onClose={onClose}
+        visible={visible}
+        title="Open Position"
+        onConfirm={onConfirm}
+        onCancel={onCancel}
+      >
+        {confirmedParams && <OrderConfirm params={confirmedParams} actionType='open'/>}
+      </Modal>
     </>
   );
 };

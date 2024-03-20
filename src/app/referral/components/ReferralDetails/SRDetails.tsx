@@ -1,11 +1,7 @@
 import styled from "styled-components";
-import Table from "../Table";
-import { Row } from "@/app/components/Row";
+import Table from "@/app/components/Table";
 
-const PrimaryText = styled.div`
-  font-size: ${props => props.theme.fontSize.medium};
-  color: ${props => props.theme.colors.primary1};
-`
+
 const SRDetails = () => {
 
   const data = [
@@ -25,7 +21,7 @@ const SRDetails = () => {
     {
       dataKey: 'rebate',
       title: "SR friends' rebate",
-      render: (row: {[key: string]: any}) => <PrimaryText>{row.rebate}</PrimaryText>
+      primary: true,
     },
     {
       dataKey: 'volume',
@@ -38,6 +34,7 @@ const SRDetails = () => {
     {
       dataKey: 'active',
       title: "Active friends",
+      secondary: true,
     }
   ]
   return (
