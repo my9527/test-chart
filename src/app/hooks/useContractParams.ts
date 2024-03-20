@@ -139,6 +139,10 @@ export const useContractParams = (address: string) => {
             [config.contract_address.stSLPAddress]: {
                 address: config.contract_address.stSLPAddress,
                 abi: StakeSlpContractAbi,
+            },
+            [config.contract_address.ExchangeManagerImplementationAddress] : {
+                address: config.contract_address.ExchangeManagerImplementationAddress,
+                abi: ExchangeContractAbi
             }
             
         } as Record<`0x${string}`, ContractParamType>

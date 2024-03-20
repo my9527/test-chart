@@ -337,7 +337,7 @@ export const OpenInterestsEffects: FC = memo(() => {
 
     const { run, cancel } = useRequest(callFns, {
         manual: true,
-        pollingInterval: 15 * 1000,
+        pollingInterval: 150_000,
         // refreshDeps: [callFns]
     });
 
