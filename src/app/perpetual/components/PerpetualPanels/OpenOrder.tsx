@@ -502,7 +502,8 @@ const OpenOrder: React.FC<{
     console.log("handleOpen", params);
     setConfirmedParams(params);
     const show = localStorage.getItem("showAgain_open");
-    if (show === "true") {
+
+    if (!show || show === "true") {
       setVisible(true);
     }
   };
