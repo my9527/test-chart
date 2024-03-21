@@ -3,7 +3,7 @@ import Footer from "../components/Footer";
 import styled from "styled-components";
 
 import { CmptMarketSocket } from "../components/SocketMarket";
-import { OpenInterestsEffects } from "../components/OpenInterestsEffects";
+import { PerpetualEffects } from "../components/Effects";
 import { useParams } from "next/navigation";
 import { useEffect } from "react";
 import { useSetRecoilState } from "recoil";
@@ -52,7 +52,7 @@ const PerpetualLayout = ({ children }: { children: React.ReactNode }) => {
   return (
     <Wrapper>
       <CmptMarketSocket />
-      <OpenInterestsEffects />
+      <PerpetualEffects />
       <Content>{children}</Content>
       <Footer />
     </Wrapper>

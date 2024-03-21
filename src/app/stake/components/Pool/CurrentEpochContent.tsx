@@ -1,4 +1,4 @@
-import { useEpoch } from "@/app/config/useEpoch"
+import { useEpoch } from "@/app/hooks/useEpoch"
 import { motion } from "framer-motion"
 import styled, { css } from "styled-components"
 import { useEpochEffect } from "../../effects/EpochEffect"
