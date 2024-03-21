@@ -90,22 +90,11 @@ const Layout = styled.div`
   }
   input {
     color: ${(props) => props.theme.colors.text1};
+    background: ${(props) => props.theme.colors.fill3}!important;
+    border: none !important;
   }
 `;
-const OrderPrice = styled.div`
-  .title {
-    color: ${(props) => props.theme.colors.text1};
-    font-family: Arial;
-    font-size: 14px;
-    font-style: normal;
-    font-weight: 700;
-    line-height: 100%;
-    margin-bottom: 5px;
-  }
-  input {
-    color: ${(props) => props.theme.colors.text1};
-  }
-`;
+
 const Select = styled(CurrencySelect)``;
 
 const StyledSlider = styled.div`
@@ -129,8 +118,11 @@ export type ParamsProps = {
   price: string;
   pnl?: string;
 };
-const CloseOrder: React.FC<{ params: ParamsProps }> = ({ params }) => {
-  const [visible, setVisible] = useState(true);
+const CloseOrder: React.FC<{ params: ParamsProps; isVisible: boolean }> = ({
+  params,
+  isVisible = false,
+}) => {
+  const [visible, setVisible] = useState(isVisible);
   const futureTypeMap: TypeMap = { long: "Long", short: "Short" };
   const [price, setPrice] = useState<string>("");
   const [curType, setCurType] = useState<string>("limit");
@@ -182,7 +174,7 @@ const CloseOrder: React.FC<{ params: ParamsProps }> = ({ params }) => {
   const amountDecimal = useMemo(() => {
     return getExponent(Number(curToken?.perpConfig?.contractSize) || 1);
   }, [curToken]);
-  console.log("curtoken", curToken);
+
   return (
     <Modal
       height={600}
