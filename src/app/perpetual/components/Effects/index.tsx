@@ -1,6 +1,6 @@
 
 
-import { FeesEffects } from "./FeesEffects";
+import { DepthAndBorrowingRateEffect } from "./DepthAndBorrowingRateEffects";
 import { OpenInterestsEffects } from "./OpenInterersEffect";
 
 
@@ -9,7 +9,7 @@ export const PerpetualEffects = () => {
 
     return (
         <>
-            <FeesEffects />
+            <DepthAndBorrowingRateEffect />
             <OpenInterestsEffects />
         </>
     );

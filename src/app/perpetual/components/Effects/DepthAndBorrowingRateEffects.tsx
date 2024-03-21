@@ -3,6 +3,8 @@ import useCurToken from "../../hooks/useCurToken";
 import { useRequest } from "ahooks";
 import { request } from "@/app/lib/request";
 import BigNumber from "bignumber.js";
+import { useSetRecoilState } from "recoil";
+import { recoilDepthAndBorrowingRate } from "../../models/market";
 
 
 // export const getSubstanceDepth = async ({ symbol }: { symbol: string }) => {
@@ -52,9 +54,11 @@ import BigNumber from "bignumber.js";
 //     // return { config, buyPriceImpactDepth, sellPriceImpactDepth };
 //   };
 
-export const FeesEffects = () => {
+export const DepthAndBorrowingRateEffect = () => {
 
     const curToken = useCurToken();
+
+    const updateDepthAndBorrowingRate = useSetRecoilState(recoilDepthAndBorrowingRate);
 
 
     const tokenRef = useRef(curToken);
@@ -71,7 +75,7 @@ export const FeesEffects = () => {
             const sellPriceImpactDepth = BigNumber(result.data?.data?.ask_total_volume || 0).toString();
 
             return {
-                originData: result.data.data,
+                origin: result.data.data,
                 buyPriceImpactDepth,
                 sellPriceImpactDepth,
             }
@@ -105,10 +109,15 @@ export const FeesEffects = () => {
         async function _run() {
 
             if(!tokenRef.current) return;
-            return Promise.all([
+            const [depth, borrowingRate] = await Promise.all([
                 getMarketDepth(),
                 getBorrowingRate()
             ]);
+
+            updateDepthAndBorrowingRate({
+                depth,
+                borrowingRate,
+            });
 
         }
 

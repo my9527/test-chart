@@ -21,6 +21,8 @@ import Modal from "@/app/components/Modal";
 import OrderConfirm from "./OrderConfirm";
 import { ParamsProps } from "./OrderConfirm";
 import { useExchangeBalance } from "@/app/hooks/useBalance";
+import { usePriceImpactK } from "../../hooks/usePriceImpactK";
+import { usePriceImpactDepth } from "../../hooks/usePriceImpactDepth";
 
 const Layout = styled.div`
   display: flex;
@@ -447,6 +449,22 @@ const OpenOrder: React.FC<{
     return _amount;
   }, [amount, curCurrency, curToken]);
 
+  const priceImpactK = usePriceImpactK(curToken.symbolName);
+
+  const { buyPriceImpactDepth } = usePriceImpactDepth();
+
+  const priceImpactFee = useMemo(() => {
+    return BigNumber(BigNumber(margin).multipliedBy(leverage) || '0')
+      .exponentiatedBy(2)
+      .div(
+        BigNumber(priceImpactK)
+          // .multipliedBy(1 / 100)
+          .multipliedBy(buyPriceImpactDepth),
+      )
+      .multipliedBy(1)
+      .toString();
+  }, [margin, priceImpactK, leverage, buyPriceImpactDepth]);
+
   const handleOpen = (type: string) => {
     setLongStopPriceInputType("normal");
     setShortStopPriceInputType("normal");
@@ -491,7 +509,7 @@ const OpenOrder: React.FC<{
       BigNumber(_amount).multipliedBy(0.0008).multipliedBy(price).toString(),
       curToken?.displayDecimal
     );
-    const impactFee = "0";
+    // const impactFee = priceImpactFee;
 
     const params = {
       symbolName,
@@ -504,8 +522,8 @@ const OpenOrder: React.FC<{
       orderType: activeOrderTab,
       slippage,
       tradeFee,
-      impactFee,
-      fees: tradeFee + impactFee,
+      impactFee: priceImpactFee,
+      fees: BigNumber(tradeFee).plus(priceImpactFee).toString(),
     };
     console.log("handleOpen", params);
     setConfirmedParams(params);
