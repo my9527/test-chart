@@ -1,7 +1,7 @@
 import { useEpoch } from "@/app/config/useEpoch"
 import { motion } from "framer-motion"
 import styled, { css } from "styled-components"
-import { useEpochEffect } from "../../effects/EpochEffect"
+import { useEpochEndTime } from '../../hooks/useEpochEndTime'
 
 const Fields = styled.div`
   display: flex;
@@ -78,18 +78,18 @@ const Divider = styled.div`
 const token = 'QLP'
 export function CurrentEpochContent () {
   const epoch = useEpoch()
-  const res = useEpochEffect()
+  const { epochEndTime } = useEpochEndTime()
 
   const epochFieldsLeft = [
     {
       key: 'start-in',
       label: "Start in",
-      value: "2024-2-26 00:00",
+      value: epochEndTime.startTime,
     },
     {
       key: 'end-in',
       label: "End in",
-      value: "2024-2-26 00:00",
+      value: epochEndTime.endTime,
     }
   ]
   const epochFieldsMiddle = [

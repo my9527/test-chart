@@ -255,3 +255,13 @@ export const recoilBalanceAndPool = atom<any>({
   
   }
 })
+
+
+export const recoilLpEpochEndTime = atom<any>({
+  key: 'lpEpochEndTime',
+  default: {
+    timestamp: NaN,
+    format: '-',
+    startTime: '-',
+  },
+});
