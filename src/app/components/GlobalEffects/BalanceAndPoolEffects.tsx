@@ -301,6 +301,8 @@ export const BalanceAndPoolEffects = () => {
                 }
             }, {});
 
+            console.log("exchangeBalance", exchangeBalance);
+
             updateBalancePool({
                 walletBalance,
                 exchangeBalance,

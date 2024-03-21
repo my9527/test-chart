@@ -71,3 +71,15 @@ export const filterThousands = (
   );
   return +result === 0 ? '0' : result;
 };
+
+export const uniqArrWithObjParams = (arr: any[], key: any) => {
+  return arr.reduce((prev: any[], cur: any) => {
+    let ids = prev.map((obj) => obj[key]);
+    if (!ids.includes(cur[key])) {
+      return [...prev, cur];
+    } else {
+      return prev;
+    }
+  }, []);
+};
+

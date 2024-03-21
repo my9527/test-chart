@@ -247,11 +247,68 @@ export const recoilPerpetualToken = atom<string>({
 
 
 
-export const recoilBalanceAndPool = atom<any>({
+type WalletBalanceType = {
+  balance?: string;
+  balanceReadable: string
+}
+
+type BalanceAndPoolType= {
+  walletBalance: Record<string, WalletBalanceType>;
+  exchangeBalance: Record<string, WalletBalanceType>;
+  epoch: string | number | undefined;
+  stableTokenPrice: Record<`0x${string}`, {
+    deposit: {
+      balance: string | number;
+      balanceReadable: string | number;
+    };
+    withdraw: {
+      balance: string | number;
+      balanceReadable: string | number;
+    };
+    poolBalance: {
+      balance: string | number;
+      balanceReadable: string | number;
+    },
+  }>;
+
+  availableLp: {
+    futureLong: string;
+    futureShort: string;
+    option: string;
+    futureTotalUsdAvailableReadable: string;
+    totalUsdAvailableReadable: string;
+  }
+}
+
+
+export const recoilBalanceAndPool = atom<BalanceAndPoolType>({
   key: 'balance_pool',
   default: {
+    walletBalance: {
+      balanceReadable: '0',
+    },
+    exchangeBalance: {
+      balanceReadable: '0',
+    },
     epoch: '',
-    walletBalance: {},
+    availableLp: {
+      futureLong: '0',
+      futureShort: '0',
+      option: '0',
+      futureTotalUsdAvailableReadable: '0',
+      totalUsdAvailableReadable: '0',
+    },
+    stableTokenPrice: {},
   
   }
 })
+
+
+export const recoilLpEpochEndTime = atom<any>({
+  key: 'lpEpochEndTime',
+  default: {
+    timestamp: NaN,
+    format: '-',
+    startTime: '-',
+  },
+});

@@ -20,6 +20,7 @@ import Btns from "./Btns";
 import Modal from "@/app/components/Modal";
 import OrderConfirm from "./OrderConfirm";
 import { ParamsProps } from "./OrderConfirm";
+import { useExchangeBalance } from "@/app/hooks/useBalance";
 
 const Layout = styled.div`
   display: flex;
@@ -366,7 +367,11 @@ const OpenOrder: React.FC<{
 
   const [inputAmount, setInputAmount] = useState<string>("");
   const [marginPercent, setMarginPercent] = useState<number>(0);
-  const fundsAvailable = 2000.66;
+
+  const exchangeBalance = useExchangeBalance();
+  
+
+  const fundsAvailable = exchangeBalance['USDX']?.balanceReadable || '0' as string;
   const [isInput, setIsInput] = useState(false);
 
   const amountDecimal = useMemo(() => {
@@ -396,7 +401,10 @@ const OpenOrder: React.FC<{
   }, [margin, leverage, curCurrency, price, isInput, curToken, amountDecimal]);
 
   useEffect(() => {
-    const arr = (+margin / fundsAvailable + "").split(".");
+    if(!+fundsAvailable) {
+      return;
+    }
+    const arr = (+margin / +fundsAvailable + "").split(".");
     const per = +(arr[0] + "." + (arr[1] ? arr[1].substring(0, 4) : "00"));
     setMarginPercent(+per > 1 ? 1 : +per);
   }, [margin, fundsAvailable]);
@@ -480,7 +488,7 @@ const OpenOrder: React.FC<{
     }
 
     const tradeFee = filterPrecision(
-      BigNumber(+price * +_amount * 0.0008).toString(),
+      BigNumber(_amount).multipliedBy(0.0008).multipliedBy(price).toString(),
       curToken?.displayDecimal
     );
     const impactFee = "0";
@@ -525,7 +533,7 @@ const OpenOrder: React.FC<{
           </div>
           <Input
             type={
-              (margin && +margin > fundsAvailable) || +margin < 0
+              (margin && BigNumber(margin).gt(fundsAvailable)) || +margin < 0
                 ? "warn"
                 : "normal"
             }
@@ -579,7 +587,7 @@ const OpenOrder: React.FC<{
         onChange={(value) => {
           setMargin(
             filterPrecision(
-              (value / 100) * fundsAvailable,
+              BigNumber(value).multipliedBy(fundsAvailable).div(100).toString(),
               curToken?.displayDecimal
             )
           );
@@ -617,7 +625,7 @@ const OpenOrder: React.FC<{
       <Data>
         <DataItem className="item">
           <p className="label">Funds Available</p>
-          <p className="value">{fundsAvailable} USD</p>
+          <p className="value">{filterThousands(fundsAvailable, 2)} USD</p>
         </DataItem>
         <DataItem className="item">
           <p className="label">Max Long</p>
