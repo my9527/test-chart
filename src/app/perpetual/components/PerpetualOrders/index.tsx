@@ -10,6 +10,8 @@ import { NotAuthed } from "@/app/components/NotAuthed";
 import { LimitMarketOrderList } from "./LimitOrders";
 import { StopOrderList } from "./StopOrder";
 import CloseOrder from "./CloseOrder";
+import AdjustMargin from "./AdjustMargin";
+
 const Wrapper = styled.div`
   position: relative;
   width: 100%;
@@ -51,7 +53,7 @@ const PerpetualOrders = () => {
           {listType === ListType.STOP && <StopOrderList />}
         </NotAuthed>
       </Content>
-      <CloseOrder
+      {/* <CloseOrder
         params={{
           amount: "10",
           symbolName: "ARB",
@@ -61,6 +63,16 @@ const PerpetualOrders = () => {
           fees: "233",
           tradeFee: "2323",
           impactFee: "2323",
+        }}
+      /> */}
+      <AdjustMargin
+        isVisible={true}
+        params={{
+          symbolName: "ARB",
+          futureType: "long",
+          margin: "233",
+          leverage: 5,
+          fundsAvailable: "3434",
         }}
       />
     </Wrapper>
