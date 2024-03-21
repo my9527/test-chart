@@ -122,6 +122,7 @@ export const CreateNewCode = ({
             value={ratio}
             marks={marks}
             unit="%"
+            per={50}
           />
         </SliderWrapper>
       </Ration>

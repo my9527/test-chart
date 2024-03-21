@@ -2,8 +2,16 @@
 import { FC, useState } from "react";
 import styled from "styled-components";
 import Tabs from "@/app/components/Tabs";
-import PoolContent from "./components/Pool";
-import StakingContent from "./components/Staking";
+import dynamic from "next/dynamic";
+// import PoolContent from "./components/Pool";
+// import StakingContent from "./components/Staking";
+
+const PoolContent = dynamic(() => import("./components/Pool"), {
+  ssr: false,
+});
+const StakingContent = dynamic(() => import("./components/Staking"), {
+  ssr: false,
+});
 
 enum StakeTabType {
   Pool = 'pool',
