@@ -148,9 +148,12 @@ const OrderConfirm: React.FC<{ params: ParamsProps; actionType: string }> = ({
     limit: "Limit Open",
     market: "Market Open",
   };
-  const [showAgain, setShowAgain] = useState(false);
+  const [showAgain, setShowAgain] = useState(true);
   useEffect(() => {
-    localStorage.setItem("showAgain", showAgain ? "true" : "false");
+    localStorage.setItem(
+      `showAgain_${actionType}`,
+      showAgain ? "true" : "false"
+    );
   }, [showAgain]);
   return (
     <Wrapper>

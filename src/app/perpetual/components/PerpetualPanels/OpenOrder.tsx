@@ -250,6 +250,7 @@ const DefaultBtn = styled.div`
   font-style: normal;
   font-weight: 400;
   line-height: 100%;
+  padding: 13px 0;
 `;
 const OpenOrder: React.FC<{
   activeOrderTab: string;
@@ -508,7 +509,10 @@ const OpenOrder: React.FC<{
     };
     console.log("handleOpen", params);
     setConfirmedParams(params);
-    setVisible(true);
+    const show = localStorage.getItem("showAgain_open");
+    if (show === "true") {
+      setVisible(true);
+    }
   };
 
   return (

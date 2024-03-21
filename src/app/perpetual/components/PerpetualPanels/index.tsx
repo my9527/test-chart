@@ -172,6 +172,7 @@ const PerpetualPanels = () => {
         <ScrollWrapper>
           {activeTab === "close" ? (
             <CloseOrder
+              entryPrice={8}
               curToken={curToken}
               leverage={confirmedLeverage}
               activeOrderTab={activeOrderTab}
