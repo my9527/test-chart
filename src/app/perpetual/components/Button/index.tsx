@@ -25,7 +25,7 @@ const Wrapper = styled.div<Props>`
   .title {
     color: ${(props) => props.theme.colors.text1};
     font-family: Arial;
-    font-size: ${(props) => props.theme.fontSize.reguar};
+    font-size: ${(props) => props.theme.fontSize.medium};
     font-style: normal;
     font-weight: 700;
     line-height: 100%; /* 16px */

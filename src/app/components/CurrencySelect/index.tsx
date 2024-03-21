@@ -13,6 +13,7 @@ const Wrapper = styled.div`
     height: 41px;
     padding-right: 8px;
     .label {
+      text-transform: capitalize;
       color: ${(props) => props.theme.colors.text1};
       font-family: Arial;
       font-size: ${(props) => props.theme.fontSize.medium};
@@ -74,7 +75,7 @@ const CurrencySelect: React.FC<{
     <Wrapper className={className}>
       <div className="cur_currency" onClick={() => setShowList(!showList)}>
         <p className="label">{curCurrency}</p>
-        <Image src={ArrowIcon} width={10} height={5} alt="" />
+        {showSelect && <Image src={ArrowIcon} width={10} height={5} alt="" />}
       </div>
       {showList && showSelect && (
         <div className="currency_list">
@@ -82,7 +83,11 @@ const CurrencySelect: React.FC<{
             return (
               <div
                 key={item}
-                className={`item ${curCurrency === item ? "active" : ""}`}
+                className={`item ${
+                  curCurrency.toLocaleLowerCase() === item.toLocaleLowerCase()
+                    ? "active"
+                    : ""
+                }`}
                 onClick={() => {
                   handleClick && handleClick(item);
                   setShowList(false);
