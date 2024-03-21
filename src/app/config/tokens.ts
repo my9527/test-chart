@@ -2,7 +2,11 @@ import BigNumber from "bignumber.js";
 import { BasicTradingFeeRatio, CHAINS_ID } from "./common";
 import addressMap from "./contract_address";
 
+import TokensSortedAndTags from "./token-tags.json";
 
+
+
+type TokensSortedAndTagsType = Record<string, { tag: string[], index:number }>
 
 
 export type Token = {
@@ -87,6 +91,7 @@ const extendToken = (token_: Token): Token => {
     fundingFeeBaseRate,
     fundingFeeLinearRate,
     maxliquidityLockRatio,
+    tag: (TokensSortedAndTags as TokensSortedAndTagsType)[token_.symbolName].tag,
     perpConfig: {
       longToken: 'USDX',
       shortToken: 'USDX',
@@ -7111,7 +7116,11 @@ const baseTokens: Record<string, Token[]> = {
 export const tokens: Record<string, Token[]> = Object.keys(baseTokens).reduce((result, cur) => {
   return {
     ...result,
-    [cur]: baseTokens[cur].map(tk => extendToken(tk))
+    [cur]: baseTokens[cur].map(tk => extendToken(tk)).sort((a, b) => {
+      const indexA = TokensSortedAndTags[(a.symbolName.toUpperCase()) as keyof typeof TokensSortedAndTags].index;
+      const indexB = TokensSortedAndTags[(b.symbolName.toUpperCase()) as keyof typeof TokensSortedAndTags].index;
+      return indexB - indexA;
+    })
   }
 }, {});
 

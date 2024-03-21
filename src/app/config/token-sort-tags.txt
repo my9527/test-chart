@@ -1,0 +1,84 @@
+ZKF	Layer 2
+ORDI	BRC-20,BTC Eco.,Hot
+1MSATS	BRC-20,Hot
+1MRATS	BRC-20,Meme,Hot
+ETHFI	 Restaking,New
+BOME	Meme,New
+SLERF	Meme,New
+ETH	Public Chain,Web3.0,Hot
+BTC	Public Chain,PoW,Hot
+ARB	Layer2,ARB Eco.,Hot
+GALA	GameFi,New
+FET	AI,Metaverse,New
+METIS	Layer2,New
+1000PEPE	Meme
+1000FLOKI	Meme
+WIF	Meme
+CKB	Public Chain,PoW
+RNDR	VR,Depin
+IOTX	Depin
+PIXEL	GameFi
+STRK	Layer2
+KAS	PoW
+JUP	DeFi,Solana Eco.
+ZETA	Public Chain
+RON	DeFi
+ALT	RaaS,LSD
+API3	Defi,Oracle
+UMA	RWA,Oracle
+MANTA	Layer 2
+LDO	LSD,DeFi
+SSV	LSD
+MAGIC	GameFi, ARB Eco.
+XAI	Layer 3, GameFi
+ENS	DID,NFT
+GMT	GameFi,Web3.0
+PEOPLE	Meme
+CAKE	BSC
+MOVR	Dot Eco.
+TRX	Public Chain
+SEI	Public Chain
+SUI	Public Chain
+APT	Public Chain
+ACE	GameFi,Web3.0
+WLD	Web3.0
+ICP	Public Chain,Web3.0
+1MBONK	Meme
+JTO	LSD
+INJ	Public Chian
+BIGTIME	GameFi
+RUNE	Defi,BTC Eco.
+STX	BTC Eco.
+TOKEN	Meme
+1000LUNC	Defi
+FTT	Option Token
+USTC	Stable Coin
+FLIP	Defi
+PYTH	Defi
+VRTX	ARB Eco.
+BLUR	NFT
+TIA	Public Chain
+BEAM	GameFi
+AAVE	Defi,RWA
+ADA	Public Chain
+APE	Metaverse,NFT
+ATOM	Public Chain,Cross Chain
+AVAX	Public Chain
+AXS	Metaverse,GameFi
+BNB	Public Chain,Option Token
+COMP	Defi,RWA
+CRV	Defi
+DOGE	Meme,PoW
+DOT	Public Chain,Web3.0
+FTM	Public Chain
+GMX	Layer2,ARB Eco.
+LINK	Defi,Oracle
+MATIC	Layer2
+MKR	Defi,RWA
+NEAR	Layer2,Public Chain
+OP	Layer2
+RDNT	Defi
+SNX	Defi,RWA
+SOL	Public Chain,Hot
+UNI	Defi,Option Token
+XRP	Public Chain,Pay
