@@ -91,7 +91,7 @@ const extendToken = (token_: Token): Token => {
     fundingFeeBaseRate,
     fundingFeeLinearRate,
     maxliquidityLockRatio,
-    tag: (TokensSortedAndTags as TokensSortedAndTagsType)[token_.symbolName].tag,
+    tag: (TokensSortedAndTags as TokensSortedAndTagsType)[token_.symbolName]?.tag || [],
     perpConfig: {
       longToken: 'USDX',
       shortToken: 'USDX',
@@ -7117,8 +7117,8 @@ export const tokens: Record<string, Token[]> = Object.keys(baseTokens).reduce((r
   return {
     ...result,
     [cur]: baseTokens[cur].map(tk => extendToken(tk)).sort((a, b) => {
-      const indexA = TokensSortedAndTags[(a.symbolName.toUpperCase()) as keyof typeof TokensSortedAndTags].index;
-      const indexB = TokensSortedAndTags[(b.symbolName.toUpperCase()) as keyof typeof TokensSortedAndTags].index;
+      const indexA = TokensSortedAndTags[(a.symbolName.toUpperCase()) as keyof typeof TokensSortedAndTags]?.index;
+      const indexB = TokensSortedAndTags[(b.symbolName.toUpperCase()) as keyof typeof TokensSortedAndTags]?.index;
       return indexB - indexA;
     })
   }
