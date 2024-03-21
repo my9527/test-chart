@@ -28,10 +28,8 @@ export const LPEffects: FC = memo(() => {
         async function _run() {
             
             const LPCalls = [{
-                address: LiqulityContractParams.address as `0x${string}`,
+                ...LiqulityContractParams,
                 functionName: 'poolAmount',
-                chainId: LiqulityContractParams.chainId,
-                abi: LiqulityContractParams.abi as AbiItem[],
                 args: [],
             }, {
                 address: LiqulityContractParams.address as `0x${string}`,
@@ -40,7 +38,6 @@ export const LPEffects: FC = memo(() => {
                 abi: LiqulityContractParams.abi as AbiItem[],
                 args: [],
             }];
-
 
             const [LPResults] = await multicallFn(client as Client, [
                 LPCalls,

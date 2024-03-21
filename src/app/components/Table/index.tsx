@@ -1,7 +1,7 @@
 import { useMemo } from "react"
 import styled, { css } from "styled-components"
 
-type TCellProps = { width: string, borderColor: string, height: number, align?: string, primary?: boolean, fontSize?: string, hasBorder?: boolean, secondary?: boolean };
+type TCellProps = { width: string, borderColor?: string, height: number, align?: string, primary?: boolean, fontSize?: string, hasBorder?: boolean, secondary?: boolean };
 
 const TableWrapper = styled.table`
   width: 100%;
@@ -99,7 +99,17 @@ function Table ({
           {
             columns.map((column, index) => {
               return (
-                <TableHeaderCell secondary={column.secondary} hasBorder={hasThBorder} fontSize={headerFontSize} primary={column.headerPrimary} align={column.align} height={headerCellHeight} borderColor={headerBorderColor} width={column.width || defaultColumnWidth} key={index}>
+                <TableHeaderCell 
+                  secondary={column.secondary} 
+                  hasBorder={hasThBorder} 
+                  fontSize={headerFontSize} 
+                  primary={column.headerPrimary} 
+                  align={column.align} 
+                  height={headerCellHeight} 
+                  borderColor={headerBorderColor} 
+                  width={column.width || defaultColumnWidth} 
+                  key={index}
+                >
                   {column.title}
                 </TableHeaderCell>
               )

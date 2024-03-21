@@ -1,0 +1,554 @@
+{
+  "ZKF": {
+    "tag": [
+      "Layer 2"
+    ],
+    "index": 0
+  },
+  "ORDI": {
+    "tag": [
+      "BRC-20",
+      "BTC Eco.",
+      "Hot"
+    ],
+    "index": 1
+  },
+  "1MSATS": {
+    "tag": [
+      "BRC-20",
+      "Hot"
+    ],
+    "index": 2
+  },
+  "1MRATS": {
+    "tag": [
+      "BRC-20",
+      "Meme",
+      "Hot"
+    ],
+    "index": 3
+  },
+  "ETHFI": {
+    "tag": [
+      " Restaking",
+      "New"
+    ],
+    "index": 4
+  },
+  "BOME": {
+    "tag": [
+      "Meme",
+      "New"
+    ],
+    "index": 5
+  },
+  "SLERF": {
+    "tag": [
+      "Meme",
+      "New"
+    ],
+    "index": 6
+  },
+  "ETH": {
+    "tag": [
+      "Public Chain",
+      "Web3.0",
+      "Hot"
+    ],
+    "index": 7
+  },
+  "BTC": {
+    "tag": [
+      "Public Chain",
+      "PoW",
+      "Hot"
+    ],
+    "index": 8
+  },
+  "ARB": {
+    "tag": [
+      "Layer2",
+      "ARB Eco.",
+      "Hot"
+    ],
+    "index": 9
+  },
+  "GALA": {
+    "tag": [
+      "GameFi",
+      "New"
+    ],
+    "index": 10
+  },
+  "FET": {
+    "tag": [
+      "AI",
+      "Metaverse",
+      "New"
+    ],
+    "index": 11
+  },
+  "METIS": {
+    "tag": [
+      "Layer2",
+      "New"
+    ],
+    "index": 12
+  },
+  "1000PEPE": {
+    "tag": [
+      "Meme"
+    ],
+    "index": 13
+  },
+  "1000FLOKI": {
+    "tag": [
+      "Meme"
+    ],
+    "index": 14
+  },
+  "WIF": {
+    "tag": [
+      "Meme"
+    ],
+    "index": 15
+  },
+  "CKB": {
+    "tag": [
+      "Public Chain",
+      "PoW"
+    ],
+    "index": 16
+  },
+  "RNDR": {
+    "tag": [
+      "VR",
+      "Depin"
+    ],
+    "index": 17
+  },
+  "IOTX": {
+    "tag": [
+      "Depin"
+    ],
+    "index": 18
+  },
+  "PIXEL": {
+    "tag": [
+      "GameFi"
+    ],
+    "index": 19
+  },
+  "STRK": {
+    "tag": [
+      "Layer2"
+    ],
+    "index": 20
+  },
+  "KAS": {
+    "tag": [
+      "PoW"
+    ],
+    "index": 21
+  },
+  "JUP": {
+    "tag": [
+      "DeFi",
+      "Solana Eco."
+    ],
+    "index": 22
+  },
+  "ZETA": {
+    "tag": [
+      "Public Chain"
+    ],
+    "index": 23
+  },
+  "RON": {
+    "tag": [
+      "DeFi"
+    ],
+    "index": 24
+  },
+  "ALT": {
+    "tag": [
+      "RaaS",
+      "LSD"
+    ],
+    "index": 25
+  },
+  "API3": {
+    "tag": [
+      "Defi",
+      "Oracle"
+    ],
+    "index": 26
+  },
+  "UMA": {
+    "tag": [
+      "RWA",
+      "Oracle"
+    ],
+    "index": 27
+  },
+  "MANTA": {
+    "tag": [
+      "Layer 2"
+    ],
+    "index": 28
+  },
+  "LDO": {
+    "tag": [
+      "LSD",
+      "DeFi"
+    ],
+    "index": 29
+  },
+  "SSV": {
+    "tag": [
+      "LSD"
+    ],
+    "index": 30
+  },
+  "MAGIC": {
+    "tag": [
+      "GameFi",
+      " ARB Eco."
+    ],
+    "index": 31
+  },
+  "XAI": {
+    "tag": [
+      "Layer 3",
+      " GameFi"
+    ],
+    "index": 32
+  },
+  "ENS": {
+    "tag": [
+      "DID",
+      "NFT"
+    ],
+    "index": 33
+  },
+  "GMT": {
+    "tag": [
+      "GameFi",
+      "Web3.0"
+    ],
+    "index": 34
+  },
+  "PEOPLE": {
+    "tag": [
+      "Meme"
+    ],
+    "index": 35
+  },
+  "CAKE": {
+    "tag": [
+      "BSC"
+    ],
+    "index": 36
+  },
+  "MOVR": {
+    "tag": [
+      "Dot Eco."
+    ],
+    "index": 37
+  },
+  "TRX": {
+    "tag": [
+      "Public Chain"
+    ],
+    "index": 38
+  },
+  "SEI": {
+    "tag": [
+      "Public Chain"
+    ],
+    "index": 39
+  },
+  "SUI": {
+    "tag": [
+      "Public Chain"
+    ],
+    "index": 40
+  },
+  "APT": {
+    "tag": [
+      "Public Chain"
+    ],
+    "index": 41
+  },
+  "ACE": {
+    "tag": [
+      "GameFi",
+      "Web3.0"
+    ],
+    "index": 42
+  },
+  "WLD": {
+    "tag": [
+      "Web3.0"
+    ],
+    "index": 43
+  },
+  "ICP": {
+    "tag": [
+      "Public Chain",
+      "Web3.0"
+    ],
+    "index": 44
+  },
+  "1MBONK": {
+    "tag": [
+      "Meme"
+    ],
+    "index": 45
+  },
+  "JTO": {
+    "tag": [
+      "LSD"
+    ],
+    "index": 46
+  },
+  "INJ": {
+    "tag": [
+      "Public Chian"
+    ],
+    "index": 47
+  },
+  "BIGTIME": {
+    "tag": [
+      "GameFi"
+    ],
+    "index": 48
+  },
+  "RUNE": {
+    "tag": [
+      "Defi",
+      "BTC Eco."
+    ],
+    "index": 49
+  },
+  "STX": {
+    "tag": [
+      "BTC Eco."
+    ],
+    "index": 50
+  },
+  "TOKEN": {
+    "tag": [
+      "Meme"
+    ],
+    "index": 51
+  },
+  "1000LUNC": {
+    "tag": [
+      "Defi"
+    ],
+    "index": 52
+  },
+  "FTT": {
+    "tag": [
+      "Option Token"
+    ],
+    "index": 53
+  },
+  "USTC": {
+    "tag": [
+      "Stable Coin"
+    ],
+    "index": 54
+  },
+  "FLIP": {
+    "tag": [
+      "Defi"
+    ],
+    "index": 55
+  },
+  "PYTH": {
+    "tag": [
+      "Defi"
+    ],
+    "index": 56
+  },
+  "VRTX": {
+    "tag": [
+      "ARB Eco."
+    ],
+    "index": 57
+  },
+  "BLUR": {
+    "tag": [
+      "NFT"
+    ],
+    "index": 58
+  },
+  "TIA": {
+    "tag": [
+      "Public Chain"
+    ],
+    "index": 59
+  },
+  "BEAM": {
+    "tag": [
+      "GameFi"
+    ],
+    "index": 60
+  },
+  "AAVE": {
+    "tag": [
+      "Defi",
+      "RWA"
+    ],
+    "index": 61
+  },
+  "ADA": {
+    "tag": [
+      "Public Chain"
+    ],
+    "index": 62
+  },
+  "APE": {
+    "tag": [
+      "Metaverse",
+      "NFT"
+    ],
+    "index": 63
+  },
+  "ATOM": {
+    "tag": [
+      "Public Chain",
+      "Cross Chain"
+    ],
+    "index": 64
+  },
+  "AVAX": {
+    "tag": [
+      "Public Chain"
+    ],
+    "index": 65
+  },
+  "AXS": {
+    "tag": [
+      "Metaverse",
+      "GameFi"
+    ],
+    "index": 66
+  },
+  "BNB": {
+    "tag": [
+      "Public Chain",
+      "Option Token"
+    ],
+    "index": 67
+  },
+  "COMP": {
+    "tag": [
+      "Defi",
+      "RWA"
+    ],
+    "index": 68
+  },
+  "CRV": {
+    "tag": [
+      "Defi"
+    ],
+    "index": 69
+  },
+  "DOGE": {
+    "tag": [
+      "Meme",
+      "PoW"
+    ],
+    "index": 70
+  },
+  "DOT": {
+    "tag": [
+      "Public Chain",
+      "Web3.0"
+    ],
+    "index": 71
+  },
+  "FTM": {
+    "tag": [
+      "Public Chain"
+    ],
+    "index": 72
+  },
+  "GMX": {
+    "tag": [
+      "Layer2",
+      "ARB Eco."
+    ],
+    "index": 73
+  },
+  "LINK": {
+    "tag": [
+      "Defi",
+      "Oracle"
+    ],
+    "index": 74
+  },
+  "MATIC": {
+    "tag": [
+      "Layer2"
+    ],
+    "index": 75
+  },
+  "MKR": {
+    "tag": [
+      "Defi",
+      "RWA"
+    ],
+    "index": 76
+  },
+  "NEAR": {
+    "tag": [
+      "Layer2",
+      "Public Chain"
+    ],
+    "index": 77
+  },
+  "OP": {
+    "tag": [
+      "Layer2"
+    ],
+    "index": 78
+  },
+  "RDNT": {
+    "tag": [
+      "Defi"
+    ],
+    "index": 79
+  },
+  "SNX": {
+    "tag": [
+      "Defi",
+      "RWA"
+    ],
+    "index": 80
+  },
+  "SOL": {
+    "tag": [
+      "Public Chain",
+      "Hot"
+    ],
+    "index": 81
+  },
+  "UNI": {
+    "tag": [
+      "Defi",
+      "Option Token"
+    ],
+    "index": 82
+  },
+  "XRP": {
+    "tag": [
+      "Public Chain",
+      "Pay"
+    ],
+    "index": 83
+  }
+}
