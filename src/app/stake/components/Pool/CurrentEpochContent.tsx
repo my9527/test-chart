@@ -1,5 +1,7 @@
+import { useEpoch } from "@/app/config/useEpoch"
 import { motion } from "framer-motion"
 import styled, { css } from "styled-components"
+import { useEpochEffect } from "../../effects/EpochEffect"
 
 const Fields = styled.div`
   display: flex;
@@ -75,6 +77,9 @@ const Divider = styled.div`
 
 const token = 'QLP'
 export function CurrentEpochContent () {
+  const epoch = useEpoch()
+  const res = useEpochEffect()
+
   const epochFieldsLeft = [
     {
       key: 'start-in',
@@ -113,7 +118,7 @@ export function CurrentEpochContent () {
   ]
   return (
     <>
-      <EpochTitle>Current Epoch 100</EpochTitle>
+      <EpochTitle>Current Epoch {epoch}</EpochTitle>
       <Fields>
         <FieldColumn>
           {

@@ -13,6 +13,7 @@ import PerpetualDetail from "../components/PerpetualDetail";
 import "react-grid-layout/css/styles.css";
 import "react-resizable/css/styles.css";
 import { recoilPanelSide } from "@/app/models";
+import useCurToken from "../hooks/useCurToken";
 
 const ReactGridLayout = WidthProvider(RGL);
 
@@ -34,6 +35,7 @@ const LAYOUT_RIGHT_LIST: Layout[] = [
 
 const Perpetual: FC = () => {
   const panelSide = useRecoilValue(recoilPanelSide);
+  const { symbolName } = useCurToken();
 
   const [layout, setLayout] = useState<Layout[]>(
     panelSide === "left" ? LAYOUT_LEFT_LIST : LAYOUT_RIGHT_LIST
@@ -60,7 +62,7 @@ const Perpetual: FC = () => {
         isBounded
       >
         <div key="trades">
-          <PerpetualTrades />
+          <PerpetualTrades key={`trades_${symbolName}`} />
         </div>
 
         <div key="charts">
@@ -70,7 +72,7 @@ const Perpetual: FC = () => {
           <PerpetualOrders />
         </div>
         <div key="panels">
-          <PerpetualPanels />
+          <PerpetualPanels key={`panels_${symbolName}`} />
         </div>
         <div key="account">
           <Account />
