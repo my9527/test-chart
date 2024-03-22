@@ -122,7 +122,7 @@ export type ParamsProps = {
   futureType: string;
   margin: string;
   fundsAvailable: string;
-  leverage: number;
+  leverage: string;
 };
 const AdjustMargin: React.FC<{ params: ParamsProps; isVisible: boolean }> = ({
   isVisible = false,
@@ -226,7 +226,7 @@ const AdjustMargin: React.FC<{ params: ParamsProps; isVisible: boolean }> = ({
         </Layout>
         <MaxAmount>
           <p className="label">Max adjustment amount</p>
-          <p className="value">{params?.fundsAvailable}</p>
+          <p className="value">{params?.fundsAvailable} UDSX</p>
         </MaxAmount>
         <Slider
           onChange={(value) => {
@@ -269,7 +269,7 @@ const AdjustMargin: React.FC<{ params: ParamsProps; isVisible: boolean }> = ({
         <StyledOrderInfo>
           <div className="item">
             <p className="label">Leverage after adjust</p>
-            <p className="value">{}</p>
+            <p className="value">{}X</p>
           </div>
           <div className="item">
             <p className="label">Liq. price after adjust</p>

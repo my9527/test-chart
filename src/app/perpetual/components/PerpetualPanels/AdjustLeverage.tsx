@@ -5,7 +5,8 @@ import useCurToken from "../../hooks/useCurToken";
 import TokenImage from "@/app/components/TokenImage";
 import Input from "@/app/components/Input";
 import Slider from "../Slider";
-
+import { verifyValidNumber } from "@/app/utils/tools";
+import BigNumber from "bignumber.js";
 const Wrapper = styled.div`
   position: relative;
   width: 100%;
@@ -70,15 +71,15 @@ const Tips = styled.p`
   margin-top: 30px;
 `;
 const AdjustLeverage: React.FC<{
-  leverage: number;
+  leverage: string;
   max: number;
-  setLeverage: (value: number) => any;
+  setLeverage: (value: string) => any;
 }> = ({ leverage, setLeverage, max }) => {
   const { symbolName } = useCurToken();
   const [value, setValue] = useState<string>(leverage + "");
   const min = 1;
 
-  const [percent, setPercent] = useState<number>(0);
+  const [percent, setPercent] = useState<string>("0");
 
   const marks = useMemo(() => {
     const _step = (max - min + 1) / 4;
@@ -94,11 +95,18 @@ const AdjustLeverage: React.FC<{
   }, [min, max]);
 
   useEffect(() => {
-    setLeverage(+value);
-    if (+value < min) {
-      setPercent(0);
+    setLeverage(value);
+    if (BigNumber(value).lt(min)) {
+      setPercent("0");
     } else {
-      setPercent((+value - min) / (max - min));
+      setPercent(
+        value
+          ? BigNumber(value)
+              .minus(min)
+              .dividedBy(BigNumber(max).minus(min))
+              .toString()
+          : "0"
+      );
     }
   }, [value]);
 
@@ -115,31 +123,30 @@ const AdjustLeverage: React.FC<{
           placeholder="input amount"
           value={value}
           onBlur={() => {
-            if (+value < min) {
-              setValue(min + "");
+            if (BigNumber(value).lt(min)) {
+              setValue(value ? min + "" : "");
+            } else {
+              setValue(value ? BigNumber(value).toString() : "");
             }
           }}
           onChange={(e: React.FormEvent<HTMLInputElement>) => {
-            const reg = /^\+?[1-9][0-9]*$/;
-            const flag = reg.test(e?.currentTarget?.value);
+            const _value = e?.currentTarget.value;
 
-            if (!e?.currentTarget?.value) {
-              setValue("");
-              setPercent(0);
+            if (_value && verifyValidNumber(_value, 2)) {
               return;
             }
-            if (flag) {
-              if (+e?.currentTarget.value > max) {
-                setValue(max + "");
-              } else {
-                setValue(e?.currentTarget.value || "");
-              }
+
+            if (BigNumber(_value).gt(max)) {
+              setValue(_value ? max + "" : "");
+            } else {
+              setValue(_value || "");
             }
           }}
         />
       </LeverageRatio>
       <Slider
-        per={percent}
+        value={value}
+        per={+percent}
         onChange={(value) => {
           setValue(value + "");
         }}

@@ -257,7 +257,7 @@ const OpenOrder: React.FC<{
   margin: string;
   setMargin: Function;
   symbolName: string;
-  leverage: number;
+  leverage: string;
   curToken: Token;
 }> = ({
   activeOrderTab,
@@ -369,10 +369,11 @@ const OpenOrder: React.FC<{
   const [marginPercent, setMarginPercent] = useState<number>(0);
 
   const exchangeBalance = useExchangeBalance();
-  
 
-  const fundsAvailable = exchangeBalance['USDX']?.balanceReadable || '0' as string;
+  const fundsAvailable =
+    exchangeBalance["USDX"]?.balanceReadable || ("0" as string);
   const [isInput, setIsInput] = useState(false);
+  const [isMarginInput, setIsMarginInput] = useState(false);
 
   const amountDecimal = useMemo(() => {
     if (curCurrency === "USD") {
@@ -386,14 +387,23 @@ const OpenOrder: React.FC<{
     if (!isInput) {
       if (curCurrency === "USD") {
         setAmount(
-          +margin * leverage
-            ? filterPrecision(+margin * +leverage, amountDecimal)
+          margin && leverage
+            ? filterPrecision(
+                BigNumber(margin).multipliedBy(leverage).toString(),
+                amountDecimal
+              )
             : ""
         );
       } else {
         setAmount(
-          margin && price
-            ? filterPrecision((+margin * leverage) / +price, amountDecimal)
+          margin && price && leverage
+            ? filterPrecision(
+                BigNumber(margin)
+                  .multipliedBy(leverage)
+                  .dividedBy(price)
+                  .toString(),
+                amountDecimal
+              )
             : ""
         );
       }
@@ -401,13 +411,16 @@ const OpenOrder: React.FC<{
   }, [margin, leverage, curCurrency, price, isInput, curToken, amountDecimal]);
 
   useEffect(() => {
-    if(!+fundsAvailable) {
-      return;
-    }
-    const arr = (+margin / +fundsAvailable + "").split(".");
-    const per = +(arr[0] + "." + (arr[1] ? arr[1].substring(0, 4) : "00"));
-    setMarginPercent(+per > 1 ? 1 : +per);
-  }, [margin, fundsAvailable]);
+    !isMarginInput &&
+      curToken?.displayDecimal &&
+      marginPercent &&
+      setMargin(
+        filterPrecision(
+          BigNumber(marginPercent).multipliedBy(fundsAvailable).toString(),
+          curToken?.displayDecimal
+        )
+      );
+  }, [marginPercent, curToken, isMarginInput]);
 
   useEffect(() => {
     setInputAmount(amount);
@@ -417,12 +430,19 @@ const OpenOrder: React.FC<{
     if (isInput) {
       if (curCurrency === "USD") {
         setMargin(
-          filterPrecision(+amount / leverage, curToken?.displayDecimal) || ""
+          filterPrecision(
+            BigNumber(amount).dividedBy(leverage).toString(),
+            curToken?.displayDecimal
+          ) || ""
         );
       } else {
         setMargin(
           filterPrecision(
-            (+amount * +price) / leverage,
+            BigNumber(amount)
+              .multipliedBy(price)
+              .dividedBy(leverage)
+              .toString(),
+
             curToken?.displayDecimal
           ) || ""
         );
@@ -455,21 +475,30 @@ const OpenOrder: React.FC<{
       let longFlag = false,
         shortFlag = false;
       if (type === "long") {
+        const maxProfitPrice = BigNumber(price).multipliedBy(
+          (curToken?.maxProfitRatio || 0) + 1
+        );
         longFlag =
           !!longStopPrice &&
           !!price &&
-          (+longStopPrice > +price * ((curToken?.maxProfitRatio || 0) + 1) ||
-            +longStopPrice < +price);
+          (BigNumber(longStopPrice).gt(maxProfitPrice) ||
+            BigNumber(longStopPrice).lt(price));
 
-        shortFlag = !!shortStopPrice && !!price && +shortStopPrice > +price;
+        shortFlag =
+          !!shortStopPrice && !!price && BigNumber(shortStopPrice).gt(price);
       } else {
+        const maxProfitPrice = BigNumber(price).dividedBy(
+          (curToken?.maxProfitRatio || 0) + 1
+        );
+
         longFlag =
           !!longStopPrice &&
           !!price &&
-          (+longStopPrice < +price / ((curToken?.maxProfitRatio || 0) + 1) ||
-            +longStopPrice > +price);
+          (BigNumber(longStopPrice).lt(maxProfitPrice) ||
+            BigNumber(longStopPrice).gt(price));
 
-        shortFlag = !!shortStopPrice && !!price && +shortStopPrice < +price;
+        shortFlag =
+          !!shortStopPrice && !!price && BigNumber(shortStopPrice).lt(price);
       }
 
       setLongStopPriceInputType(longFlag ? "warn" : "normal");
@@ -484,7 +513,10 @@ const OpenOrder: React.FC<{
       const decimal = getExponent(
         Number(curToken?.perpConfig?.contractSize) || 1
       );
-      _amount = filterPrecision(+amount / +price, decimal);
+      _amount = filterPrecision(
+        BigNumber(amount).dividedBy(price).toString(),
+        decimal
+      );
     }
 
     const tradeFee = filterPrecision(
@@ -552,7 +584,9 @@ const OpenOrder: React.FC<{
               }
 
               setMargin(value);
+              setMarginPercent(0);
               setIsInput(false);
+              setIsMarginInput(true);
             }}
           />
         </StyledLayout>
@@ -585,12 +619,9 @@ const OpenOrder: React.FC<{
       </MarginAmount>
       <Slider
         onChange={(value) => {
-          setMargin(
-            filterPrecision(
-              BigNumber(value).multipliedBy(fundsAvailable).div(100).toString(),
-              curToken?.displayDecimal
-            )
-          );
+          setIsMarginInput(false);
+          setMarginPercent(BigNumber(value).dividedBy(100).toNumber());
+
           setIsInput(false);
         }}
         per={marginPercent || 0}

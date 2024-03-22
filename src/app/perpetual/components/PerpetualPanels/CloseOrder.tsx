@@ -137,7 +137,7 @@ const CloseOrder: React.FC<{
   margin: string;
   setMargin: Function;
   symbolName: string;
-  leverage: number;
+  leverage: string;
   curToken: Token;
   entryPrice: number;
 }> = ({
