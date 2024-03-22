@@ -339,8 +339,8 @@ const OpenOrder: React.FC<{
 
       const curTokenParDecimal = getExponent(token_.pars);
       
-      const formattedTokenSizeToPar = BigNumber(margin_)
-        .div(BigNumber.max(token_?.pars))
+      const formattedTokenSizeToPar = BigNumber(amount_)
+        .div(BigNumber.max(token_?.pars, 1))
         .toString();
         
       const formattedSize = ethers.utils
@@ -351,7 +351,7 @@ const OpenOrder: React.FC<{
         side === FutureType.LONG ? token_.futureLongId : token_.futureShortId,
         ethers.utils.parseUnits(BigNumber(price_).toString(), 6).toString(), // 根据market 或 limit， 此处的price 有两种计算模式
         formattedSize,
-        ethers.utils.parseUnits(amount_, 6).toString() 
+        ethers.utils.parseUnits(margin_, 6).toString() 
       ];
     
       // 是否是市价单
@@ -372,11 +372,11 @@ const OpenOrder: React.FC<{
       const contractAddress = isMarket ? MarketOrderContractParams.address : LimitOrderContractParams.address;
       return [
         contractAddress, 
-        false, // allowfailure 此处应该是false， 及不允许失败
+        false,
         appConfig.executionFee,
         txData
       ];
-    }, []);
+    }, [MarketOrderContractParams, LimitOrderContractParams]);
 
     /**
      * 生成 stop order tx params;
@@ -408,7 +408,7 @@ const OpenOrder: React.FC<{
         paramData
       ]
 
-    }, []);
+    }, [StopOrderContractParams, appConfig]);
 
 
     // 发起交易
@@ -417,14 +417,15 @@ const OpenOrder: React.FC<{
 
       // 交易方向是long 或者 short
       const isHandleTypeLong = handleType === 'long';
+      const isLimit = params.orderType === 'limit';
 
       // 正常单
       const normalParams = createTx(
         isHandleTypeLong ? FutureType.LONG : FutureType.SHORT, // 方向
-        params.activeOrderTab, // 市价/限价
-        params.margin, // 保证金
-        BigNumber(params.activeOrderTab === 'limit' ? price : tickPrice).toString(),// 价格
+        params.orderType, // 市价/限价
         params.amount, // 数量
+        BigNumber(isLimit ? params.price : tickPrice).toString(),// 价格
+        params.margin, // 数量
         params.slippage, // 滑点
         curToken,
       );
@@ -680,6 +681,7 @@ const OpenOrder: React.FC<{
         BigNumber(amount).dividedBy(price).toString(),
         decimal
       );
+      // _amount = filterPrecision(+amount / +price, decimal);
     }
 
     const tradeFee = filterPrecision(
@@ -717,6 +719,7 @@ const OpenOrder: React.FC<{
     if (!show || show === "true") {
       setVisible(true);
     } else{
+      console.log("submit tx");
       // 如果不弹窗，则直接发起交易
       submitTx(params, type, tickerPrice.currentTickerPrice);
     }
