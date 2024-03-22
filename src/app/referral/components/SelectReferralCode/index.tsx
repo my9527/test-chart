@@ -170,7 +170,7 @@ export const SelectReferralCode = ({
       width={740}
       overlayColor="rgba(0, 0, 0, 0.5)"
       footer={
-        <FlexBox justify="space-between">
+        <FlexBox justifyContent="space-between">
           <CreateCodeButton role="button" onClick={() => setCreateNewCodeVisible(true)}>
             Create Code
             <svg width="13" height="14" viewBox="0 0 13 14" fill="none">

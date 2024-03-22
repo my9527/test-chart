@@ -1,4 +1,4 @@
-import { useEpoch } from "@/app/config/useEpoch";
+import { useEpoch } from "@/app/hooks/useEpoch";
 import { userClaimWithdrawLiquidities } from "@/app/graphql/liquidity/depositAndWithdraw";
 import { useAppConfig } from "@/app/hooks/useAppConfig";
 import { useContractParams } from "@/app/hooks/useContractParams";

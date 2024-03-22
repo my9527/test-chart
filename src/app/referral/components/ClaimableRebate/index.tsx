@@ -15,7 +15,7 @@ const Wrapper = styled.div`
   flex-direction: column;
   justify-content: space-between;
   &:hover {
-    box-shadow: 0px 0px 20px 0px rgba(124, 103, 255, 0.25);
+    box-shadow: ${props => props.theme.colors.fill2Hover}
   }
 `
 
@@ -67,7 +67,7 @@ const ClaimableRebate: FC<IClaimableRebateProps> = ({ onClickHistory }) => {
         <Title>Total Claimable Rebate</Title>
         <Label>Data will be updated every Monday at 00:00 AM UTC.</Label>
       </Top>
-      <FlexBox justify="space-between" align="flex-end">
+      <FlexBox justifyContent="space-between" alignItems="flex-end">
         <Left>
           <HistoryBtn onClick={onClickHistory}>
             History
