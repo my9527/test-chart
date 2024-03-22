@@ -123,26 +123,38 @@ export const useContractParams = (address: string) => {
             [config.contract_address.UserBalanceImplementationAddress]: {
                 address: config.contract_address.UserBalanceImplementationAddress,
                 abi: UserBalanceContractAbi,
+                chainId: chainId,
             },
             [config.contract_address.USDCAddress]: {
                 address: config.contract_address.USDCAddress,
                 abi: ExchangeStableTokenContractAbi,
+                chainId: chainId,
             },
             [config.contract_address.WETHAddress]: {
                 address: config.contract_address.WETHAddress,
                 abi: ExchangeStableTokenContractAbi,
+                chainId: chainId,
             },
             [config.contract_address.stSEXAddress]: {
                 address: config.contract_address.stSEXAddress,
                 abi: StakeSexContractAbi,
+                chainId: chainId,
             },
             [config.contract_address.stSLPAddress]: {
                 address: config.contract_address.stSLPAddress,
                 abi: StakeSlpContractAbi,
+                chainId: chainId,
             },
             [config.contract_address.ExchangeManagerImplementationAddress] : {
                 address: config.contract_address.ExchangeManagerImplementationAddress,
-                abi: ExchangeContractAbi
+                abi: ExchangeContractAbi,
+                chainId: chainId,
+
+            },
+            [config.contract_address.DelegationHubImplementationAddress] : {
+                address: config.contract_address.DelegationHubImplementationAddress,
+                abi: DelegationHubAbi,
+                chainId: chainId,
             }
             
         } as Record<`0x${string}`, ContractParamType>

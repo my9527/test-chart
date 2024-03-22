@@ -66,7 +66,7 @@ const PerpetualOrders = () => {
         }}
       /> */}
       <AdjustMargin
-        isVisible={true}
+        isVisible={false}
         params={{
           symbolName: "ARB",
           futureType: "long",

@@ -3,6 +3,7 @@ import styled from "styled-components";
 import TokenImage from "@/app/components/TokenImage";
 import CheckBox from "@/app/components/CheckBox";
 import { useState, useEffect } from "react";
+import { filterPrecision } from "@/app/utils/tools";
 
 const Wrapper = styled.div`
   position: relative;
@@ -189,15 +190,15 @@ const OrderConfirm: React.FC<{ params: ParamsProps; actionType: string }> = ({
         </div>
         <div className="item">
           <p className="label">Fees</p>
-          <p className="value">{params?.fees} USD</p>
+          <p className="value">{filterPrecision(params?.fees, 4)} USD</p>
         </div>
         <div className="item">
           <p className="label">--- Trading fee</p>
-          <p className="value">{params?.tradeFee} USD</p>
+          <p className="value">{filterPrecision(params?.tradeFee, 4)} USD</p>
         </div>
         <div className="item">
           <p className="label">--- Price impact fee</p>
-          <p className="value">{params?.impactFee} USD</p>
+          <p className="value">{filterPrecision(params?.impactFee, 4)} USD</p>
         </div>
       </OrderInfo>
       {actionType === "close" ? (

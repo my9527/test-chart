@@ -12,17 +12,22 @@ export const useSendTxByDelegate = () => {
 
 
     const appConfig = useAppConfig();
-    const DelegationHubContractParams = useContractParams(appConfig.contract_address.DelegationHubContractParams);
+    const DelegationHubContractParams = useContractParams(appConfig.contract_address.DelegationHubImplementationAddress);
     const sendTx = useSendTx();
 
 
     // TODO: 增加 1ct 代理交易
-    const _sendByDelegate = async function ({ data, value, to, showMsg = true }: { showMsg: boolean
-    } & Pick<TransactionRequest, 'data' | 'value' | 'to'>) {
+    // & Pick<TransactionRequest, 'data' | 'value' | 'to'>
+    const _sendByDelegate = async function ({ data, value, to, showMsg = true }: { showMsg: boolean,
+        data: any,
+        value: any,
+        to?: any,
+    } ) {
 
 
         const txData = encodeTx({
-            contractAddress: DelegationHubContractParams.address,
+            // contractAddress: DelegationHubContractParams.address,
+            abi: DelegationHubContractParams.abi,
             functionName: 'delegate',
             args: data ? [data] : [],
         });

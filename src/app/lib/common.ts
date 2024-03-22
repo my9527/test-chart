@@ -1,3 +1,4 @@
+import BigNumber from "bignumber.js";
 import dayjs from "dayjs";
 
 
@@ -29,3 +30,18 @@ export const sortArrByKey = (arr: any[], prop: string, dir: string)=> {
     }
   });
 }
+
+
+
+
+/**
+ * 精度处理
+ * @param str 
+ * @param decimal 
+ * @returns 
+ */
+export const formatNumber = (str: string, decimal?: number) => {
+  if (!str) return '';
+  if (BigNumber(str).isZero()) return '';
+  return BigNumber(str).toFixed(decimal === undefined ? 6 : decimal, BigNumber.ROUND_DOWN);
+};
