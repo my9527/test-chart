@@ -20,7 +20,7 @@ const Box = styled.div`
   background-color: ${props => props.theme.colors.fill2};
   border-radius: 8px;
   &:hover {
-    box-shadow: 0px 0px 20px 0px rgba(124, 103, 255, 0.25);
+    box-shadow: ${props => props.theme.colors.fill2Hover}
   }
 `
 
@@ -37,7 +37,7 @@ const BuySellPanel = styled.div`
   background-color: ${props => props.theme.colors.fill2};
   border-radius: 0 0 8px 8px;
   &:hover {
-    box-shadow: 0px 0px 20px 0px rgba(124, 103, 255, 0.25);
+    box-shadow: ${props => props.theme.colors.fill2Hover}
   }
 `
 

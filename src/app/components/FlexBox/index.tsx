@@ -1,20 +1,46 @@
 import styled, { css } from "styled-components";
 import { Aligns, Justify } from "../BaseFlex";
 
-const FlexBox = styled.div<{ justify?: Justify, align?: Aligns, gap?: string }>`
+interface FlexContainerProps {
+  alignItems?: Aligns;
+  justifyContent?: Justify;
+  gap?: string;
+  direction?: string;
+  flexWrap?: string;
+}
+
+const FlexContainer = styled.div<FlexContainerProps>`
   display: flex;
+  align-items: ${({ alignItems }) => alignItems || 'flex-start'};
+  justify-content: ${({ justifyContent }) => justifyContent || 'flex-start'};
+  flex-direction: ${({ direction }) => direction || 'row'};
+  gap: ${({ gap }) => gap || '0'};
+  flex-wrap: ${({ flexWrap }) => flexWrap || 'nowrap'};
+`;
 
-  ${props => props.gap && css`
-    gap: ${props.gap};
-  `}
+interface FlexBoxProps extends FlexContainerProps {
+  className?: string;
+}
 
-  ${props => props.justify && css`
-    justify-content: ${props.justify};
-  `}
-
-  ${props => props.justify && css`
-    align-items: ${props.align};
-  `}
-`
+const FlexBox: FCC<FlexBoxProps> = ({
+  children,
+  alignItems,
+  justifyContent,
+  direction,
+  flexWrap,
+  className,
+  gap,
+}) => (
+  <FlexContainer
+    alignItems={alignItems}
+    justifyContent={justifyContent}
+    direction={direction}
+    flexWrap={flexWrap}
+    className={className}
+    gap={gap}
+  >
+    {children}
+  </FlexContainer>
+);
 
 export default FlexBox;

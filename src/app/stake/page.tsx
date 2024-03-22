@@ -22,6 +22,7 @@ const Wrapper = styled.div`
   background-color: ${props => props.theme.colors.fill1};
   padding: 50px 0;
   height: calc(100vh - 50px);
+  overflow-y: auto;
 `
 
 const Content = styled.div`

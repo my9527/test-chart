@@ -36,14 +36,14 @@ const YourReferral: FC<IYourReferralProps> = ({ onClickRankDetail }) => {
   return (
     <Wrapper>
       <ReferralRank>
-        <FlexBox justify="space-between">
+        <FlexBox justifyContent="space-between">
           <Label>Your Referral Rank:</Label>
           <FlexBox gap="20px">
             <Button onClick={onClickRankDetail} padding="2px 10px" primary>Rank Details</Button>
             <Label>Rank 1</Label>
           </FlexBox>
         </FlexBox>
-        <FlexBox justify="space-between">
+        <FlexBox justifyContent="space-between">
           <Label>Allocatable Rebate Ratio:</Label>
           <Label>30%</Label>
         </FlexBox>

@@ -17,7 +17,7 @@ const Wrapper = styled.div`
   flex-direction: column;
   position: relative;
   &:hover {
-    box-shadow: 0px 0px 20px 0px rgba(124, 103, 255, 0.25);
+    box-shadow: ${props => props.theme.colors.fill2Hover}
   }
 `
 
