@@ -1,6 +1,6 @@
 import { getDefaultConfig } from "@rainbow-me/rainbowkit";
 import { getConnectorClient, waitForTransactionReceipt } from "@wagmi/core";
-import { Client, PublicClient, WalletClient, encodeFunctionData } from "viem";
+import { AbiItem, Client, PublicClient, WalletClient, encodeFunctionData } from "viem";
 import { WagmiProviderProps } from "wagmi";
 import { useContractParams } from "../hooks/useContractParams";
 import { BigNumberish } from "ethers";
@@ -30,7 +30,7 @@ export const sendTx: SendTxInterface = async ({client, signer, to, value, data }
             // chain: chainId[0],
           };
           if (signer) {
-            p.account = signer;
+            p.account = signer.account?.address;
           }
           if (value) {
             p.value = value;
@@ -38,14 +38,18 @@ export const sendTx: SendTxInterface = async ({client, signer, to, value, data }
           if (data) {
             p.data = data;
           }
+
+
+          // await client.estimateGas()
     
           const gasEstimate = await client.estimateGas({
-            account: signer?.account?.address,
             ...p,
+            // account: signer?.account?.address,
           });
     
           const hash = await signer.sendTransaction({
             ...p,
+            // account: signer?.account?.address,
           });
     
           return hash
@@ -90,17 +94,14 @@ export const awaitTx = async (txHash: `0x${string}`, clientConfig: WagmiProvider
 
 // encode tx params
 export const encodeTx = ({
-  contractAddress, 
+  abi, 
   functionName, 
   args
 }: {
-  contractAddress: `0x${string}`, functionName: string, args?: any[]
+  abi: AbiItem[], functionName: string, args?: any[]
 }) => {
-
-  const contractParams = useContractParams(contractAddress);
-
   return encodeFunctionData({
-    abi: contractParams.abi,
+    abi: abi,
     functionName,
     args: args || [],
   });

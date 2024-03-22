@@ -2606,7 +2606,7 @@ const baseTokens: Record<string, Token[]> = {
       ],
       "futureLongId": 24,
       "futureShortId": 24,
-      "pars": 0.01,
+      "pars": 0.1,
       "displayDecimal": 3,
       "maxProfitRatio": 10,
       "maxLeverage": 100,

@@ -18,6 +18,7 @@ import Modal from "@/app/components/Modal";
 import OrderConfirm from "./OrderConfirm";
 import { ParamsProps } from "./OrderConfirm";
 import BigNumber from "bignumber.js";
+import { BasicTradingFeeRatio } from "@/app/config/common";
 const Layout = styled.div`
   display: flex;
   flex-direction: column;
@@ -204,7 +205,8 @@ const CloseOrder: React.FC<{
     }
 
     const tradeFee = filterPrecision(
-      BigNumber(+price * +_amount * 0.0008).toString(),
+      // BigNumber(+price * +_amount * 0.0008).toString(),
+      BigNumber(price).multipliedBy(_amount).multipliedBy(curToken.tradingFeeRatio || BasicTradingFeeRatio).div(100).toString(),
       curToken?.displayDecimal
     );
     const impactFee = "0";

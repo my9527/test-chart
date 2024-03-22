@@ -2,20 +2,24 @@ import FlexBox from "@/app/components/FlexBox"
 import Image from "next/image"
 import styled, { css } from "styled-components"
 import CloseEyeIcon from "@/app/assets/portfolio/close-eye.svg"
+import OpenEyeIcon from "@/app/assets/portfolio/open-eye.svg"
+import DepositIcon from "@/app/assets/portfolio/deposit.svg"
+import WithdrawIcon from "@/app/assets/portfolio/withdraw.svg"
+import WalletAssets from "./WalletAssets"
+import { CopyBtn } from "@/app/components/CopyBtn"
+import { useTheme } from "styled-components"
+import { useState } from "react"
+import Box from "@/app/components/Box"
+import SimpleText from "@/app/components/SimpleText"
 
 const Wrapper = styled.div`
   display: flex;
   flex-direction: column;
   gap: 10px;
+  padding: 20px 0;
 `
 
-const Box = styled.div<{ $padding?: string }>`
-  background: ${props => props.theme.colors.fill2};
-  border-radius: 8px;
-  &:hover {
-    background: ${props => props.theme.colors.fill2Hover};
-  }
-  
+const StyledBox = styled(Box)<{ $padding?: string }>`
   ${props => props.$padding && css`
     padding: ${props.$padding};
   `}
@@ -29,28 +33,16 @@ const Avatar = styled.div`
   margin-right: 20px;
 `
 
-const AccountTitle = styled.div`
-  font-size: ${props => props.theme.fontSize.reguar};
-  color: ${props => props.theme.colors.text1};
-`
-
 const Label = styled.div`
   font-size: ${props => props.theme.fontSize.small};
   color: ${props => props.theme.colors.text4};
 `
 
-const EquityText = styled.div`
-  font-size: ${props => props.theme.fontSize.medium};
-  color: ${props => props.theme.colors.primary1};
-`
-
-const Text = styled.div<{ $size: string, $color: string }>`
-  font-size: ${props => props.theme.fontSize[props.$size]};
-  color: ${props => props.theme.colors[props.$color]};
-`
-
 const IconButton = styled.button`
   outline: none;
+  background: unset;
+  border: none;
+  cursor: pointer;
 `
 
 const Divider = styled.div`
@@ -60,49 +52,89 @@ const Divider = styled.div`
   margin: 0 30px;
 `
 
+const Button = styled.button`
+  outline: none;
+  height: 40px;
+  width: 150px;
+  border-radius: 999px;
+  background: ${props => props.theme.colors.fill3};
+  color: ${props => props.theme.colors.text1};
+  font-size: ${props => props.theme.fontSize.small};
+  border: none;
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+
+  &:hover {
+    background: ${props => props.theme.colors.primary3};
+  }
+`
+
 const data = {
   address: '0x12······1234',
   equity: '123,123,123.00 USDX',
   marginUsage: '50.00%',
   unrealizedPnl: '-123,123,123.00 USDX'
 }
+
 const Overview = () => {
   const { address, equity, marginUsage, unrealizedPnl } = data
+  const [visibility, setVisibility] = useState(false)
+
+  const theme = useTheme()
+
+  const toggleVisibility = () => {
+    setVisibility(!visibility)
+  }
   return (
     <Wrapper>
-      <Box $padding="23px 35px">
-        <FlexBox>
-          <Avatar />
-          <div>
-            <Text $size="reguar" $color="reguar">Account</Text>
-            <FlexBox gap={20}>
-              <Label>{address}</Label>
-              <IconButton>
-                <Image src={CloseEyeIcon} alt="hide address" />
-              </IconButton>
-              <IconButton>
-                <Image src={CloseEyeIcon} alt="hide address" />
-              </IconButton>
+      <StyledBox $padding="23px 35px">
+        <FlexBox justifyContent="space-between" alignItems="center">
+          <FlexBox alignItems="center">
+            <Avatar />
+            <FlexBox gap={'2px'} direction="column">
+              <SimpleText $size="reguar" $color="reguar">Account</SimpleText>
+              <FlexBox gap={'20px'} alignItems="center">
+                <Label>{address}</Label>
+                <IconButton onClick={toggleVisibility}>
+                  <Image src={visibility ? CloseEyeIcon : OpenEyeIcon} alt="hide address" />
+                </IconButton>
+                <CopyBtn color={theme.colors.primary1} content={address} />
+              </FlexBox>
             </FlexBox>
-          </div>
-          <Divider />
-          <div>
-            <Label>Equity:</Label>
-            <Text $color="primary1" $size="medium">{equity}</Text>
-          </div>
-          <Divider />
-          <div>
-            <Label>Margin usage:</Label>
-            <Text $color="primary1" $size="medium">{marginUsage}</Text>
-          </div>
-          <Divider />
-          <div>
-            <Label>Unrealized PnL:</Label>
-            <Text $color="text5" $size="medium">{unrealizedPnl}</Text>
-          </div>
+            <Divider />
+            <FlexBox gap={'2px'} direction="column">
+              <Label>Equity:</Label>
+              <SimpleText $color="primary1" $size="medium">{equity}</SimpleText>
+            </FlexBox>
+            <Divider />
+            <FlexBox gap={'2px'} direction="column">
+              <Label>Margin usage:</Label>
+              <SimpleText $color="text1" $size="medium">{marginUsage}</SimpleText>
+            </FlexBox>
+            <Divider />
+            <FlexBox gap={'2px'} direction="column">
+              <Label>Unrealized PnL:</Label>
+              <SimpleText $color="text5" $size="medium">{unrealizedPnl}</SimpleText>
+            </FlexBox>
+          </FlexBox>
+          <FlexBox gap="10px">
+            <Button>
+              <Image src={DepositIcon} alt="deposit" />
+              Deposit
+            </Button>
+            <Button>
+              <Image src={WithdrawIcon} alt="withdraw" />
+              Withdraw
+            </Button>
+          </FlexBox>
         </FlexBox>
-      </Box>
-      <Box></Box>
+      </StyledBox>
+      <StyledBox $padding="20px 35px">
+        <WalletAssets />
+      </StyledBox>
     </Wrapper>
   )
 }

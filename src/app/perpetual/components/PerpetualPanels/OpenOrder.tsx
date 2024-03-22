@@ -3,7 +3,7 @@ import styled from "styled-components";
 import Price from "./Price";
 import CurrencySelect from "@/app/components/CurrencySelect";
 import Slider from "../Slider";
-import { useEffect, useState, useRef, useMemo } from "react";
+import { useEffect, useState, useRef, useMemo, useCallback } from "react";
 import Input from "@/app/components/Input";
 import CheckBox from "@/app/components/CheckBox";
 import { verifyValidNumber } from "@/app/utils/tools";
@@ -21,6 +21,18 @@ import Modal from "@/app/components/Modal";
 import OrderConfirm from "./OrderConfirm";
 import { ParamsProps } from "./OrderConfirm";
 import { useExchangeBalance } from "@/app/hooks/useBalance";
+import { useAppConfig } from "@/app/hooks/useAppConfig";
+import useTickerPrice from "@/app/hooks/useTickerPrice";
+import { useExecutionFee } from "@/app/hooks/useExecutionFee";
+import { useContractParams } from "@/app/hooks/useContractParams";
+import { usePriceImpactK } from "../../hooks/usePriceImpactK";
+import { usePriceImpactDepth } from "../../hooks/usePriceImpactDepth";
+import { useSendTxByDelegate } from "@/app/hooks/useSendTxByDelegate";
+import { BasicTradingFeeRatio, FutureType } from "@/app/config/common";
+import { encodeTx } from "@/app/lib/txTools";
+import { formatNumber } from "@/app/lib/common";
+import { ethers } from "ethers";
+import dayjs from "dayjs";
 
 const Layout = styled.div`
   display: flex;
@@ -238,6 +250,15 @@ const DefaultBtn = styled.div`
   line-height: 100%;
   padding: 13px 0;
 `;
+
+
+// 合约执行方法名称
+const MakeOrderFunctionName = {
+  LIMIT: 'makeIncreaseLimitOrder',
+  MARKET: 'makeIncreaseMarketOrder',
+  STOP: 'makeFutureStopOrder',
+}
+
 const OpenOrder: React.FC<{
   activeOrderTab: string;
   margin: string;
@@ -257,6 +278,14 @@ const OpenOrder: React.FC<{
   const [curCurrency, setCurCurrency] = useState("USD");
   const [amount, setAmount] = useState<string>("");
 
+  const [confirmedParams, setConfirmedParams] = useState<
+    ParamsProps | undefined
+  >();
+  const [longStopPriceInputType, setLongStopPriceInputType] =
+    useState("normal");
+  const [shortStopPriceInputType, setShortStopPriceInputType] =
+    useState("normal");
+
   const [showStopOrder, setShowStopOrder] = useState<boolean>(false);
   const [longStopPrice, setLongStopPrice] = useState<string>("");
   const [shortStopPrice, setShortStopPrice] = useState<string>("");
@@ -269,10 +298,154 @@ const OpenOrder: React.FC<{
 
   const [visible, setVisible] = useState(false);
 
+
+  const exchangeBalance = useExchangeBalance();
+  const appConfig = useAppConfig();
+  const tickerPrice = useTickerPrice();
+  const executionFee = useExecutionFee();
+
+  const priceImpactK = usePriceImpactK(curToken.symbolName);
+  const { sendByDelegate } = useSendTxByDelegate();
+
+  //usePriceImpactDepth
+  const { buyPriceImpactDepth, sellPriceImpactDepth } = usePriceImpactDepth();
+
+
+
+  const MarketOrderContractParams = useContractParams(appConfig.contract_address.MarketOrderImplementationAddress);
+  const LimitOrderContractParams = useContractParams(appConfig.contract_address.LimitOrderImplementationAddress);
+  const StopOrderContractParams = useContractParams(appConfig.contract_address.StopOrderImplementationAddress);
+
+
+     /**
+     * 生成 limit or market tx params;
+     */
+     const createTx = useCallback((side: FutureType,type: string, margin_: string, price_: string, amount_: string, slippage_: string | number, token_: Token) => {
+
+
+      const curTokenParDecimal = getExponent(token_.pars);
+      
+      const formattedTokenSizeToPar = BigNumber(amount_)
+        .div(BigNumber.max(token_?.pars, 1))
+        .toString();
+        
+      const formattedSize = ethers.utils
+        .parseUnits(formatNumber(formattedTokenSizeToPar, curTokenParDecimal), curTokenParDecimal)
+        .toString();
+
+      const params = [
+        side === FutureType.LONG ? token_.futureLongId : token_.futureShortId,
+        ethers.utils.parseUnits(BigNumber(price_).toString(), 6).toString(), // 根据market 或 limit， 此处的price 有两种计算模式
+        formattedSize,
+        ethers.utils.parseUnits(margin_, 6).toString() 
+      ];
+    
+      // 是否是市价单
+      const isMarket = type === 'market';
+      if(isMarket) {
+        params.push(+dayjs().add(5, 'm').unix());
+      }
+
+      params.push(side === FutureType.LONG ? FutureType.LONG : FutureType.SHORT);
+      const methodName = isMarket ? MakeOrderFunctionName.MARKET : MakeOrderFunctionName.LIMIT;
+
+      const txData = encodeTx({
+        abi: isMarket ? MarketOrderContractParams.abi : LimitOrderContractParams.abi,
+        functionName: methodName,
+        args: params,
+      });
+      // 根据单的类型确定合约地址
+      const contractAddress = isMarket ? MarketOrderContractParams.address : LimitOrderContractParams.address;
+      return [
+        contractAddress, 
+        false,
+        appConfig.executionFee,
+        txData
+      ];
+    }, [MarketOrderContractParams, LimitOrderContractParams]);
+
+    /**
+     * 生成 stop order tx params;
+     */
+    const createStopTx = useCallback((token_: Token, size: string | number,triggerPrice: string, futureType_: FutureType, isStopLoss: boolean ) => {
+
+      // futureId,
+      // size,
+      // triggerPrice,
+      // isStopLoss,
+      // futureType,
+      const paramData = encodeTx({
+        abi: StopOrderContractParams.abi,
+        functionName: MakeOrderFunctionName.STOP,
+        args: [
+          token_.futureLongId,
+          BigNumber(size).div(getExponent(token_.pars)).toFixed(0, BigNumber.ROUND_DOWN),
+          triggerPrice,
+          isStopLoss,
+          futureType_
+        ]
+      });
+
+
+      return [
+        StopOrderContractParams.address,
+        false,
+        appConfig.executionFee,
+        paramData
+      ]
+
+    }, [StopOrderContractParams, appConfig]);
+
+
+    // 发起交易
+    const submitTx = useCallback((params: any, handleType: string, tickPrice: string | number) => {
+      const delegateParams = [];
+
+      // 交易方向是long 或者 short
+      const isHandleTypeLong = handleType === 'long';
+      const isLimit = params.orderType === 'limit';
+
+      // 正常单
+      const normalParams = createTx(
+        isHandleTypeLong ? FutureType.LONG : FutureType.SHORT, // 方向
+        params.orderType, // 市价/限价
+        params.amount, // 数量
+        BigNumber(isLimit ? params.price : tickPrice).toString(),// 价格
+        params.margin, // 数量
+        params.slippage, // 滑点
+        curToken,
+      );
+
+      delegateParams.push(normalParams);
+
+      
+      // 止盈单
+      if(params.longStopPrice) {
+        delegateParams.push(createStopTx(curToken, params.amount, params.longStopPrice, isHandleTypeLong ? FutureType.SHORT : FutureType.LONG, false))
+      }
+      // 止损单
+      if(params.shortStopPrice) {
+        delegateParams.push(createStopTx(curToken, params.amount, params.shortStopPrice, isHandleTypeLong ? FutureType.LONG : FutureType.SHORT, true))
+      }
+      // 发起交易
+      sendByDelegate({
+        data: delegateParams,
+        // 计算需要支付的金额去执行交易
+        value: delegateParams.reduce((result, cur: any) => {
+          return result.plus(cur[2] as string)
+        }, BigNumber(0)).toString(),
+        showMsg: false,
+      });
+    }, [curToken]);
+
+
+
+
   const onClose = () => {
     setVisible(false);
   };
   const onConfirm = () => {
+    submitTx(confirmedParams, confirmedParams?.futureType as string, tickerPrice.currentTickerPrice);
     setVisible(false);
   };
   const onCancel = () => {
@@ -354,10 +527,8 @@ const OpenOrder: React.FC<{
   const [inputAmount, setInputAmount] = useState<string>("");
   const [marginPercent, setMarginPercent] = useState<number>(0);
 
-  const exchangeBalance = useExchangeBalance();
 
-  const fundsAvailable =
-    exchangeBalance["USDX"]?.balanceReadable || ("0" as string);
+  const fundsAvailable = exchangeBalance["USDX"]?.balanceReadable || "0";
   const [isInput, setIsInput] = useState(false);
   const [isMarginInput, setIsMarginInput] = useState(false);
 
@@ -436,13 +607,6 @@ const OpenOrder: React.FC<{
     }
   }, [inputAmount, isInput, curCurrency, price]);
 
-  const [confirmedParams, setConfirmedParams] = useState<
-    ParamsProps | undefined
-  >();
-  const [longStopPriceInputType, setLongStopPriceInputType] =
-    useState("normal");
-  const [shortStopPriceInputType, setShortStopPriceInputType] =
-    useState("normal");
 
   const currencyAmount = useMemo(() => {
     let _amount = amount;
@@ -503,13 +667,22 @@ const OpenOrder: React.FC<{
         BigNumber(amount).dividedBy(price).toString(),
         decimal
       );
+      // _amount = filterPrecision(+amount / +price, decimal);
     }
 
     const tradeFee = filterPrecision(
-      BigNumber(_amount).multipliedBy(0.0008).multipliedBy(price).toString(),
+      BigNumber(_amount).multipliedBy(curToken?.tradingFeeRatio || BasicTradingFeeRatio).div(100).multipliedBy(price).toString(),
       curToken?.displayDecimal
     );
-    const impactFee = "0";
+    const priceImpactFee = BigNumber(BigNumber(margin).multipliedBy(leverage) || '0')
+        .exponentiatedBy(2)
+        .div(
+          BigNumber(priceImpactK)
+            // .multipliedBy(1 / 100)
+            .multipliedBy(type === 'long' ? sellPriceImpactDepth : buyPriceImpactDepth),
+        )
+        .multipliedBy(1)
+        .toString();
 
     const params = {
       symbolName,
@@ -522,8 +695,8 @@ const OpenOrder: React.FC<{
       orderType: activeOrderTab,
       slippage,
       tradeFee,
-      impactFee,
-      fees: tradeFee + impactFee,
+      impactFee: priceImpactFee,
+      fees: BigNumber(tradeFee).plus(priceImpactFee).toString() ,
     };
     console.log("handleOpen", params);
     setConfirmedParams(params);
@@ -531,6 +704,10 @@ const OpenOrder: React.FC<{
 
     if (!show || show === "true") {
       setVisible(true);
+    } else{
+      console.log("submit tx");
+      // 如果不弹窗，则直接发起交易
+      submitTx(params, type, tickerPrice.currentTickerPrice);
     }
   };
 
