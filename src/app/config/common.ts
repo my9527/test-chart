@@ -44,7 +44,7 @@ export const DefaultRemainCollateralRatio = 0.5 / 100;
 
 
 // default tradingFeeRatio
-export const  BasicTradingFeeRatio = 0.08;
+export const  BasicTradingFeeRatio = 0.08; // 这里指代的是 0.0008, 计算使用时需要 0.08 / 100;
 
 
 // 

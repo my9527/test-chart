@@ -21,28 +21,18 @@ import Modal from "@/app/components/Modal";
 import OrderConfirm from "./OrderConfirm";
 import { ParamsProps } from "./OrderConfirm";
 import { useExchangeBalance } from "@/app/hooks/useBalance";
+import { useAppConfig } from "@/app/hooks/useAppConfig";
+import useTickerPrice from "@/app/hooks/useTickerPrice";
+import { useExecutionFee } from "@/app/hooks/useExecutionFee";
+import { useContractParams } from "@/app/hooks/useContractParams";
 import { usePriceImpactK } from "../../hooks/usePriceImpactK";
 import { usePriceImpactDepth } from "../../hooks/usePriceImpactDepth";
 import { useSendTxByDelegate } from "@/app/hooks/useSendTxByDelegate";
-import { ethers } from "ethers";
-import { useContractParams } from "@/app/hooks/useContractParams";
-import { useAppConfig } from "@/app/hooks/useAppConfig";
-import { FutureType } from "@/app/config/common";
-import dayjs from "dayjs";
-import { formatNumber } from "@/app/lib/common";
-import useTickerPrice from "@/app/hooks/useTickerPrice";
+import { BasicTradingFeeRatio, FutureType } from "@/app/config/common";
 import { encodeTx } from "@/app/lib/txTools";
-import { useExecutionFee } from "@/app/hooks/useExecutionFee";
-
-
-
-const MakeOrderFunctionName = {
-  LIMIT: 'makeIncreaseLimitOrder',
-  MARKET: 'makeIncreaseMarketOrder',
-  STOP: 'makeFutureStopOrder',
-}
-
-
+import { formatNumber } from "@/app/lib/common";
+import { ethers } from "ethers";
+import dayjs from "dayjs";
 
 const Layout = styled.div`
   display: flex;
@@ -274,12 +264,21 @@ const DefaultBtn = styled.div`
   line-height: 100%;
   padding: 13px 0;
 `;
+
+
+// 合约执行方法名称
+const MakeOrderFunctionName = {
+  LIMIT: 'makeIncreaseLimitOrder',
+  MARKET: 'makeIncreaseMarketOrder',
+  STOP: 'makeFutureStopOrder',
+}
+
 const OpenOrder: React.FC<{
   activeOrderTab: string;
   margin: string;
   setMargin: Function;
   symbolName: string;
-  leverage: number;
+  leverage: string;
   curToken: Token;
 }> = ({
   activeOrderTab,
@@ -289,214 +288,53 @@ const OpenOrder: React.FC<{
   leverage,
   curToken,
 }) => {
-    const [price, setPrice] = useState<string>("");
-    const [curCurrency, setCurCurrency] = useState("USD");
-    const [amount, setAmount] = useState<string>("");
+  const [price, setPrice] = useState<string>("");
+  const [curCurrency, setCurCurrency] = useState("USD");
+  const [amount, setAmount] = useState<string>("");
 
-    const [showStopOrder, setShowStopOrder] = useState<boolean>(false);
-    const [longStopPrice, setLongStopPrice] = useState<string>("");
-    const [shortStopPrice, setShortStopPrice] = useState<string>("");
+  const [confirmedParams, setConfirmedParams] = useState<
+    ParamsProps | undefined
+  >();
+  const [longStopPriceInputType, setLongStopPriceInputType] =
+    useState("normal");
+  const [shortStopPriceInputType, setShortStopPriceInputType] =
+    useState("normal");
 
-    const { currentTokenAvailableLiq } = useRecoilValue(recoilOpenInterests);
-    const appConfig = useAppConfig();
-    const tickerPrice = useTickerPrice();
+  const [showStopOrder, setShowStopOrder] = useState<boolean>(false);
+  const [longStopPrice, setLongStopPrice] = useState<string>("");
+  const [shortStopPrice, setShortStopPrice] = useState<string>("");
 
-    const executionFee = useExecutionFee();
+  const { currentTokenAvailableLiq } = useRecoilValue(recoilOpenInterests);
 
-    const MarketOrderContractParams = useContractParams(appConfig.contract_address.MarketOrderImplementationAddress);
-    const LimitOrderContractParams = useContractParams(appConfig.contract_address.LimitOrderImplementationAddress);
-    const StopOrderContractParams = useContractParams(appConfig.contract_address.StopOrderImplementationAddress);
+  const [slippage, setSlippage] = useState(
+    localStorage.getItem("slippage") ?? "0.5"
+  );
 
-
-
-
-
-
-    const [slippage, setSlippage] = useState(
-      localStorage.getItem("slippage") ?? "0.5"
-    );
-
-    const [visible, setVisible] = useState(false);
-
-    const onClose = () => {
-      setVisible(false);
-    };
-    const onConfirm = () => {
-      setVisible(false);
-    };
-    const onCancel = () => {
-      setVisible(false);
-    };
-
-    const longAvailableTokenForFutureResults = useMemo(() => {
-      const long = currentTokenAvailableLiq?.longReadable || "0";
-
-      return BigNumber(long).toString();
-    }, [currentTokenAvailableLiq?.longReadable]);
-
-    const shortAvailableTokenForFutureResults = useMemo(() => {
-      const short = currentTokenAvailableLiq?.shortReadable || "0";
-
-      return BigNumber(short).toString();
-    }, [currentTokenAvailableLiq?.shortReadable]);
-
-    const longPnl = useMemo(() => {
-      let v = "--";
-      if (amount && price && longStopPrice) {
-        if (!shortStopPrice && shortStopPrice) {
-          v = filterPrecision(
-            BigNumber(
-              curCurrency === "USD"
-                ? ((+longStopPrice - +price) * +amount) / +price
-                : (+longStopPrice - +price) * +amount
-            )
-              .abs()
-              .toString(),
-            curToken?.displayDecimal
-          );
-        } else {
-          v = filterPrecision(
-            BigNumber(
-              curCurrency === "USD"
-                ? ((+longStopPrice - +price) * +amount) / +price
-                : (+longStopPrice - +price) * +amount
-            ).toString(),
-            curToken?.displayDecimal
-          );
-        }
-      }
-      return v;
-    }, [amount, price, longStopPrice, curCurrency, shortStopPrice]);
-
-    const shortPnl = useMemo(() => {
-      let v = "--";
-      if (amount && price && shortStopPrice) {
-        if (!longStopPrice) {
-          v = filterPrecision(
-            BigNumber(
-              curCurrency === "USD"
-                ? ((+shortStopPrice - +price) * +amount) / +price
-                : (+shortStopPrice - +price) * +amount
-            )
-              .abs()
-              .toString(),
-            curToken?.displayDecimal
-          );
-          v = "-" + v;
-        } else {
-          v = filterPrecision(
-            BigNumber(
-              curCurrency === "USD"
-                ? ((+price - +shortStopPrice) * +amount) / +price
-                : (+price - +shortStopPrice) * +amount
-            ).toString(),
-            curToken?.displayDecimal
-          );
-        }
-      }
-      return v;
-    }, [amount, price, shortStopPrice, curCurrency, longStopPrice]);
-
-    // u本位 amount=margin*leverage ,amount输入变化，leverage不变，margin变化，下面百分比变化，百分比*fund savailable=amount
-    // 币本位 amount=margin*leverage/price，amount输入变化同上
-
-    const [inputAmount, setInputAmount] = useState<string>("");
-    const [marginPercent, setMarginPercent] = useState<number>(0);
+  const [visible, setVisible] = useState(false);
 
 
-    const exchangeBalance = useExchangeBalance();
+  const exchangeBalance = useExchangeBalance();
+  const appConfig = useAppConfig();
+  const tickerPrice = useTickerPrice();
+  const executionFee = useExecutionFee();
+
+  const priceImpactK = usePriceImpactK(curToken.symbolName);
+  const { sendByDelegate } = useSendTxByDelegate();
+
+  //usePriceImpactDepth
+  const { buyPriceImpactDepth, sellPriceImpactDepth } = usePriceImpactDepth();
 
 
-    const fundsAvailable = exchangeBalance['USDX']?.balanceReadable || '0' as string;
-    const [isInput, setIsInput] = useState(false);
 
-    const amountDecimal = useMemo(() => {
-      if (curCurrency === "USD") {
-        return 6;
-      } else {
-        return getExponent(Number(curToken?.perpConfig?.contractSize) || 1);
-      }
-    }, [curCurrency, curToken]);
-
-    useEffect(() => {
-      if (!isInput) {
-        if (curCurrency === "USD") {
-          setAmount(
-            BigNumber(margin).multipliedBy(leverage).gt(0) ? filterPrecision(BigNumber(margin).multipliedBy(leverage).toString(), amountDecimal) : ""
-            // +margin * leverage
-            //   ? filterPrecision(+margin * +leverage, amountDecimal)
-            //   : ""
-          );
-        } else {
+  const MarketOrderContractParams = useContractParams(appConfig.contract_address.MarketOrderImplementationAddress);
+  const LimitOrderContractParams = useContractParams(appConfig.contract_address.LimitOrderImplementationAddress);
+  const StopOrderContractParams = useContractParams(appConfig.contract_address.StopOrderImplementationAddress);
 
 
-          setAmount(
-            margin && price
-            ? filterPrecision(BigNumber(margin).multipliedBy(leverage).dividedBy(price).toString(), amountDecimal) : ""
-              // ? filterPrecision((+margin * leverage) / +price, amountDecimal)
-              // : ""
-          );
-        }
-      }
-    }, [margin, leverage, curCurrency, price, isInput, curToken, amountDecimal]);
-
-    useEffect(() => {
-      if (!+fundsAvailable) {
-        return;
-      }
-      const arr = (+margin / +fundsAvailable + "").split(".");
-      const per = +(arr[0] + "." + (arr[1] ? arr[1].substring(0, 4) : "00"));
-      setMarginPercent(+per > 1 ? 1 : +per);
-    }, [margin, fundsAvailable]);
-
-    useEffect(() => {
-      setInputAmount(amount);
-    }, [amount, amountDecimal]);
-
-    useEffect(() => {
-      if (isInput) {
-        if (curCurrency === "USD") {
-          setMargin(
-            filterPrecision(+amount / leverage, curToken?.displayDecimal) || ""
-          );
-        } else {
-          setMargin(
-            filterPrecision(
-              (+amount * +price) / leverage,
-              curToken?.displayDecimal
-            ) || ""
-          );
-        }
-      }
-    }, [inputAmount, isInput, curCurrency, price]);
-
-    const [confirmedParams, setConfirmedParams] = useState<
-      ParamsProps | undefined
-    >();
-    const [longStopPriceInputType, setLongStopPriceInputType] =
-      useState("normal");
-    const [shortStopPriceInputType, setShortStopPriceInputType] =
-      useState("normal");
-
-    const currencyAmount = useMemo(() => {
-      let _amount = amount;
-      if (curCurrency !== "USD") {
-        _amount = BigNumber(amount).multipliedBy(price).toString();
-      }
-
-      return _amount;
-    }, [amount, curCurrency, curToken]);
-
-    const priceImpactK = usePriceImpactK(curToken.symbolName);
-
-    const { buyPriceImpactDepth, sellPriceImpactDepth } = usePriceImpactDepth();
-
-    const { sendByDelegate } = useSendTxByDelegate();
-
-    /**
+     /**
      * 生成 limit or market tx params;
      */
-    const createTx = useCallback((side: FutureType,type: string, margin_: string, price_: string, amount_: string, slippage_: string | number, token_: Token) => {
+     const createTx = useCallback((side: FutureType,type: string, margin_: string, price_: string, amount_: string, slippage_: string | number, token_: Token) => {
 
 
       const curTokenParDecimal = getExponent(token_.pars);
@@ -516,11 +354,12 @@ const OpenOrder: React.FC<{
         ethers.utils.parseUnits(amount_, 6).toString() 
       ];
     
-
+      // 是否是市价单
       const isMarket = type === 'market';
       if(isMarket) {
         params.push(+dayjs().add(5, 'm').unix());
       }
+
       params.push(side === FutureType.LONG ? FutureType.LONG : FutureType.SHORT);
       const methodName = isMarket ? MakeOrderFunctionName.MARKET : MakeOrderFunctionName.LIMIT;
 
@@ -529,11 +368,11 @@ const OpenOrder: React.FC<{
         functionName: methodName,
         args: params,
       });
-
+      // 根据单的类型确定合约地址
       const contractAddress = isMarket ? MarketOrderContractParams.address : LimitOrderContractParams.address;
       return [
         contractAddress, 
-        false,
+        false, // allowfailure 此处应该是false， 及不允许失败
         appConfig.executionFee,
         txData
       ];
@@ -569,30 +408,10 @@ const OpenOrder: React.FC<{
         paramData
       ]
 
-
-      const p = [
-        // futureId,
-        // size = amount / pars
-        // triggerPrice 
-        // allowfailure
-        // futureType
-      ]
-
-
-
-
-      // const contracts = await prepareWriteContract({
-      //   ...StopOrderImplementationContract,
-      //   chainId: chain?.id,
-      //   functionName: 'makeFutureStopOrder',
-      //   args: arg,
-      // });
-      // stopOrderConfig.push([contracts.address, false, execFeeRaw, contracts.request.data]);
-
     }, []);
 
 
-    //
+    // 发起交易
     const submitTx = useCallback((params: any, handleType: string, tickPrice: string | number) => {
       const delegateParams = [];
 
@@ -630,55 +449,244 @@ const OpenOrder: React.FC<{
         }, BigNumber(0)).toString(),
         showMsg: false,
       });
-    }, [curToken, tickerPrice]);
+    }, [curToken]);
 
 
-    const handleOpen = (type: string) => {
-      setLongStopPriceInputType("normal");
-      setShortStopPriceInputType("normal");
-      if (showStopOrder) {
-        //判断止盈止损价格是否超出
-        let longFlag = false,
-          shortFlag = false;
-        if (type === "long") {
-          longFlag =
-            !!longStopPrice &&
-            !!price &&
-            (+longStopPrice > +price * ((curToken?.maxProfitRatio || 0) + 1) ||
-              +longStopPrice < +price);
 
-          shortFlag = !!shortStopPrice && !!price && +shortStopPrice > +price;
-        } else {
-          longFlag =
-            !!longStopPrice &&
-            !!price &&
-            (+longStopPrice < +price / ((curToken?.maxProfitRatio || 0) + 1) ||
-              +longStopPrice > +price);
 
-          shortFlag = !!shortStopPrice && !!price && +shortStopPrice < +price;
-        }
+  const onClose = () => {
+    setVisible(false);
+  };
+  const onConfirm = () => {
+    submitTx(confirmedParams, confirmedParams?.futureType as string, tickerPrice.currentTickerPrice);
+    setVisible(false);
+  };
+  const onCancel = () => {
+    setVisible(false);
+  };
 
-        setLongStopPriceInputType(longFlag ? "warn" : "normal");
-        setShortStopPriceInputType(shortFlag ? "warn" : "normal");
+  const longAvailableTokenForFutureResults = useMemo(() => {
+    const long = currentTokenAvailableLiq?.longReadable || "0";
 
-        if (longFlag || shortFlag) {
-          return;
-        }
-      }
-      let _amount = amount;
-      if (curCurrency === "USD") {
-        const decimal = getExponent(
-          Number(curToken?.perpConfig?.contractSize) || 1
+    return BigNumber(long).toString();
+  }, [currentTokenAvailableLiq?.longReadable]);
+
+  const shortAvailableTokenForFutureResults = useMemo(() => {
+    const short = currentTokenAvailableLiq?.shortReadable || "0";
+
+    return BigNumber(short).toString();
+  }, [currentTokenAvailableLiq?.shortReadable]);
+
+  const longPnl = useMemo(() => {
+    let v = "--";
+    if (amount && price && longStopPrice) {
+      if (!shortStopPrice && shortStopPrice) {
+        v = filterPrecision(
+          BigNumber(
+            curCurrency === "USD"
+              ? ((+longStopPrice - +price) * +amount) / +price
+              : (+longStopPrice - +price) * +amount
+          )
+            .abs()
+            .toString(),
+          curToken?.displayDecimal
         );
-        _amount = filterPrecision(+amount / +price, decimal);
+      } else {
+        v = filterPrecision(
+          BigNumber(
+            curCurrency === "USD"
+              ? ((+longStopPrice - +price) * +amount) / +price
+              : (+longStopPrice - +price) * +amount
+          ).toString(),
+          curToken?.displayDecimal
+        );
+      }
+    }
+    return v;
+  }, [amount, price, longStopPrice, curCurrency, shortStopPrice]);
+
+  const shortPnl = useMemo(() => {
+    let v = "--";
+    if (amount && price && shortStopPrice) {
+      if (!longStopPrice) {
+        v = filterPrecision(
+          BigNumber(
+            curCurrency === "USD"
+              ? ((+shortStopPrice - +price) * +amount) / +price
+              : (+shortStopPrice - +price) * +amount
+          )
+            .abs()
+            .toString(),
+          curToken?.displayDecimal
+        );
+        v = "-" + v;
+      } else {
+        v = filterPrecision(
+          BigNumber(
+            curCurrency === "USD"
+              ? ((+price - +shortStopPrice) * +amount) / +price
+              : (+price - +shortStopPrice) * +amount
+          ).toString(),
+          curToken?.displayDecimal
+        );
+      }
+    }
+    return v;
+  }, [amount, price, shortStopPrice, curCurrency, longStopPrice]);
+
+  // u本位 amount=margin*leverage ,amount输入变化，leverage不变，margin变化，下面百分比变化，百分比*fund savailable=amount
+  // 币本位 amount=margin*leverage/price，amount输入变化同上
+
+  const [inputAmount, setInputAmount] = useState<string>("");
+  const [marginPercent, setMarginPercent] = useState<number>(0);
+
+
+  const fundsAvailable = exchangeBalance["USDX"]?.balanceReadable || "0";
+  const [isInput, setIsInput] = useState(false);
+  const [isMarginInput, setIsMarginInput] = useState(false);
+
+  const amountDecimal = useMemo(() => {
+    if (curCurrency === "USD") {
+      return 6;
+    } else {
+      return getExponent(Number(curToken?.perpConfig?.contractSize) || 1);
+    }
+  }, [curCurrency, curToken]);
+
+  useEffect(() => {
+    if (!isInput) {
+      if (curCurrency === "USD") {
+        setAmount(
+          margin && leverage
+            ? filterPrecision(
+                BigNumber(margin).multipliedBy(leverage).toString(),
+                amountDecimal
+              )
+            : ""
+        );
+      } else {
+        setAmount(
+          margin && price && leverage
+            ? filterPrecision(
+                BigNumber(margin)
+                  .multipliedBy(leverage)
+                  .dividedBy(price)
+                  .toString(),
+                amountDecimal
+              )
+            : ""
+        );
+      }
+    }
+  }, [margin, leverage, curCurrency, price, isInput, curToken, amountDecimal]);
+
+  useEffect(() => {
+    !isMarginInput &&
+      curToken?.displayDecimal &&
+      marginPercent &&
+      setMargin(
+        filterPrecision(
+          BigNumber(marginPercent).multipliedBy(fundsAvailable).toString(),
+          curToken?.displayDecimal
+        )
+      );
+  }, [marginPercent, curToken, isMarginInput]);
+
+  useEffect(() => {
+    setInputAmount(amount);
+  }, [amount, amountDecimal]);
+
+  useEffect(() => {
+    if (isInput) {
+      if (curCurrency === "USD") {
+        setMargin(
+          filterPrecision(
+            BigNumber(amount).dividedBy(leverage).toString(),
+            curToken?.displayDecimal
+          ) || ""
+        );
+      } else {
+        setMargin(
+          filterPrecision(
+            BigNumber(amount)
+              .multipliedBy(price)
+              .dividedBy(leverage)
+              .toString(),
+
+            curToken?.displayDecimal
+          ) || ""
+        );
+      }
+    }
+  }, [inputAmount, isInput, curCurrency, price]);
+
+
+  const currencyAmount = useMemo(() => {
+    let _amount = amount;
+    if (curCurrency !== "USD") {
+      _amount = BigNumber(amount).multipliedBy(price).toString();
+    }
+
+    return _amount;
+  }, [amount, curCurrency, curToken]);
+
+  const handleOpen = (type: string) => {
+    setLongStopPriceInputType("normal");
+    setShortStopPriceInputType("normal");
+    if (showStopOrder) {
+      //判断止盈止损价格是否超出
+      let longFlag = false,
+        shortFlag = false;
+      if (type === "long") {
+        const maxProfitPrice = BigNumber(price).multipliedBy(
+          (curToken?.maxProfitRatio || 0) + 1
+        );
+        longFlag =
+          !!longStopPrice &&
+          !!price &&
+          (BigNumber(longStopPrice).gt(maxProfitPrice) ||
+            BigNumber(longStopPrice).lt(price));
+
+        shortFlag =
+          !!shortStopPrice && !!price && BigNumber(shortStopPrice).gt(price);
+      } else {
+        const maxProfitPrice = BigNumber(price).dividedBy(
+          (curToken?.maxProfitRatio || 0) + 1
+        );
+
+        longFlag =
+          !!longStopPrice &&
+          !!price &&
+          (BigNumber(longStopPrice).lt(maxProfitPrice) ||
+            BigNumber(longStopPrice).gt(price));
+
+        shortFlag =
+          !!shortStopPrice && !!price && BigNumber(shortStopPrice).lt(price);
       }
 
-      const tradeFee = filterPrecision(
-        BigNumber(_amount).multipliedBy(0.0008).multipliedBy(price).toString(),
-        curToken?.displayDecimal
-      );
+      setLongStopPriceInputType(longFlag ? "warn" : "normal");
+      setShortStopPriceInputType(shortFlag ? "warn" : "normal");
 
-      const priceImpactFee = BigNumber(BigNumber(margin).multipliedBy(leverage) || '0')
+      if (longFlag || shortFlag) {
+        return;
+      }
+    }
+    let _amount = amount;
+    if (curCurrency === "USD") {
+      const decimal = getExponent(
+        Number(curToken?.perpConfig?.contractSize) || 1
+      );
+      _amount = filterPrecision(
+        BigNumber(amount).dividedBy(price).toString(),
+        decimal
+      );
+    }
+
+    const tradeFee = filterPrecision(
+      BigNumber(_amount).multipliedBy(curToken?.tradingFeeRatio || BasicTradingFeeRatio).div(100).multipliedBy(price).toString(),
+      curToken?.displayDecimal
+    );
+    const priceImpactFee = BigNumber(BigNumber(margin).multipliedBy(leverage) || '0')
         .exponentiatedBy(2)
         .div(
           BigNumber(priceImpactK)
@@ -688,283 +696,283 @@ const OpenOrder: React.FC<{
         .multipliedBy(1)
         .toString();
 
-      const params = {
-        symbolName,
-        price,
-        margin,
-        amount: _amount,
-        longStopPrice,
-        shortStopPrice,
-        futureType: type,
-        orderType: activeOrderTab,
-        slippage,
-        tradeFee,
-        impactFee: priceImpactFee,
-        fees: BigNumber(tradeFee).plus(priceImpactFee).toString(),
-      };
-      console.log("handleOpen", params);
-      setConfirmedParams(params);
-      const show = localStorage.getItem("showAgain_open");
-
-      if (!show || show === "true") {
-        setVisible(true);
-      } else {
-        submitTx(params, type, tickerPrice.currentTickerPrice);
-      }
+    const params = {
+      symbolName,
+      price,
+      margin,
+      amount: _amount,
+      longStopPrice,
+      shortStopPrice,
+      futureType: type,
+      orderType: activeOrderTab,
+      slippage,
+      tradeFee,
+      impactFee: priceImpactFee,
+      fees: BigNumber(tradeFee).plus(priceImpactFee).toString() ,
     };
+    console.log("handleOpen", params);
+    setConfirmedParams(params);
+    const show = localStorage.getItem("showAgain_open");
 
-    return (
-      <>
-        <Price
-          displayDecimal={curToken?.displayDecimal}
-          symbolName={symbolName}
-          price={price}
-          setPrice={setPrice}
-          activeOrderTab={activeOrderTab}
-        />
-        <MarginAmount>
-          <StyledLayout>
-            <div className="title">
-              Margin
-              <div className="unit">USD</div>
-            </div>
-            <Input
-              type={
-                (margin && BigNumber(margin).gt(fundsAvailable)) || +margin < 0
-                  ? "warn"
-                  : "normal"
-              }
-              placeholder="input margin"
-              value={margin}
-              onBlur={() => {
-                setMargin(
-                  margin ? filterPrecision(margin, curToken?.displayDecimal) : ""
-                );
-              }}
-              onChange={(e: React.FormEvent<HTMLInputElement>) => {
-                const value = e?.currentTarget.value;
-
-                if (value && verifyValidNumber(value, curToken?.displayDecimal)) {
-                  return;
-                }
-
-                setMargin(value);
-                setIsInput(false);
-              }}
-            />
-          </StyledLayout>
-          <StyledLayout>
-            <div className="title">
-              Amount
-              <StyledCurrencySelect
-                curCurrency={curCurrency}
-                list={["USD", symbolName]}
-                handleClick={(item: string) => {
-                  setCurCurrency(item);
-                }}
-              />
-            </div>
-            <Input
-              onBlur={() => {
-                setAmount(amount ? filterPrecision(amount, amountDecimal) : "");
-              }}
-              placeholder="input amount"
-              value={inputAmount}
-              onChange={(e: React.FormEvent<HTMLInputElement>) => {
-                const value = e?.currentTarget.value;
-
-                if (value && verifyValidNumber(value, amountDecimal)) return;
-                setIsInput(true);
-                setAmount(value);
-              }}
-            />
-          </StyledLayout>
-        </MarginAmount>
-        <Slider
-          onChange={(value) => {
-            setMargin(
-              filterPrecision(
-                BigNumber(value).multipliedBy(fundsAvailable).div(100).toString(),
-                curToken?.displayDecimal
-              )
-            );
-            setIsInput(false);
-          }}
-          per={marginPercent || 0}
-          marks={[
-            {
-              label: "",
-              value: 0,
-            },
-            {
-              label: "",
-              value: 25,
-            },
-            {
-              label: "",
-              value: 50,
-            },
-
-            {
-              label: "",
-              value: 75,
-            },
-            {
-              label: "",
-              value: 100,
-            },
-          ]}
-          min={0}
-          max={100}
-          step={25}
-          unit="%"
-        />
-        <Data>
-          <DataItem className="item">
-            <p className="label">Funds Available</p>
-            <p className="value">{filterThousands(fundsAvailable, 2)} USD</p>
-          </DataItem>
-          <DataItem className="item">
-            <p className="label">Max Long</p>
-            <p className="value">
-              {" "}
-              {longAvailableTokenForFutureResults
-                ? filterThousands(longAvailableTokenForFutureResults, 2)
-                : ""}
-              USD
-            </p>
-          </DataItem>
-          <DataItem className="item">
-            <p className="label">Max Short</p>
-            <p className="value">
-              {" "}
-              {shortAvailableTokenForFutureResults
-                ? filterThousands(shortAvailableTokenForFutureResults, 2)
-                : ""}
-              USD
-            </p>
-          </DataItem>
-        </Data>
-        <StopOrder>
-          <div className="title_area">
-            <p className="title_text">Stop Order</p>
-            <CheckBox handleClick={() => setShowStopOrder(!showStopOrder)} />
-          </div>
-          {showStopOrder && (
-            <div className="input_area">
-              <div className="item">
-                <Input
-                  type={longStopPriceInputType}
-                  value={longStopPrice}
-                  onChange={(e: React.FormEvent<HTMLInputElement>) => {
-                    const value = e?.currentTarget.value;
-
-                    if (
-                      value &&
-                      verifyValidNumber(value, curToken?.displayDecimal)
-                    )
-                      return;
-
-                    setLongStopPrice(value);
-                  }}
-                  placeholder="TP Trigger Price"
-                />
-                <div className="pnl">
-                  Est.pnl:<span className="long">{longPnl}USD</span>
-                </div>
-              </div>
-              <div className="item">
-                <Input
-                  type={shortStopPriceInputType}
-                  value={shortStopPrice}
-                  onChange={(e: React.FormEvent<HTMLInputElement>) => {
-                    const value = e?.currentTarget.value;
-
-                    if (
-                      value &&
-                      verifyValidNumber(value, curToken?.displayDecimal)
-                    )
-                      return;
-                    setShortStopPrice(value);
-                  }}
-                  placeholder="SL Trigger Price"
-                />
-                <div className="pnl">
-                  Est.pnl:<span className="short">{shortPnl}USD</span>
-                </div>
-              </div>
-            </div>
-          )}
-        </StopOrder>
-
-        <DataItem className="item">
-          <p className="label">Slippage tolerance</p>
-
-          <div className="slippage">
-            <input
-              onBlur={() => {
-                localStorage.setItem("slippage", slippage);
-              }}
-              value={slippage}
-              className="input"
-              onChange={(e: React.FormEvent<HTMLInputElement>) => {
-                const value = e?.currentTarget.value;
-
-                if (value && verifyValidNumber(value, 2)) return;
-
-                if (+value / 100 > (curToken?.maxLeverage as number)) {
-                  setSlippage((curToken?.maxLeverage as number) * 100 + "");
-                  return;
-                }
-                setSlippage(value);
-              }}
-            />
-            %
-          </div>
-        </DataItem>
-        <Fee>
-          <p className="label">
-            Fee
-            <div className="content">
-              <DataItem className="item upgrade_item">
-                <p className="label">VIP Level:Tier</p>
-                <p className="value upgrade">upgrade</p>
-              </DataItem>
-              <DataItem className="item">
-                <p className="label">Fee discount</p>
-                <p className="value">20%</p>
-              </DataItem>
-            </div>
-          </p>
-          <p className="value">0.08%</p>
-        </Fee>
-        {price && margin && leverage && BigNumber(currencyAmount).gt(10) ? (
-          <Btns
-            handleClick={handleOpen}
-            longBtnText="LONG"
-            shortBtnText="SHORT"
-            showIcon={true}
-          />
-        ) : (
-          <DefaultBtn>
-            {price && margin && leverage && !BigNumber(currencyAmount).gt(10)
-              ? "Amount should over 10 USD"
-              : "Please enter the price"}
-          </DefaultBtn>
-        )}
-        <Modal
-          height={500}
-          onClose={onClose}
-          visible={visible}
-          title="Open Position"
-          onConfirm={onConfirm}
-          onCancel={onCancel}
-        >
-          {confirmedParams && (
-            <OrderConfirm params={confirmedParams} actionType="open" />
-          )}
-        </Modal>
-      </>
-    );
+    if (!show || show === "true") {
+      setVisible(true);
+    } else{
+      // 如果不弹窗，则直接发起交易
+      submitTx(params, type, tickerPrice.currentTickerPrice);
+    }
   };
+
+  return (
+    <>
+      <Price
+        displayDecimal={curToken?.displayDecimal}
+        symbolName={symbolName}
+        price={price}
+        setPrice={setPrice}
+        activeOrderTab={activeOrderTab}
+      />
+      <MarginAmount>
+        <StyledLayout>
+          <div className="title">
+            Margin
+            <div className="unit">USD</div>
+          </div>
+          <Input
+            type={
+              (margin && BigNumber(margin).gt(fundsAvailable)) || +margin < 0
+                ? "warn"
+                : "normal"
+            }
+            placeholder="input margin"
+            value={margin}
+            onBlur={() => {
+              setMargin(
+                margin ? filterPrecision(margin, curToken?.displayDecimal) : ""
+              );
+            }}
+            onChange={(e: React.FormEvent<HTMLInputElement>) => {
+              const value = e?.currentTarget.value;
+
+              if (value && verifyValidNumber(value, curToken?.displayDecimal)) {
+                return;
+              }
+
+              setMargin(value);
+              setMarginPercent(0);
+              setIsInput(false);
+              setIsMarginInput(true);
+            }}
+          />
+        </StyledLayout>
+        <StyledLayout>
+          <div className="title">
+            Amount
+            <StyledCurrencySelect
+              curCurrency={curCurrency}
+              list={["USD", symbolName]}
+              handleClick={(item: string) => {
+                setCurCurrency(item);
+              }}
+            />
+          </div>
+          <Input
+            onBlur={() => {
+              setAmount(amount ? filterPrecision(amount, amountDecimal) : "");
+            }}
+            placeholder="input amount"
+            value={inputAmount}
+            onChange={(e: React.FormEvent<HTMLInputElement>) => {
+              const value = e?.currentTarget.value;
+
+              if (value && verifyValidNumber(value, amountDecimal)) return;
+              setIsInput(true);
+              setAmount(value);
+            }}
+          />
+        </StyledLayout>
+      </MarginAmount>
+      <Slider
+        onChange={(value) => {
+          setIsMarginInput(false);
+          setMarginPercent(BigNumber(value).dividedBy(100).toNumber());
+
+          setIsInput(false);
+        }}
+        per={marginPercent || 0}
+        marks={[
+          {
+            label: "",
+            value: 0,
+          },
+          {
+            label: "",
+            value: 25,
+          },
+          {
+            label: "",
+            value: 50,
+          },
+
+          {
+            label: "",
+            value: 75,
+          },
+          {
+            label: "",
+            value: 100,
+          },
+        ]}
+        min={0}
+        max={100}
+        step={25}
+        unit="%"
+      />
+      <Data>
+        <DataItem className="item">
+          <p className="label">Funds Available</p>
+          <p className="value">{filterThousands(fundsAvailable, 2)} USD</p>
+        </DataItem>
+        <DataItem className="item">
+          <p className="label">Max Long</p>
+          <p className="value">
+            {" "}
+            {longAvailableTokenForFutureResults
+              ? filterThousands(longAvailableTokenForFutureResults, 2)
+              : ""}
+            USD
+          </p>
+        </DataItem>
+        <DataItem className="item">
+          <p className="label">Max Short</p>
+          <p className="value">
+            {" "}
+            {shortAvailableTokenForFutureResults
+              ? filterThousands(shortAvailableTokenForFutureResults, 2)
+              : ""}
+            USD
+          </p>
+        </DataItem>
+      </Data>
+      <StopOrder>
+        <div className="title_area">
+          <p className="title_text">Stop Order</p>
+          <CheckBox handleClick={() => setShowStopOrder(!showStopOrder)} />
+        </div>
+        {showStopOrder && (
+          <div className="input_area">
+            <div className="item">
+              <Input
+                type={longStopPriceInputType}
+                value={longStopPrice}
+                onChange={(e: React.FormEvent<HTMLInputElement>) => {
+                  const value = e?.currentTarget.value;
+
+                  if (
+                    value &&
+                    verifyValidNumber(value, curToken?.displayDecimal)
+                  )
+                    return;
+
+                  setLongStopPrice(value);
+                }}
+                placeholder="TP Trigger Price"
+              />
+              <div className="pnl">
+                Est.pnl:<span className="long">{longPnl}USD</span>
+              </div>
+            </div>
+            <div className="item">
+              <Input
+                type={shortStopPriceInputType}
+                value={shortStopPrice}
+                onChange={(e: React.FormEvent<HTMLInputElement>) => {
+                  const value = e?.currentTarget.value;
+
+                  if (
+                    value &&
+                    verifyValidNumber(value, curToken?.displayDecimal)
+                  )
+                    return;
+                  setShortStopPrice(value);
+                }}
+                placeholder="SL Trigger Price"
+              />
+              <div className="pnl">
+                Est.pnl:<span className="short">{shortPnl}USD</span>
+              </div>
+            </div>
+          </div>
+        )}
+      </StopOrder>
+
+      <DataItem className="item">
+        <p className="label">Slippage tolerance</p>
+
+        <div className="slippage">
+          <input
+            onBlur={() => {
+              localStorage.setItem("slippage", slippage);
+            }}
+            value={slippage}
+            className="input"
+            onChange={(e: React.FormEvent<HTMLInputElement>) => {
+              const value = e?.currentTarget.value;
+
+              if (value && verifyValidNumber(value, 2)) return;
+
+              if (+value / 100 > (curToken?.maxLeverage as number)) {
+                setSlippage((curToken?.maxLeverage as number) * 100 + "");
+                return;
+              }
+              setSlippage(value);
+            }}
+          />
+          %
+        </div>
+      </DataItem>
+      <Fee>
+        <p className="label">
+          Fee
+          <div className="content">
+            <DataItem className="item upgrade_item">
+              <p className="label">VIP Level:Tier</p>
+              <p className="value upgrade">upgrade</p>
+            </DataItem>
+            <DataItem className="item">
+              <p className="label">Fee discount</p>
+              <p className="value">20%</p>
+            </DataItem>
+          </div>
+        </p>
+        <p className="value">0.08%</p>
+      </Fee>
+      {price && margin && leverage && BigNumber(currencyAmount).gt(10) ? (
+        <Btns
+          handleClick={handleOpen}
+          longBtnText="LONG"
+          shortBtnText="SHORT"
+          showIcon={true}
+        />
+      ) : (
+        <DefaultBtn>
+          {price && margin && leverage && !BigNumber(currencyAmount).gt(10)
+            ? "Amount should over 10 USD"
+            : "Please enter the price"}
+        </DefaultBtn>
+      )}
+      <Modal
+        height={500}
+        onClose={onClose}
+        visible={visible}
+        title="Open Position"
+        onConfirm={onConfirm}
+        onCancel={onCancel}
+      >
+        {confirmedParams && (
+          <OrderConfirm params={confirmedParams} actionType="open" />
+        )}
+      </Modal>
+    </>
+  );
+};
 export default OpenOrder;

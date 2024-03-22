@@ -13,7 +13,7 @@ const Wrapper = styled.div`
   padding: 16px 20px;
   flex-shrink: 0;
   &:hover {
-    box-shadow: 0px 0px 20px 0px rgba(124, 103, 255, 0.25);
+    box-shadow: ${props => props.theme.colors.fill2Hover}
   }
 `
 
@@ -56,15 +56,15 @@ const ReferralCode: FC = () => {
   return (
     <Wrapper>
       <Row>
-        <FlexBox justify="space-between">
+        <FlexBox justifyContent="space-between">
           <Label>Bound referral code:</Label>
           <Button onClick={openModal}>Bind Referral Code</Button>
         </FlexBox>
-        <FlexBox justify="space-between">
+        <FlexBox justifyContent="space-between">
           <Label>Enjoyed code ratio:</Label>
           <Label>-</Label>
         </FlexBox>
-        <FlexBox justify="space-between">
+        <FlexBox justifyContent="space-between">
           <Label>Bonus ratio:</Label>
           <Label>10%</Label>
         </FlexBox>

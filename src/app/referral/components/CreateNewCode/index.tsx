@@ -106,11 +106,11 @@ export const CreateNewCode = ({
     >
       <Title>Set rebate split</Title>
       <Ration>
-        <FlexBox justify="space-between">
+        <FlexBox justifyContent="space-between">
           <Label>Total rebate ratio:</Label>
           <Value>{totalRation}%</Value>
         </FlexBox>
-        <FlexBox justify="space-between">
+        <FlexBox justifyContent="space-between">
           <Label>Yours / Friends&apos;:</Label>
           <Value>{`${ratio}%/${totalRation - ratio}%`}</Value>
         </FlexBox>
@@ -133,7 +133,7 @@ export const CreateNewCode = ({
         value={note}
         onChange={handleChange}
       />
-      <FlexBox justify="space-between" align="center">
+      <FlexBox justifyContent="space-between" alignItems="center">
         <Title>Set as default</Title>
         <Checkbox padding={2} checked={defaultChecked} onChange={setDefaultChecked} />
       </FlexBox>

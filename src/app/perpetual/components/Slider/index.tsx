@@ -2,6 +2,12 @@
 import React, { useMemo } from "react";
 import styled from "styled-components";
 import { useEffect, useState, useRef } from "react";
+import {
+  filterPrecision,
+  getExponent,
+  filterThousands,
+} from "@/app/utils/tools";
+import BigNumber from "bignumber.js";
 const Wrapper = styled.div`
   position: relative;
 `;
@@ -49,7 +55,7 @@ const CurDot = styled(Dot)<PercentProps>`
   z-index: 6;
   right: 0;
   transform: ${(props) => {
-    if (props?.percent === 0) {
+    if (props?.percent <0.1) {
       return "translate(100%,-50%)";
     } else if (props?.percent === 1) {
       return "translate(0,-50%)";
@@ -66,10 +72,10 @@ const CurDot = styled(Dot)<PercentProps>`
     line-height: 120%;
     position: relative;
     transform: ${(props) => {
-      if (props?.percent === 0) {
+      if (props?.percent < 0.1) {
         return "translate(0, -100%)";
       } else if (props?.percent === 1) {
-        return "translate(-100%,-100%)";
+        return "translate(-310%,-100%)";
       } else {
         return "translate(-100%,-100%)";
       }
@@ -125,7 +131,7 @@ const Mark = styled.div<PercentProps>`
 export interface SliderProps {
   className?: string;
   disabled?: boolean;
-  value?: number;
+  value?: string;
   min: number;
   max: number;
   step?: number; // 步长，取值必须大于 0，并且可被 (max - min) 整除。
@@ -141,7 +147,7 @@ const Slider: React.FC<SliderProps> = ({
   min = 0,
   max = 100,
   step = 1,
-  value = 0,
+  value,
   unit,
   onChange,
   per,
@@ -207,15 +213,45 @@ const Slider: React.FC<SliderProps> = ({
   }, [isDragging]);
 
   useEffect(() => {
-    onChange && isChange && onChange(Math.floor((max - min) * percent + min));
+    if (onChange && isChange) {
+      const v = BigNumber(max)
+        .minus(min)
+        .multipliedBy(percent)
+        .plus(min)
+        .toNumber();
+      console.log("Leverage_left-change", v, filterPrecision(v, 2));
+
+      onChange(BigNumber(v).lt(1) ? v : +filterPrecision(v, 2));
+    }
   }, [percent, isChange]);
+
+  const showValue = useMemo(() => {
+    console.log("Leverage_left_value11", value, value === "");
+    if (value || value === "") {
+      return value || min;
+    } else {
+      const v = BigNumber(max)
+        .minus(min)
+        .multipliedBy(per)
+        .plus(min)
+        .toNumber();
+      console.log("Leverage_left_value", v, per, +filterPrecision(v, 2));
+      return v ? +filterPrecision(v, 2) : 0;
+    }
+  }, [max, min, per, value]);
   return (
     <Wrapper>
       <Track
         ref={trackRef}
         onClick={(e) => {
           setIsChange(true);
-          setPercent((e.clientX - zeroX - 5) / trackWidth);
+          setPercent(
+            BigNumber(e.clientX)
+              .minus(zeroX)
+              .minus(5)
+              .dividedBy(trackWidth)
+              .toNumber()
+          );
         }}
       />
       <SliderThumb
@@ -224,7 +260,13 @@ const Slider: React.FC<SliderProps> = ({
         onClick={(e) => {
           if (!isDragging) {
             setIsChange(true);
-            setPercent((e.clientX - zeroX - 5) / trackWidth);
+            setPercent(
+              BigNumber(e.clientX)
+                .minus(zeroX)
+                .minus(5)
+                .dividedBy(trackWidth)
+                .toNumber()
+            );
           }
         }}
       >
@@ -238,19 +280,20 @@ const Slider: React.FC<SliderProps> = ({
           }}
         >
           <p className="value">
-            {(max - min) * per + min < 1
-              ? ((max - min) * per + min).toFixed(1)
-              : Math.floor((max - min) * per + min)}
-            {/* {per} */}
+            {showValue}
             {unit}
           </p>
         </CurDot>
       </SliderThumb>
       <Marks>
         {marks.map((i, index) => {
-          const left = (i?.value - min) / (max - min);
+          // const left = (i?.value - min) / (max - min);
+          const left = BigNumber(i?.value)
+            .minus(min)
+            .dividedBy(BigNumber(max).minus(min))
+            .toNumber();
           const _left = index === 0 ? 0 : left > 1 ? 1 : left;
-
+          console.log("_left", _left);
           return (
             <Mark
               key={_left}

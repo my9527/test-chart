@@ -141,16 +141,16 @@ export function StakeFormContent() {
         </SelectArea>
         <Divider />
         <Form>
-          <FlexBox justify="space-between">
+          <FlexBox justifyContent="space-between">
             <Label>Score</Label>
             <Label>123,123,123.00</Label>
           </FlexBox>
-          <FlexBox justify="space-between">
+          <FlexBox justifyContent="space-between">
             <Label>Maturity</Label>
             <Label>26 Mar 2024</Label>
           </FlexBox>
         </Form>
-        <FlexBox justify="center"><Button disabled={stakeDisabled}>Stake</Button></FlexBox>
+        <FlexBox justifyContent="center"><Button disabled={stakeDisabled}>Stake</Button></FlexBox>
       </Content>
     </>
   )

@@ -87,16 +87,16 @@ export function BuySellContent() {
         />
         <Form>
           <Label>{`1 ${token} = 1.00 USDX`}</Label>
-          <FlexBox justify="space-between">
+          <FlexBox justifyContent="space-between">
             <Label>Fees</Label>
             <Value>-</Value>
           </FlexBox>
-          <FlexBox justify="space-between">
+          <FlexBox justifyContent="space-between">
             <Label>{`Est. ${token} received`}</Label>
             <Value>123,123.00</Value>
           </FlexBox>
         </Form>
-        <FlexBox justify="center"><Button>{type === TradeType.Sell ? 'Sell' : 'Buy'}</Button></FlexBox>
+        <FlexBox justifyContent="center"><Button>{type === TradeType.Sell ? 'Sell' : 'Buy'}</Button></FlexBox>
       </Content>
     </>
   )
