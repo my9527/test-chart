@@ -2,16 +2,20 @@
 import styled from "styled-components";
 import Tabs from "../Tabs";
 import { tabProps } from "../Tabs";
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import Modal from "@/app/components/Modal";
 import TokenImage from "@/app/components/TokenImage";
-import { useTokenByName } from "@/app/hooks/useTokens";
+import { useTokenByFutureId, useTokenByName } from "@/app/hooks/useTokens";
 import BigNumber from "bignumber.js";
 import Input from "@/app/components/Input";
 import { getExponent, filterPrecision } from "@/app/utils/tools";
 import { verifyValidNumber } from "@/app/utils/tools";
 import Slider from "../Slider";
 import { useEffect } from "react";
+import { getLiqPrice } from "@/app/perpetual/lib/getLiqPrice";
+import { recoilOpenInterests } from "@/app/models";
+import { useRecoilValue } from "recoil";
+import { useExchangeBalance } from "@/app/hooks/useBalance";
 const Wrapper = styled.div`
   position: relative;
   width: 100%;
@@ -115,24 +119,87 @@ const MaxAmount = styled.div`
     color: ${(props) => props.theme.colors.text1};
   }
 `;
-const StyledOrderInfo=styled(OrderInfo)`margin-top:20px;`
+const StyledOrderInfo = styled(OrderInfo)`
+  margin-top: 20px;
+`;
 type TypeMap = { [key: string]: string };
 export type ParamsProps = {
-  symbolName: string;
   futureType: string;
   margin: string;
   fundsAvailable: string;
   leverage: string;
+  tokenSize: string;
+  isLong: boolean;
+  futureId: string;
+  entryPriceReadable: string;
+  collateralReadable: string;
 };
-const AdjustMargin: React.FC<{ params: ParamsProps; isVisible: boolean }> = ({
-  isVisible = false,
-  params,
-}) => {
-  const [visible, setVisible] = useState(isVisible);
+const AdjustMargin: React.FC<{
+  params: ParamsProps;
+  visible: boolean;
+  setVisible: Function;
+}> = ({ params, visible, setVisible }) => {
   const [activeTypeTab, setActiveTypeTab] = useState<string>("add");
-  const curToken = useTokenByName(params?.symbolName);
+  const curToken = useTokenByFutureId(params?.futureId);
   const [margin, setMargin] = useState<string>("");
   const [marginPercent, setMarginPercent] = useState<number>(0);
+  const { currentTokenAvailableLiq } = useRecoilValue(recoilOpenInterests);
+  const [isMarginInput, setIsMarginInput] = useState(false);
+  const balance = useExchangeBalance();
+
+  const maxAmount = useMemo(() => {
+    const v =
+      Math.max(
+        0,
+        Math.min(
+          BigNumber(
+            params?.isLong
+              ? currentTokenAvailableLiq?.longReadable
+              : currentTokenAvailableLiq?.shortReadable
+          )
+            .dividedBy(curToken?.maxProfitRatio || 1)
+            .toNumber(),
+          +balance["USDX"]?.balanceReadable,
+          BigNumber(params?.tokenSize)
+            .multipliedBy(params?.entryPriceReadable)
+            .minus(params?.collateralReadable)
+            .minus(0.1)
+            .toNumber()
+        )
+      ) || 0;
+    return filterPrecision(v, curToken?.displayDecimal);
+  }, [
+    curToken?.maxProfitRatio,
+    currentTokenAvailableLiq,
+    params?.tokenSize,
+    params?.entryPriceReadable,
+    balance,
+    params?.collateralReadable,
+    params?.isLong,
+  ]);
+
+  const liqPriceReadable = getLiqPrice({
+    size: params?.tokenSize,
+    // futureId: i.futureId,
+    token: curToken,
+    isLong: params?.isLong,
+    collateral: params?.collateralReadable,
+    fees: 0,
+    entryPrice: params?.entryPriceReadable,
+  });
+
+  useEffect(() => {
+    !isMarginInput &&
+      curToken?.displayDecimal &&
+      marginPercent &&
+      maxAmount &&
+      setMargin(
+        filterPrecision(
+          BigNumber(marginPercent).multipliedBy(maxAmount).toString(),
+          curToken?.displayDecimal
+        )
+      );
+  }, [marginPercent, curToken, isMarginInput, maxAmount]);
 
   const typeTabList = [
     { label: "Add Margin", key: "add" },
@@ -153,14 +220,6 @@ const AdjustMargin: React.FC<{ params: ParamsProps; isVisible: boolean }> = ({
     setVisible(false);
   };
 
-  useEffect(() => {
-    const per = filterPrecision(
-      BigNumber(margin).dividedBy(params?.fundsAvailable).toString(),
-      2
-    );
-    setMarginPercent(+per > 1 ? 1 : +per);
-  }, [margin, params?.fundsAvailable]);
-
   return (
     <Modal
       height={600}
@@ -179,8 +238,8 @@ const AdjustMargin: React.FC<{ params: ParamsProps; isVisible: boolean }> = ({
           }}
         />
         <Symbol>
-          <TokenImage name={params?.symbolName} width={20} height={20} />
-          <p className="symbol_name">{params?.symbolName}USD</p>
+          <TokenImage name={curToken?.symbolName} width={20} height={20} />
+          <p className="symbol_name">{curToken?.symbolName}USD</p>
           <p className={`future_type future_type_${params?.futureType}`}>
             {futureTypeMap[params?.futureType]}
             &nbsp;
@@ -221,21 +280,19 @@ const AdjustMargin: React.FC<{ params: ParamsProps; isVisible: boolean }> = ({
               }
 
               setMargin(value);
+              setMarginPercent(0);
+              setIsMarginInput(true);
             }}
           />
         </Layout>
         <MaxAmount>
           <p className="label">Max adjustment amount</p>
-          <p className="value">{params?.fundsAvailable} UDSX</p>
+          <p className="value">{maxAmount} USD</p>
         </MaxAmount>
         <Slider
           onChange={(value) => {
-            setMargin(
-              filterPrecision(
-                (value / 100) * +params?.fundsAvailable,
-                curToken?.displayDecimal
-              )
-            );
+            setIsMarginInput(false);
+            setMarginPercent(BigNumber(value).dividedBy(100).toNumber());
           }}
           per={marginPercent || 0}
           marks={[
