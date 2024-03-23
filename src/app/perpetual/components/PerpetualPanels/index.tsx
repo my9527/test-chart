@@ -75,7 +75,10 @@ const ScrollWrapper = styled.div`
     background: #292929;
   }
 `;
-const Leverage = styled.div`
+type VisibleProps = {
+  visible: boolean;
+};
+const Leverage = styled.div<VisibleProps>`
   position: absolute;
   bottom: 0;
   right: 14px;
@@ -99,6 +102,12 @@ const Leverage = styled.div`
     height: 6px;
     flex-shrink: 0;
   }
+
+  img {
+    transform: ${(props) => {
+      return `rotate(${props.visible ? "180deg" : "0deg"})`;
+    }};
+  }
 `;
 
 const PerpetualPanels = () => {
@@ -106,10 +115,10 @@ const PerpetualPanels = () => {
 
   const [activeTab, setActiveTab] = useState<string>("open");
   const [activeOrderTab, setActiveOrderTab] = useState<string>("limit");
-  const defaultLeverage = 5;
-  const [leverage, setLeverage] = useState<number>(defaultLeverage);
+  const defaultLeverage = "5";
+  const [leverage, setLeverage] = useState<string>(defaultLeverage);
   const [confirmedLeverage, setConfirmedLeverage] =
-    useState<number>(defaultLeverage);
+    useState<string>(defaultLeverage);
 
   const [margin, setMargin] = useState<string>("");
 
@@ -163,7 +172,7 @@ const PerpetualPanels = () => {
             }}
           />
           {activeTab === "close" ? null : (
-            <Leverage onClick={() => setVisible(true)}>
+            <Leverage onClick={() => setVisible(true)} visible={visible}>
               <p className="label">{confirmedLeverage}X</p>
               <Image src={ArrowIcon} width={8} height={6} alt="" />
             </Leverage>
