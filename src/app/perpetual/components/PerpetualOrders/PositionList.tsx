@@ -294,8 +294,7 @@ const Position: FCC<{
 
   const liqPrice = useMemo(() => {
     // console.log("liqPrice", pos.collateral, feesReadable, pos.entryPriceReadable, pos.tokenSize, pos.isLong, token)
-
-    return getLiqPrice({
+    const _liqPrice = getLiqPrice({
       collateral: pos.collateralReadable,
       fees: feesReadable,
       entryPrice: pos.entryPriceReadable,
@@ -303,6 +302,11 @@ const Position: FCC<{
       isLong: pos.isLong,
       token: token,
     });
+    return filterPrecision(
+      _liqPrice,
+      token.displayDecimal,
+      pos?.isLong ? BigNumber.ROUND_CEIL : BigNumber.ROUND_DOWN
+    );
   }, [
     feesReadable,
     pos.collateral,
@@ -337,7 +341,9 @@ const Position: FCC<{
   const hasProfit = useMemo(() => {
     return BigNumber(pnl).lt(0) ? false : true;
   }, [pnl]);
-
+  const markPrice = useMemo(() => {
+    return filterPrecision(indexPrices?.price, token.displayDecimal);
+  }, [indexPrices?.price, token.displayDecimal]);
   return (
     <PositionItemWrapper>
       <td align="left" width={140}>
@@ -358,7 +364,7 @@ const Position: FCC<{
         </div>
       </td>
       <td {...PositionTdAttrs} width={140}>
-        {filterPrecision(indexPrices?.price, token.displayDecimal)}
+        {markPrice}
       </td>
       <td {...PositionTdAttrs} width={140}>
         {filterPrecision(pos.entryPriceReadable, token.displayDecimal)}
@@ -379,16 +385,20 @@ const Position: FCC<{
         </div>
       </td>
       <td {...PositionTdAttrs} width={140}>
-        {filterPrecision(
-          liqPrice,
-          token.displayDecimal,
-          pos?.isLong ? BigNumber.ROUND_CEIL : BigNumber.ROUND_DOWN
-        )}
+        {liqPrice}
       </td>
       <td {...PositionTdAttrs} width={140}>
         <div
           className="button button_wrapper"
-          onClick={() => handleShowAdujustMargin(pos)}
+          onClick={() =>
+            handleShowAdujustMargin({
+              ...pos,
+              liqPrice,
+              pnl,
+              feesReadable,
+              markPrice,
+            })
+          }
         >
           <div className="content">
             <p className="plus">+</p>

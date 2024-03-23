@@ -16,6 +16,8 @@ import { getLiqPrice } from "@/app/perpetual/lib/getLiqPrice";
 import { recoilOpenInterests } from "@/app/models";
 import { useRecoilValue } from "recoil";
 import { useExchangeBalance } from "@/app/hooks/useBalance";
+import { DefaultRemainCollateralRatio } from "@/app/config/common";
+
 const Wrapper = styled.div`
   position: relative;
   width: 100%;
@@ -81,7 +83,7 @@ const OrderInfo = styled.div`
     .value {
       color: ${(props) => props.theme.colors.text1};
     }
-    .margin {
+    .liqPrice {
       color: ${(props) => props.theme.colors.primary1};
     }
   }
@@ -96,10 +98,12 @@ const Layout = styled.div`
     line-height: 100%;
     margin-bottom: 5px;
   }
-  input {
-    color: ${(props) => props.theme.colors.text1};
-    background: ${(props) => props.theme.colors.fill3} !important;
-    border: none !important;
+  .normal {
+    .input {
+      color: ${(props) => props.theme.colors.text1};
+      background: ${(props) => props.theme.colors.fill3} !important;
+      border: none !important;
+    }
   }
 `;
 const MaxAmount = styled.div`
@@ -133,6 +137,10 @@ export type ParamsProps = {
   futureId: string;
   entryPriceReadable: string;
   collateralReadable: string;
+  liqPrice: string;
+  pnl: string;
+  feesReadable: string;
+  markPrice: string;
 };
 const AdjustMargin: React.FC<{
   params: ParamsProps;
@@ -146,61 +154,7 @@ const AdjustMargin: React.FC<{
   const { currentTokenAvailableLiq } = useRecoilValue(recoilOpenInterests);
   const [isMarginInput, setIsMarginInput] = useState(false);
   const balance = useExchangeBalance();
-
-  const maxAmount = useMemo(() => {
-    const v =
-      Math.max(
-        0,
-        Math.min(
-          BigNumber(
-            params?.isLong
-              ? currentTokenAvailableLiq?.longReadable
-              : currentTokenAvailableLiq?.shortReadable
-          )
-            .dividedBy(curToken?.maxProfitRatio || 1)
-            .toNumber(),
-          +balance["USDX"]?.balanceReadable,
-          BigNumber(params?.tokenSize)
-            .multipliedBy(params?.entryPriceReadable)
-            .minus(params?.collateralReadable)
-            .minus(0.1)
-            .toNumber()
-        )
-      ) || 0;
-    return filterPrecision(v, curToken?.displayDecimal);
-  }, [
-    curToken?.maxProfitRatio,
-    currentTokenAvailableLiq,
-    params?.tokenSize,
-    params?.entryPriceReadable,
-    balance,
-    params?.collateralReadable,
-    params?.isLong,
-  ]);
-
-  const liqPriceReadable = getLiqPrice({
-    size: params?.tokenSize,
-    // futureId: i.futureId,
-    token: curToken,
-    isLong: params?.isLong,
-    collateral: params?.collateralReadable,
-    fees: 0,
-    entryPrice: params?.entryPriceReadable,
-  });
-
-  useEffect(() => {
-    !isMarginInput &&
-      curToken?.displayDecimal &&
-      marginPercent &&
-      maxAmount &&
-      setMargin(
-        filterPrecision(
-          BigNumber(marginPercent).multipliedBy(maxAmount).toString(),
-          curToken?.displayDecimal
-        )
-      );
-  }, [marginPercent, curToken, isMarginInput, maxAmount]);
-
+  console.log("params", params);
   const typeTabList = [
     { label: "Add Margin", key: "add" },
     { label: "Reduce Margin", key: "reduce" },
@@ -210,10 +164,255 @@ const AdjustMargin: React.FC<{
     add: "Add margin",
     reduce: "Reduce margin",
   };
+
+  const maxAmount = useMemo(() => {
+    console.log("maxAmount", activeTypeTab);
+    if (activeTypeTab === "add") {
+      const v =
+        Math.max(
+          0,
+          Math.min(
+            BigNumber(
+              params?.isLong
+                ? currentTokenAvailableLiq?.longReadable
+                : currentTokenAvailableLiq?.shortReadable
+            )
+              .dividedBy(curToken?.maxProfitRatio || 1)
+              .toNumber(),
+            +balance["USDX"]?.balanceReadable,
+            BigNumber(params?.tokenSize)
+              .multipliedBy(params?.entryPriceReadable)
+              .minus(params?.collateralReadable)
+              .minus(0.1)
+              .toNumber()
+          )
+        ) || 0;
+      return filterPrecision(v, curToken?.displayDecimal);
+    } else {
+      const netValue = BigNumber(params?.collateralReadable)
+        .plus(params?.pnl)
+        .minus(params?.feesReadable)
+        .toNumber();
+
+      const minCollaterinPosition = 0.1;
+      const predictedliqiodatefeeratio = 0.0008;
+
+      const feeRatio = BigNumber(curToken?.tradingFeeRatio || 0)
+        .div(100)
+        .plus(curToken?.maintainMarginRatio || DefaultRemainCollateralRatio)
+        .toString();
+
+      const minremaincollateral = BigNumber(params?.tokenSize)
+        .multipliedBy(params?.markPrice)
+        .multipliedBy(
+          Math.max(
+            BigNumber(2)
+              .multipliedBy(
+                BigNumber(predictedliqiodatefeeratio).plus(feeRatio)
+              )
+              .toNumber(),
+            BigNumber(1)
+              .dividedBy(curToken?.maxLeverage || "5")
+              .toNumber()
+          )
+        )
+        .toNumber();
+      const max = Math.max(
+        0,
+        BigNumber(Math.min(netValue, +params?.collateralReadable))
+          .minus(
+            Math.max(
+              minremaincollateral,
+              minCollaterinPosition,
+              BigNumber(params?.pnl)
+                .dividedBy(curToken?.maxProfitRatio || "1")
+                .toNumber()
+            )
+          )
+          .minus(0.1)
+          .toNumber()
+      );
+      return filterPrecision(max, curToken?.displayDecimal);
+    }
+  }, [
+    curToken?.maxProfitRatio,
+    currentTokenAvailableLiq,
+    params?.tokenSize,
+    params?.entryPriceReadable,
+    balance,
+    params?.collateralReadable,
+    params?.isLong,
+    activeTypeTab,
+  ]);
+
+  const getLeverage = ({
+    size,
+    price,
+    margin,
+    pnl,
+    fees,
+  }: {
+    size: string;
+    price: string;
+    margin: string;
+    pnl: string;
+    fees: string;
+  }) => {
+    return filterPrecision(
+      BigNumber(size)
+        .multipliedBy(price)
+        .dividedBy(BigNumber(margin).plus(BigNumber(pnl).minus(fees)))
+        .toString(),
+      2
+    );
+  };
+  const origin_leverage = useMemo(() => {
+    return getLeverage({
+      size: params?.tokenSize,
+      price: params?.entryPriceReadable,
+      margin: params?.collateralReadable,
+      pnl: params?.pnl,
+      fees: params?.feesReadable,
+    });
+  }, [
+    params?.tokenSize,
+    params?.entryPriceReadable,
+    params?.collateralReadable,
+    params?.pnl,
+    params?.feesReadable,
+  ]);
+
+  const liqPriceReadable = useMemo(() => {
+    const _margin =
+      activeTypeTab === "add"
+        ? BigNumber(params?.collateralReadable).plus(margin).toString()
+        : BigNumber(params?.collateralReadable).minus(margin).toString();
+        
+    return filterPrecision(
+      getLiqPrice({
+        size: params?.tokenSize,
+        token: curToken,
+        isLong: params?.isLong,
+        collateral: _margin,
+        fees: params?.feesReadable,
+        entryPrice: params?.entryPriceReadable,
+      }),
+      curToken?.displayDecimal
+    );
+  }, [
+    params?.tokenSize,
+    curToken,
+    params?.isLong,
+    params?.collateralReadable,
+    margin,
+    params?.feesReadable,
+    params?.entryPriceReadable,
+    activeTypeTab,
+  ]);
+
+  const getMaxProfitPrice = ({ margin }: { margin: string }) => {
+    const maxProfit = BigNumber(curToken?.maxProfitRatio || "1").multipliedBy(
+      margin
+    );
+    if (params?.isLong) {
+      return filterPrecision(
+        BigNumber(maxProfit)
+          .plus(
+            BigNumber(params?.entryPriceReadable).multipliedBy(
+              params?.tokenSize
+            )
+          )
+          .dividedBy(params?.tokenSize)
+          .toString(),
+        curToken?.displayDecimal
+      );
+    } else {
+      const _price = filterPrecision(
+        BigNumber(params?.entryPriceReadable)
+          .multipliedBy(params?.tokenSize)
+          .minus(maxProfit)
+          .dividedBy(params?.tokenSize)
+          .toString(),
+        curToken?.displayDecimal
+      );
+      return +_price < 0 ? 0 : _price;
+    }
+  };
+  const origin_maxProfitPrice = useMemo(() => {
+    return getMaxProfitPrice({ margin: params?.collateralReadable });
+  }, [
+    curToken?.maxProfitRatio,
+    params?.collateralReadable,
+    params?.tokenSize,
+    params?.entryPriceReadable,
+    curToken?.displayDecimal,
+    params?.isLong,
+  ]);
+
+  const maxProfitPrice = useMemo(() => {
+    const _margin =
+      activeTypeTab === "add"
+        ? BigNumber(params?.collateralReadable).plus(margin).toString()
+        : BigNumber(params?.collateralReadable).minus(margin).toString();
+    return getMaxProfitPrice({
+      margin: _margin,
+    });
+  }, [
+    curToken?.maxProfitRatio,
+    params?.collateralReadable,
+    params?.tokenSize,
+    params?.entryPriceReadable,
+    curToken?.displayDecimal,
+    params?.isLong,
+    margin,
+    activeTypeTab,
+  ]);
+
+  useEffect(() => {
+    !isMarginInput &&
+      curToken?.displayDecimal &&
+      maxAmount &&
+      setMargin(
+        filterPrecision(
+          BigNumber(marginPercent).multipliedBy(maxAmount).toString(),
+          curToken?.displayDecimal
+        )
+      );
+  }, [marginPercent, curToken, isMarginInput, maxAmount]);
+
+  const leverage = useMemo(() => {
+    const _margin =
+      activeTypeTab === "add"
+        ? BigNumber(params?.collateralReadable).plus(margin).toString()
+        : BigNumber(params?.collateralReadable).minus(margin).toString();
+    return getLeverage({
+      size: params?.tokenSize,
+      price: params?.entryPriceReadable,
+      margin: _margin,
+      pnl: params?.pnl,
+      fees: params?.feesReadable,
+    });
+  }, [
+    margin,
+    params?.tokenSize,
+    params?.entryPriceReadable,
+    params?.collateralReadable,
+    params?.pnl,
+    params?.feesReadable,
+    activeTypeTab,
+  ]);
+  useEffect(() => {
+    if (!visible) {
+      setMargin("");
+      setMarginPercent(0);
+      setActiveTypeTab("add");
+    }
+  }, [visible]);
   const onClose = () => {
     setVisible(false);
   };
   const onConfirm = () => {
+    console.log("margin", margin);
     setVisible(false);
   };
   const onCancel = () => {
@@ -240,27 +439,31 @@ const AdjustMargin: React.FC<{
         <Symbol>
           <TokenImage name={curToken?.symbolName} width={20} height={20} />
           <p className="symbol_name">{curToken?.symbolName}USD</p>
-          <p className={`future_type future_type_${params?.futureType}`}>
-            {futureTypeMap[params?.futureType]}
+          <p
+            className={`future_type future_type_${
+              params?.isLong ? "long" : "short"
+            }`}
+          >
+            {futureTypeMap[params?.isLong ? "long" : "short"]}
             &nbsp;
-            {params?.leverage}X
+            {origin_leverage}X
           </p>
         </Symbol>
         <OrderInfo>
           <div className="item">
             <p className="label">Liq. price</p>
-            <p className="value">{}</p>
+            <p className="value liqPrice">{params?.liqPrice}</p>
           </div>
           <div className="item">
             <p className="label">Max profit price</p>
-            <p className="value">{}</p>
+            <p className="value">{origin_maxProfitPrice}</p>
           </div>
         </OrderInfo>
         <Layout>
           <p className="title">{actionTypeMap[activeTypeTab]}</p>
           <Input
             type={
-              (margin && BigNumber(margin).gt(params?.fundsAvailable)) ||
+              (margin && BigNumber(margin).gt(maxAmount)) ||
               BigNumber(margin).lt(0)
                 ? "warn"
                 : "normal"
@@ -291,6 +494,7 @@ const AdjustMargin: React.FC<{
         </MaxAmount>
         <Slider
           onChange={(value) => {
+            console.log("value", value);
             setIsMarginInput(false);
             setMarginPercent(BigNumber(value).dividedBy(100).toNumber());
           }}
@@ -326,15 +530,15 @@ const AdjustMargin: React.FC<{
         <StyledOrderInfo>
           <div className="item">
             <p className="label">Leverage after adjust</p>
-            <p className="value">{}X</p>
+            <p className="value">{leverage}X</p>
           </div>
           <div className="item">
             <p className="label">Liq. price after adjust</p>
-            <p className="value">{}</p>
+            <p className="value">{liqPriceReadable}</p>
           </div>
           <div className="item">
             <p className="label">Max profit price after adjust</p>
-            <p className="value">{}</p>
+            <p className="value">{maxProfitPrice}</p>
           </div>
         </StyledOrderInfo>
       </Wrapper>
