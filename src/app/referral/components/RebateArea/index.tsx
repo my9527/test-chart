@@ -1,7 +1,6 @@
 import styled from "styled-components";
-import ClaimableRebate from "../ClaimableRebate";
-import ReferralCode from "../ReferralCode";
-import { Sidebar } from "../Sidebar";
+import ClaimableRebate from "./ClaimableRebate";
+import ReferralCode from "./ReferralCode";
 import { useState } from "react";
 import { HistoryDrawer } from "./HistoryDrawer";
 
