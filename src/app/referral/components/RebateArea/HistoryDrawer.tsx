@@ -9,7 +9,11 @@ const Wrapper = styled.div`
   position: relative;
   width: 474px;
 `
-
+const StyledSearchInput = styled(SearchInput)`
+  position: absolute;
+  right: 20px;
+  top: 10px;
+`
 interface IHistoryDrawerProps {
   visible: boolean,
   onHide: () => void,
@@ -74,7 +78,7 @@ export const HistoryDrawer = ({
             }
           ]}
         />
-        <SearchInput value={searchText} onChange={setSearchText} />
+        <StyledSearchInput value={searchText} onChange={setSearchText} />
       </Wrapper>
     </Sidebar>
   )

@@ -2,8 +2,8 @@
 import { FC, useState } from "react";
 import styled from "styled-components";
 import FlexBox from '@/app/components/FlexBox'
-import Button from "../Button";
-import { BindReferralCodeModal } from "../BindReferralCodeModal";
+import Button from "../../Button";
+import { BindReferralCodeModal } from "../../BindReferralCodeModal";
 
 
 const Wrapper = styled.div`

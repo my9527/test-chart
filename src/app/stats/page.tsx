@@ -9,6 +9,7 @@ const Leaderboard = dynamic(() => import('./components/Leaderboard'))
 const Wrapper = styled.div`
   height: calc(100vh - 50px);
   background: ${props => props.theme.colors.fill1};
+  overflow-y: auto;
 `
 
 const Content = styled.div`
@@ -16,6 +17,7 @@ const Content = styled.div`
   margin: 0 auto;
   display: flex;
   flex-direction: column;
+  padding: 25px 0 50px;
 `
 
 const PortfolioPage = () => {
