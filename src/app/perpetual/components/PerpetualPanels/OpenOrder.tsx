@@ -52,20 +52,6 @@ const Layout = styled.div`
     line-height: 100%;
   }
 `;
-
-// const Price = styled(Layout)`
-//   .market {
-//     color: ${(props) => props.theme.colors.primary1};
-//     text-align: right;
-//     font-family: Arial;
-//     font-size: ${(props) => props.theme.fontSize.medium};
-//     font-style: normal;
-//     font-weight: 400;
-//     line-height: 100%;
-//     cursor: pointer;
-//     padding: 0 8px;
-//   }
-// `;
 const MarginAmount = styled.div`
   display: flex;
   align-items: center;
@@ -591,7 +577,7 @@ const OpenOrder: React.FC<{
           curToken?.displayDecimal
         )
       );
-  }, [marginPercent, curToken, isMarginInput]);
+  }, [marginPercent, curToken, isMarginInput,fundsAvailable]);
 
   useEffect(() => {
     setInputAmount(amount);

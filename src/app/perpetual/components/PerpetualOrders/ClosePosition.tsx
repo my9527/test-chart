@@ -118,11 +118,11 @@ export type ParamsProps = {
   price: string;
   pnl?: string;
 };
-const CloseOrder: React.FC<{ params: ParamsProps; isVisible: boolean }> = ({
-  params,
-  isVisible = false,
-}) => {
-  const [visible, setVisible] = useState(isVisible);
+const ClosePosition: React.FC<{
+  params: ParamsProps;
+  visible: boolean;
+  setVisible: Function;
+}> = ({ params, visible, setVisible }) => {
   const futureTypeMap: TypeMap = { long: "Long", short: "Short" };
   const [price, setPrice] = useState<string>("");
   const [curType, setCurType] = useState<string>("limit");
@@ -329,4 +329,4 @@ const CloseOrder: React.FC<{ params: ParamsProps; isVisible: boolean }> = ({
     </Modal>
   );
 };
-export default CloseOrder;
+export default ClosePosition;

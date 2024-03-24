@@ -2,15 +2,12 @@
 import styled from "styled-components";
 import DraggableIcon from "../DraggableIcon";
 import { OrderHeader } from "./Header";
-
 import { PositionList } from "./PositionList";
 import { Col } from "@/app/components/Col";
 import { useState } from "react";
 import { NotAuthed } from "@/app/components/NotAuthed";
 import { LimitMarketOrderList } from "./LimitOrders";
 import { StopOrderList } from "./StopOrder";
-import CloseOrder from "./CloseOrder";
-import AdjustMargin from "./AdjustMargin";
 
 const Wrapper = styled.div`
   position: relative;
@@ -53,28 +50,6 @@ const PerpetualOrders = () => {
           {listType === ListType.STOP && <StopOrderList />}
         </NotAuthed>
       </Content>
-      {/* <CloseOrder
-        params={{
-          amount: "10",
-          symbolName: "ARB",
-          price: "233.34",
-          margin: "66",
-          futureType: "long",
-          fees: "233",
-          tradeFee: "2323",
-          impactFee: "2323",
-        }}
-      /> */}
-      <AdjustMargin
-        isVisible={false}
-        params={{
-          symbolName: "ARB",
-          futureType: "long",
-          margin: "233",
-          leverage: 5,
-          fundsAvailable: "3434",
-        }}
-      />
     </Wrapper>
   );
 };

@@ -25,6 +25,12 @@ const Title = styled.h2`
   border-bottom: 1px solid ${(props) => props.theme.colors.border1};
 `
 
+const StyledSearchInput = styled(SearchInput)`
+  position: absolute;
+  right: 20px;
+  top: 10px;
+`
+
 const ReferralDetails: FC = () => {
   //是否是二级返佣用户
   const isSecondClassUser = true
@@ -59,7 +65,7 @@ const ReferralDetails: FC = () => {
         )
       }
       
-      <SearchInput value={searchText} onChange={setSearchText} />
+      <StyledSearchInput value={searchText} onChange={setSearchText} />
     </Wrapper>
   )
 };

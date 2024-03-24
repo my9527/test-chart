@@ -4,11 +4,12 @@ import Tabs from "../components/Tabs";
 import { useState } from "react";
 import dynamic from "next/dynamic";
 const OverviewPage = dynamic(() => import('./components/Overview'))
-const VIPLevel = dynamic(() => import('./components/VIPLevel'))
+const Leaderboard = dynamic(() => import('./components/Leaderboard'))
 
 const Wrapper = styled.div`
   height: calc(100vh - 50px);
   background: ${props => props.theme.colors.fill1};
+  overflow-y: auto;
 `
 
 const Content = styled.div`
@@ -16,16 +17,11 @@ const Content = styled.div`
   margin: 0 auto;
   display: flex;
   flex-direction: column;
+  padding: 25px 0 50px;
 `
-enum ETabType {
-  Overview = 'overview',
-  VIPLevel = 'vip-level',
-  Position = 'position',
-  History = 'history'
-}
 
 const PortfolioPage = () => {
-  const [tab, setTab] = useState(ETabType.Overview as string)
+  const [tab, setTab] = useState('leaderboard')
 
   return (
     <Wrapper>
@@ -33,25 +29,15 @@ const PortfolioPage = () => {
         <Tabs 
           tabs={[
             {
-              key: ETabType.Overview,
+              key: 'leaderboard',
+              title: 'Leaderboard',
+              children: <Leaderboard />,
+            },
+            {
+              key: 'overview',
               title: 'Overview',
               children: <OverviewPage />,
             },
-            {
-              key: ETabType.VIPLevel,
-              title: 'VIP Level',
-              children: <VIPLevel />,
-            },
-            {
-              key: ETabType.Position,
-              title: 'Position',
-              children: <div>position</div>,
-            },
-            {
-              key: ETabType.History,
-              title: 'History',
-              children: <div>history</div>,
-            }
           ]}
           tab={tab}
           onTabChange={setTab}

@@ -55,7 +55,7 @@ const CurDot = styled(Dot)<PercentProps>`
   z-index: 6;
   right: 0;
   transform: ${(props) => {
-    if (props?.percent <0.1) {
+    if (props?.percent < 0.1) {
       return "translate(100%,-50%)";
     } else if (props?.percent === 1) {
       return "translate(0,-50%)";
@@ -219,14 +219,12 @@ const Slider: React.FC<SliderProps> = ({
         .multipliedBy(percent)
         .plus(min)
         .toNumber();
-      console.log("Leverage_left-change", v, filterPrecision(v, 2));
 
       onChange(BigNumber(v).lt(1) ? v : +filterPrecision(v, 2));
     }
   }, [percent, isChange]);
 
   const showValue = useMemo(() => {
-    console.log("Leverage_left_value11", value, value === "");
     if (value || value === "") {
       return value || min;
     } else {
@@ -235,7 +233,7 @@ const Slider: React.FC<SliderProps> = ({
         .multipliedBy(per)
         .plus(min)
         .toNumber();
-      console.log("Leverage_left_value", v, per, +filterPrecision(v, 2));
+
       return v ? +filterPrecision(v, 2) : 0;
     }
   }, [max, min, per, value]);
@@ -293,7 +291,7 @@ const Slider: React.FC<SliderProps> = ({
             .dividedBy(BigNumber(max).minus(min))
             .toNumber();
           const _left = index === 0 ? 0 : left > 1 ? 1 : left;
-          console.log("_left", _left);
+
           return (
             <Mark
               key={_left}
