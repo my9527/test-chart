@@ -11,6 +11,8 @@ import { useTheme } from "styled-components"
 import { useState } from "react"
 import Box from "@/app/components/Box"
 import SimpleText from "@/app/components/SimpleText"
+import { useAccount } from "wagmi"
+import { shortenString } from "@/app/lib/shortenString"
 
 const Wrapper = styled.div`
   display: flex;
@@ -72,6 +74,20 @@ const Button = styled.button`
   }
 `
 
+const StyledFlexBox = styled(FlexBox)`
+  position: relative;
+`
+
+const Address = styled.div`
+  position: absolute;
+  left: 0;
+  top: 120%;
+  background: ${props => props.theme.colors.fill2};
+  border-radius: 8px;
+  color: ${props => props.theme.colors.text4};
+  font-size: ${props => props.theme.fontSize.small};
+`
+
 const data = {
   address: '0x12······1234',
   equity: '123,123,123.00 USDX',
@@ -80,9 +96,11 @@ const data = {
 }
 
 const Overview = () => {
-  const { address, equity, marginUsage, unrealizedPnl } = data
+  const account = useAccount()
+  const address = account?.address ?? ''
+  console.log('xxx account', address)
+  const { equity, marginUsage, unrealizedPnl } = data
   const [visibility, setVisibility] = useState(false)
-
   const theme = useTheme()
 
   const toggleVisibility = () => {
@@ -96,13 +114,14 @@ const Overview = () => {
             <Avatar />
             <FlexBox gap={'2px'} direction="column">
               <SimpleText $size="reguar" $color="reguar">Account</SimpleText>
-              <FlexBox gap={'20px'} alignItems="center">
-                <Label>{address}</Label>
+              <StyledFlexBox gap={'20px'} alignItems="center">
+                <Label>{shortenString(address)}</Label>
                 <IconButton onClick={toggleVisibility}>
                   <Image src={visibility ? CloseEyeIcon : OpenEyeIcon} alt="hide address" />
                 </IconButton>
                 <CopyBtn color={theme.colors.primary1} content={address} />
-              </FlexBox>
+                {visibility && <Address>{address}</Address>}
+              </StyledFlexBox>
             </FlexBox>
             <Divider />
             <FlexBox gap={'2px'} direction="column">

@@ -10,6 +10,7 @@ interface IButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   hoverBgColor?: string;
   textColor?: string;
   borderColor?: string;
+  minWidth?: number;
 }
 
 const StyledButton = styled.button<IButtonProps>`
@@ -21,6 +22,7 @@ const StyledButton = styled.button<IButtonProps>`
   border: 1px solid ${props => props.borderColor || 'transparent'};
   font-size: ${props => props.theme.fontSize.small};
   line-height: 14px;
+  min-width: ${props => props.minWidth}px;
 
   ${props => props.hoverBgColor && css`
     &:hover {

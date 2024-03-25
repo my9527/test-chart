@@ -31,34 +31,41 @@ const TableWrapper = styled.div`
 
 const durationOptions = [
   {
-    value: 0,
+    value: 'VOLUMN_24HOUR',
     label: '24H'
   },
   {
-    value: 1,
+    value: 'VOLUMN_1D',
     label: '1D'
   },
   {
-    value: 2,
+    value: 'VOLUMN_30D',
     label: '30D'
   },
   {
-    value: 3,
+    value: 'VOLUMN_90D',
     label: '90D'
   }
 ]
 const Leaderboard = () => {
   const [searchVal, setSearchVal] = useState<string>("");
 
-  const [duration, setDuration] = useState<number>(durationOptions[0]?.value);
+  const [duration, setDuration] = useState(durationOptions[0]?.value);
   return (
     <Wrapper>
-      <Header gap="20px">
+      <Header gap="20px" alignItems="center">
         <DurationSelect value={duration} onChange={setDuration} options={durationOptions} />
         <StyledSearchInput value={searchVal} onChange={setSearchVal} />
       </Header>
       <TableWrapper>
-        <Table hasTdBorder hasThBorder data={data} columns={columns} />
+        <Table 
+          headerCellHeight={52} 
+          bodyCellHeight={54} 
+          hasTdBorder 
+          hasThBorder 
+          data={data} 
+          columns={columns}
+        />
       </TableWrapper>
     </Wrapper>
   );
