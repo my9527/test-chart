@@ -17,6 +17,7 @@ import { calcPnl, calcPnlPercentage } from "../../lib/getPnl";
 import ClosePosition from "./ClosePosition";
 import AdjustMargin from "./AdjustMargin";
 import { ParamsProps } from "./AdjustMargin";
+import StopOrdersModal from "./StopOrdersModal";
 const Wrapper = styled(Row)`
   width: 100%;
   max-height: 100%;
@@ -246,7 +247,8 @@ const Position: FCC<{
   pos: PositionType;
   handleShowAdujustMargin: Function;
   handleClose: Function;
-}> = ({ pos, handleShowAdujustMargin, handleClose }) => {
+  handleShowStopOrders:Function
+}> = ({ pos, handleShowAdujustMargin, handleClose,handleShowStopOrders }) => {
   const token = useTokenByFutureId(pos.futureId);
 
   const indexPrices = useIndexPricesById(pos.futureId);
@@ -391,7 +393,7 @@ const Position: FCC<{
         <div
           className="button button_wrapper"
           onClick={() =>
-            handleShowAdujustMargin({
+            handleShowStopOrders({
               ...pos,
               liqPrice,
               pnl,
@@ -438,6 +440,7 @@ export const PositionList = () => {
     {} as ParamsProps
   );
   const [showClosePosition, setShowClosePosition] = useState(false);
+  const [showStopOrders, setShowStopOrders] = useState(false);
 
   // sort by futureId asc
   const openPositions = useMemo(() => {
@@ -455,6 +458,11 @@ export const PositionList = () => {
     setShowClosePosition(true);
     setActivePosition(ele);
   };
+  const handleShowStopOrders = (ele: ParamsProps) => {
+    setShowStopOrders(true);
+    setActivePosition(ele);
+  };
+
   return (
     <Wrapper>
       <TableWrapper>
@@ -482,6 +490,7 @@ export const PositionList = () => {
                   pos={pos}
                   handleShowAdujustMargin={handleShowAdujustMargin}
                   handleClose={handleClose}
+                  handleShowStopOrders={handleShowStopOrders}
                 />
               );
             })}
@@ -499,6 +508,13 @@ export const PositionList = () => {
         <ClosePosition
           visible={showClosePosition}
           setVisible={setShowClosePosition}
+          params={activePosition}
+        />
+      )}
+      {showStopOrders && (
+        <StopOrdersModal
+          visible={showStopOrders}
+          setVisible={setShowStopOrders}
           params={activePosition}
         />
       )}
