@@ -107,12 +107,11 @@ const Layout = styled.div`
     line-height: 100%;
     margin-bottom: 5px;
   }
-  .normal {
-    .input {
-      color: ${(props) => props.theme.colors.text1};
-      background: ${(props) => props.theme.colors.fill3} !important;
-      border: none !important;
-    }
+
+  .input {
+    color: ${(props) => props.theme.colors.text1};
+    background: ${(props) => props.theme.colors.fill3} !important;
+    border: 1px solid transparent;
   }
 `;
 const MaxAmount = styled.div`

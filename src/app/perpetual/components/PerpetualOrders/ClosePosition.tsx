@@ -101,12 +101,10 @@ const Layout = styled.div`
     margin-bottom: 5px;
   }
 
-  .normal {
-    .input {
-      color: ${(props) => props.theme.colors.text1};
-      background: ${(props) => props.theme.colors.fill3} !important;
-      border: none !important;
-    }
+  .input {
+    color: ${(props) => props.theme.colors.text1};
+    background: ${(props) => props.theme.colors.fill3} !important;
+    border: 1px solid transparent;
   }
 `;
 
@@ -149,7 +147,9 @@ const ClosePosition: React.FC<{
   const [price, setPrice] = useState<string>("");
   const [curType, setCurType] = useState<string>("limit");
   const [amount, setAmount] = useState<string>("");
+  const [inputAmount, setInputAmount] = useState<string>("");
   const [amountPercent, setAmountPercent] = useState<number>(0);
+  const [isInput, setIsInput] = useState(false);
 
   const appConfig = useAppConfig();
 
@@ -157,13 +157,28 @@ const ClosePosition: React.FC<{
 
   const curToken = useTokenByFutureId(params?.futureId);
 
-  useEffect(() => {
-    amountPercent && setAmount("");
-  }, [amountPercent]);
+  const amountDecimal = useMemo(() => {
+    return getExponent(Number(curToken?.perpConfig?.contractSize) || 1);
+  }, [curToken]);
 
   useEffect(() => {
-    amount && setAmountPercent(0);
+    setInputAmount(amount);
   }, [amount]);
+
+  useEffect(() => {
+    amountPercent &&
+      !isInput &&
+      setAmount(
+        filterPrecision(
+          BigNumber(amountPercent).multipliedBy(params?.tokenSize).toString(),
+          amountDecimal
+        )
+      );
+  }, [amountPercent, isInput, amountDecimal, params?.tokenSize]);
+
+  useEffect(() => {
+    isInput && setAmountPercent(0);
+  }, [isInput]);
 
   const MarketOrderContractParams = useContractParams(
     appConfig.contract_address.MarketOrderImplementationAddress
@@ -175,11 +190,6 @@ const ClosePosition: React.FC<{
   // const curToken = useTokenByName(params?.symbolName);
 
   const { sendByDelegate } = useSendTxByDelegate();
-
-  useEffect(() => {
-    const per = +filterPrecision(+amount / +params?.tokenSize, 4);
-    setAmountPercent(per > 1 ? 1 : per < 0 ? 0 : per);
-  }, [amount]);
 
   const maxProfitPrice = useMemo(() => {
     return getMaxProfitPrice({
@@ -204,10 +214,6 @@ const ClosePosition: React.FC<{
       setPrice(filterPrecision(indexPrices?.price, curToken?.displayDecimal));
     }
   }, [curType, indexPrices, curToken?.symbolName]);
-
-  const amountDecimal = useMemo(() => {
-    return getExponent(Number(curToken?.perpConfig?.contractSize) || 1);
-  }, [curToken]);
 
   const slippage = localStorage.getItem("slippage") || "0.08%";
 
@@ -300,18 +306,11 @@ const ClosePosition: React.FC<{
     setVisible(false);
   };
   const onConfirm = () => {
-    const _amount =
-      amount ||
-      BigNumber(amountPercent).multipliedBy(params?.tokenSize).toString();
-    if (price && _amount) {
+    if (price && amount) {
       if (
         !BigNumber(price).gt(maxProfitPrice) &&
-        !BigNumber(_amount).gt(params?.tokenSize)
+        !BigNumber(amount).gt(params?.tokenSize)
       ) {
-        console.log("onconfirm", {
-          price,
-          amount: _amount,
-        });
         //发起交易
         const _run = async () => {
           const descAmount = BigNumber(amount)
@@ -472,12 +471,13 @@ const ClosePosition: React.FC<{
               setAmount(amount ? filterPrecision(amount, amountDecimal) : "");
             }}
             placeholder="input amount"
-            value={amount}
+            value={inputAmount}
             onChange={(e: React.FormEvent<HTMLInputElement>) => {
               const value = e?.currentTarget.value;
 
               if (value && verifyValidNumber(value, amountDecimal)) return;
 
+              setIsInput(true);
               setAmount(value);
             }}
             suffix={
@@ -488,11 +488,9 @@ const ClosePosition: React.FC<{
         <StyledSlider>
           <Slider
             onChange={(value) => {
+              setIsInput(false);
               setAmountPercent(
-                +filterPrecision(
-                  BigNumber(value).dividedBy(100).toString(),
-                  curToken?.displayDecimal
-                )
+                +filterPrecision(BigNumber(value).dividedBy(100).toString(), 2)
               );
             }}
             per={amountPercent || 0}
