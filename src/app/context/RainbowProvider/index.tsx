@@ -19,10 +19,13 @@ import {
 } from '@rainbow-me/rainbowkit/wallets';
 
 import {
+  iotexTest,
+  arbitrumSepoliaTest,
   arbitrumOne,
   zkFair,
   zkFairTestnet,
-  arbitrumGoerliTest
+  arbitrumGoerliTest,
+
 
 } from "../../config/chains";
 
@@ -43,6 +46,8 @@ const config = getDefaultConfig({
   ],
   chains: [
     // arbitrumOne,
+    iotexTest,
+    arbitrumSepoliaTest,
     zkFairTestnet,
     zkFair,
     arbitrumOne,

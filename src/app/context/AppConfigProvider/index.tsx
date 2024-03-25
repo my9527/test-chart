@@ -5,7 +5,7 @@ import { defineChain } from "viem";
 import { useChainId } from "wagmi";
 
 import { CHAINS_ID, DEFAULT_CHAIN_ID } from "@/app/config/common";
-import { arbitrumGoerliTest, arbitrumOne, zkFair, zkFairTestnet } from "@/app/config/chains";
+import { arbitrumGoerliTest, arbitrumOne, iotexTest, zkFair, zkFairTestnet } from "@/app/config/chains";
 
 import addressMap from "@/app/config/contract_address";
 
@@ -137,6 +137,32 @@ const AppConfigOnChain: Record<number, AppConfigType> = {
     executionFee: '300000000000000',
     contract_address: addressMap[CHAINS_ID.arbitrumGoerli],
 
+    epoch_duration: 1,
+  },
+  [CHAINS_ID.iotxTest]: {
+    chain: iotexTest,
+    // config graphhql
+    // config graphhql
+    graph: {
+      base: 'https://api.thegraph.com/subgraphs/name/substanceexchangedevelop/core',
+      perpetual: 'https://gql-testnet.substancex.io/subgraphs/name/sex/user',
+      baseBlock: 'https://api.thegraph.com/subgraphs/name/iliaazhel/arbitrum-goerli-blocklytics',
+    },
+
+    // config rpc
+    rpc: {
+      http: "https://arb.substancex.io/",
+      wss: "wss://babel-api.testnet.iotex.io/ws",
+    },
+
+    // config api
+    api: {
+      http: "https://api-testnet.substancex.io/api/backend/",
+      wss: "wss://api-testnet.substancex.io/",
+    },
+
+    executionFee: '300000000000000',
+    contract_address: addressMap[CHAINS_ID.iotxTest],
     epoch_duration: 1,
   }
 };

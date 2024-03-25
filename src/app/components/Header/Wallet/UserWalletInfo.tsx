@@ -7,6 +7,7 @@ import { Row } from "../../Row";
 import { Col } from "../../Col";
 import { FC, ReactNode } from "react";
 import Image from "next/image";
+import { DepositModal } from "../DepositModal";
 
 import IconDepositSvg from "@/app/assets/header/icon-deposit.svg";
 import IconIotxSvg from "@/app/assets/header/icon-iotx.svg";
@@ -146,10 +147,10 @@ cursor: pointer;
 // `
 
 
-const ToolBtn: FC<{ iconUrl: any, name: string }> = ({ iconUrl, name}) => {
+const ToolBtn: FC<{ iconUrl: any, name: string, onClick?: AnyFunc }> = ({ iconUrl, name, onClick}) => {
 
     return (
-        <ToolBtnWrapper gap="10px">
+        <ToolBtnWrapper gap="10px" onClick={onClick}>
             <Image alt={name} src={iconUrl} />
             <span className="tool-name">{name}</span>
         </ToolBtnWrapper>
@@ -301,7 +302,9 @@ export const UserWalletInfo: FC<{ address: `0x${string}` | undefined }> = ({ add
             <Divider />
             <Col gap="10px" className="full" >
                 <Row className="full" gap="20px">
-                    <ToolBtn iconUrl={IconDepositSvg} name="Deposit" />
+                    <DepositModal>
+                        <ToolBtn iconUrl={IconDepositSvg} name="Deposit" />
+                    </DepositModal>
                     <ToolBtn iconUrl={IconDepositSvg} name="Withdraw" />
                 </Row>
                 <Row className="full" gap="20px">
@@ -321,6 +324,8 @@ export const UserWalletInfo: FC<{ address: `0x${string}` | undefined }> = ({ add
                 </svg>
                 <div>Disconnect</div>
             </Row>
+
+            
 
 
         </Wrapper>

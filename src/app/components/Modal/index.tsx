@@ -3,6 +3,7 @@ import styled from "styled-components";
 import { createPortal } from "react-dom";
 import { motion } from "framer-motion";
 import CloseIcon from "./CloseIcon";
+import { useCallback, useState } from "react";
 
 const ModalWrapper = styled(motion.div)<{ $overlayColor?: string }>`
   position: fixed;
@@ -134,6 +135,22 @@ const Modal: React.FC<{
   onCancel,
   overlayColor,
 }) => {
+
+  const [loading, updateLoading] = useState(false);
+
+  const handleConfirm = useCallback(() => {
+    async function run() {
+      updateLoading(true);
+      if(onConfirm){
+        await onConfirm();
+      }
+      updateLoading(false);
+    }
+    return run();
+    
+  }, [onConfirm]);
+
+
   return visible
     ? createPortal(
         <ModalWrapper $overlayColor={overlayColor}>
@@ -161,9 +178,7 @@ const Modal: React.FC<{
                       </CancelBtn>
                     )}
                     <ConfirmBtn
-                      onClick={() => {
-                        onConfirm && onConfirm();
-                      }}
+                      onClick={handleConfirm}
                     >
                       <div className="label">{confirmBtnText}</div>
                     </ConfirmBtn>

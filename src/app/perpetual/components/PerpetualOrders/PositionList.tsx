@@ -485,16 +485,16 @@ export const PositionList = () => {
         visible={showClosePosition}
         setVisible={setShowClosePosition}
         params={activePosition}
-        params={{
-          amount: "10",
-          symbolName: "ARB",
-          price: "233.34",
-          margin: "66",
-          futureType: "long",
-          fees: "233",
-          tradeFee: "2323",
-          impactFee: "2323",
-        }}
+        // params={{
+        //   amount: "10",
+        //   symbolName: "ARB",
+        //   price: "233.34",
+        //   margin: "66",
+        //   futureType: "long",
+        //   fees: "233",
+        //   tradeFee: "2323",
+        //   impactFee: "2323",
+        // }}
       />
     </Wrapper>
   );

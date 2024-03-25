@@ -88,7 +88,10 @@ const CurrencySelect: React.FC<{
                     ? "active"
                     : ""
                 }`}
-                onClick={() => {
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  e.nativeEvent.stopImmediatePropagation();
                   handleClick && handleClick(item);
                   setShowList(false);
                 }}

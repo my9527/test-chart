@@ -23,7 +23,7 @@ export const useTokenByName = (tokenName: string) => {
 
   
   const token = useMemo(() => {
-    return tokens.filter((token_) => token_.symbolName.toLowerCase() === tokenName.toLowerCase());
+    return tokens.filter((token_) => token_.symbolName.toLowerCase() === tokenName?.toLowerCase());
   }, [tokens, tokenName]);
 
   return token[0];

@@ -1,6 +1,6 @@
 
 
-import { zkFair, arbitrumOne, zkFairTestnet, arbitrumGoerliTest } from "./chains";
+import { zkFair, arbitrumOne, zkFairTestnet, arbitrumGoerliTest, arbitrumSepoliaTest, iotexTest } from "./chains";
 
 export const IS_LOCAL = process.env.NODE_ENV === "development";
 
@@ -15,6 +15,8 @@ export enum CHAINS_ID {
     'arbitrum' = arbitrumOne.id,
     'zkfairtest' = zkFairTestnet.id,
     'arbitrumGoerli' = arbitrumGoerliTest.id,
+    'arbitrumSepolia' = arbitrumSepoliaTest.id,
+    'iotxTest' = iotexTest.id,
 }
 
 // default chain id for app
