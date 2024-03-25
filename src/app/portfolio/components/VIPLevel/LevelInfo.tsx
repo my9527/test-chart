@@ -15,7 +15,7 @@ const Content = styled(FlexBox)`
 const Level = styled.div`
   background-color: ${props => props.theme.colors.fill3};
   padding: 27px 35px;
-  background-image: url('../../../assets/portfolio/vip-level-bg.png');
+  background-image: url('/src/app/assets/portfolio/vip-level-bg.png');
   background-repeat: no-repeat;
   background-size: cover;
   border-radius: 8px;

@@ -26,8 +26,7 @@ const Item = styled.div<{ $active: boolean }>`
   }
 `
 const WalletAssets = () => {
-  const [selectedWallet, setSelectedWallet] = useState<string>('dex')
-
+  const [selectedWallet, setSelectedWallet] = useState<string>('exchangeWallet')
 
   
   return (
@@ -46,7 +45,14 @@ const WalletAssets = () => {
           ))
         }
       </FlexBox>
-      <Table data={assetsData} columns={columns} />
+      <Table 
+        data={assetsData} 
+        columns={columns} 
+        bodyCellHeight={67}
+        headerCellHeight={54}
+        hasTdBorder
+        hasThBorder
+      />
     </>
   );
 };
