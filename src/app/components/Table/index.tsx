@@ -82,10 +82,21 @@ function Table ({
       <tr key={rowIndex}>
         {
           columns.map((column, columnIndex) => {
-            if (column.render) {
-              return <td style={{ width: column.width || defaultColumnWidth }} key={`${rowIndex}-${columnIndex}`}>{column.render(row)}</td>;
-            }
-            return <TableCell secondary={column.secondary} hasBorder={hasTdBorder} fontSize={bodyFontSize} align={column.align} height={bodyCellHeight} borderColor={bodyBorderColor} primary={column.primary} width={column.width || defaultColumnWidth} key={`${rowIndex}-${columnIndex}`}>{row[column.dataKey!]}</TableCell>;
+            return (
+              <TableCell 
+                secondary={column.secondary} 
+                hasBorder={hasTdBorder} 
+                fontSize={bodyFontSize} 
+                align={column.align} 
+                height={bodyCellHeight} 
+                borderColor={bodyBorderColor} 
+                primary={column.primary} 
+                width={column.width || defaultColumnWidth} 
+                key={`${rowIndex}-${columnIndex}`}
+              >
+                {column.render ? column.render(row) : row[column.dataKey!]}
+              </TableCell>
+            );
           })
         }
       </tr>
