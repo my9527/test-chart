@@ -111,6 +111,8 @@ export const BalanceAndPoolEffects = () => {
             }]
         }).flat(1);
 
+        console.log("walletBalanceCalls", walletBalanceCalls);
+
 
         const exchangeBalanceCalls = !usrAddress?[] : depositTokens.map(tk => {
             return {
@@ -170,13 +172,15 @@ export const BalanceAndPoolEffects = () => {
             const ShortAvReadable = ethers.utils.formatUnits(ShortAv || '', 6);
             const OptionAvReadable = ethers.utils.formatUnits(OptionAv || '', 6);
 
+            // BigNumber.toString 应该加上参数10， 避免出现科学记数法
+
             const futureTotalLP = ethers.utils.formatUnits(
-                BigNumber(LongAv || '0').plus(ShortAv || '0').toString(), 
+                BigNumber(LongAv || '0').plus(ShortAv || '0').toString(10),
                 6
             );
 
             const totalUSD = ethers.utils.formatUnits(
-                BigNumber(LongAv || '0').plus(ShortAv || '0').plus(OptionAv || '0').toString(), 
+                BigNumber(LongAv || '0').plus(ShortAv || '0').plus(OptionAv || '0').toString(10), 
                 6
             );
 
@@ -278,6 +282,9 @@ export const BalanceAndPoolEffects = () => {
             // 链上钱包资产
             const walletBalance = walletBalanceResults.reduce((result: any, rslt, index) => {
                 const cur = rslt.result?.toString();
+
+                console.log("walletbalance ---", depositTokens[index].symbolName, BigNumber(cur || '0').div(1e6).toString(10))
+
                 return {
                     ...result,
 

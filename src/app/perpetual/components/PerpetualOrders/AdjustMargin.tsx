@@ -16,11 +16,16 @@ import { getLiqPrice } from "@/app/perpetual/lib/getLiqPrice";
 import { recoilOpenInterests } from "@/app/models";
 import { useRecoilValue } from "recoil";
 import { useExchangeBalance } from "@/app/hooks/useBalance";
-import { DefaultRemainCollateralRatio } from "@/app/config/common";
 import { PositionType } from "@/app/models";
 import { getLeverage } from "../../lib/getLeverage";
 import { useIndexPricesById } from "@/app/hooks/useIndexPrices";
 import { getMaxProfitPrice } from "../../lib/getMaxProfitPrice";
+import { DefaultRemainCollateralRatio, FutureType } from "@/app/config/common";
+import { ethers } from "ethers";
+import { useContractParams } from "@/app/hooks/useContractParams";
+import { useAppConfig } from "@/app/hooks/useAppConfig";
+import { encodeTx } from "@/app/lib/txTools";
+import { useSendTxByDelegate } from "@/app/hooks/useSendTxByDelegate";
 
 const Wrapper = styled.div`
   position: relative;
@@ -143,6 +148,7 @@ const AdjustMargin: React.FC<{
   visible: boolean;
   setVisible: Function;
 }> = ({ params, visible, setVisible }) => {
+  const appConfig = useAppConfig();
   const [activeTypeTab, setActiveTypeTab] = useState<string>("add");
   const curToken = useTokenByFutureId(params?.futureId);
   const [margin, setMargin] = useState<string>("");
@@ -150,7 +156,9 @@ const AdjustMargin: React.FC<{
   const { currentTokenAvailableLiq } = useRecoilValue(recoilOpenInterests);
   const [isMarginInput, setIsMarginInput] = useState(false);
   const balance = useExchangeBalance();
-
+  const UpdateCollateralOrderContractParams = useContractParams(
+    appConfig.contract_address.UpdateCollateralOrderImplementationAddress
+  );
   const typeTabList = [
     { label: "Add Margin", key: "add" },
     { label: "Reduce Margin", key: "reduce" },
@@ -164,6 +172,8 @@ const AdjustMargin: React.FC<{
   const markPrice = useMemo(() => {
     return filterPrecision(indexPrices?.price, curToken?.displayDecimal);
   }, [indexPrices?.price, curToken?.displayDecimal]);
+
+  const { sendByDelegate } = useSendTxByDelegate();
 
   const maxAmount = useMemo(() => {
     if (activeTypeTab === "add") {
@@ -373,8 +383,37 @@ const AdjustMargin: React.FC<{
   const onClose = () => {
     setVisible(false);
   };
-  const onConfirm = () => {
-    console.log("margin", margin);
+  const onConfirm = async () => {
+    const _margin = ethers.utils.parseUnits(margin, 6).toString();
+    // ele?.futureId,
+    // _i,
+    // !collateralTabValue,
+    // ele?.futureType,
+
+    const _encodedData = encodeTx({
+      abi: UpdateCollateralOrderContractParams.abi,
+      functionName: "createUpdateCollateralOrder",
+      args: [
+        params.futureId,
+        _margin,
+        activeTypeTab === "add",
+        params.isLong ? FutureType.LONG : FutureType.SHORT,
+      ],
+    });
+
+    await sendByDelegate({
+      data: [
+        [
+          UpdateCollateralOrderContractParams.address,
+          false,
+          appConfig.executionFee,
+          _encodedData,
+        ],
+      ],
+      value: appConfig.executionFee,
+      showMsg: false,
+    });
+
     setVisible(false);
   };
   const onCancel = () => {
@@ -452,7 +491,7 @@ const AdjustMargin: React.FC<{
         </Layout>
         <MaxAmount>
           <p className="label">Max adjustment amount</p>
-          <p className="value">{maxAmount} USD</p>
+          <p className="value">{maxAmount || "0"} USD</p>
         </MaxAmount>
         <Slider
           onChange={(value) => {

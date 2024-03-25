@@ -1,12 +1,9 @@
 "use client";
 import styled from "styled-components";
-import Btns from "../PerpetualPanels/Btns";
 import Modal from "@/app/components/Modal";
 import { useState, useEffect, useMemo } from "react";
 import TokenImage from "@/app/components/TokenImage";
 import Input from "@/app/components/Input";
-import { useRecoilValue } from "recoil";
-import { recoilIndexPrices } from "@/app/models";
 import { getExponent, filterPrecision } from "@/app/utils/tools";
 import { verifyValidNumber } from "@/app/utils/tools";
 import CurrencySelect from "@/app/components/CurrencySelect";
@@ -14,13 +11,19 @@ import Slider from "../Slider";
 import { useTokenByFutureId } from "@/app/hooks/useTokens";
 import BigNumber from "bignumber.js";
 import { ParamsProps } from "./AdjustMargin";
-import { BasicTradingFeeRatio } from "@/app/config/common";
 import { getLeverage } from "../../lib/getLeverage";
 import { usePriceImpactK } from "../../hooks/usePriceImpactK";
 import { usePriceImpactDepth } from "../../hooks/usePriceImpactDepth";
 import { getTradeFee, getPriceImpactFee } from "../../lib/getFee";
 import { useIndexPricesById } from "@/app/hooks/useIndexPrices";
 import { getMaxProfitPrice } from "../../lib/getMaxProfitPrice";
+import { ethers } from "ethers";
+import dayjs from "dayjs";
+import { useContractParams } from "@/app/hooks/useContractParams";
+import { useAppConfig } from "@/app/hooks/useAppConfig";
+import { encodeTx } from "@/app/lib/txTools";
+import { useSendTxByDelegate } from "@/app/hooks/useSendTxByDelegate";
+import { FutureType } from "@/app/config/common";
 
 const Wrapper = styled.div`
   position: relative;
@@ -119,16 +122,38 @@ const StyledInput = styled(Input)`
 `;
 type TypeMap = { [key: string]: string };
 
+const futureTypeMap: TypeMap = { long: "Long", short: "Short" };
+
+const FuncNameMap = {
+  MARKET: "makeDecreaseMarketOrder",
+  LIMIT: "makeDecreaseLimitOrder",
+};
+
+// export type ParamsProps = {
+//   symbolName: string;
+//   futureType: string;
+//   margin: string;
+//   amount: string;
+//   slippage?: string;
+//   fees: string;
+//   tradeFee: string;
+//   impactFee: string;
+//   price: string;
+//   pnl?: string;
+// } & PositionType;
 const ClosePosition: React.FC<{
   params: ParamsProps;
   visible: boolean;
   setVisible: Function;
 }> = ({ params, visible, setVisible }) => {
-  const futureTypeMap: TypeMap = { long: "Long", short: "Short" };
   const [price, setPrice] = useState<string>("");
   const [curType, setCurType] = useState<string>("limit");
   const [amount, setAmount] = useState<string>("");
   const [amountPercent, setAmountPercent] = useState<number>(0);
+
+  const appConfig = useAppConfig();
+
+  const indexPrices = useIndexPricesById(params.futureId);
 
   const curToken = useTokenByFutureId(params?.futureId);
 
@@ -138,6 +163,22 @@ const ClosePosition: React.FC<{
 
   useEffect(() => {
     amount && setAmountPercent(0);
+  }, [amount]);
+
+  const MarketOrderContractParams = useContractParams(
+    appConfig.contract_address.MarketOrderImplementationAddress
+  );
+  const LimitOrderContractParams = useContractParams(
+    appConfig.contract_address.LimitOrderImplementationAddress
+  );
+
+  // const curToken = useTokenByName(params?.symbolName);
+
+  const { sendByDelegate } = useSendTxByDelegate();
+
+  useEffect(() => {
+    const per = +filterPrecision(+amount / +params?.tokenSize, 4);
+    setAmountPercent(per > 1 ? 1 : per < 0 ? 0 : per);
   }, [amount]);
 
   const maxProfitPrice = useMemo(() => {
@@ -157,9 +198,6 @@ const ClosePosition: React.FC<{
     curToken?.displayDecimal,
     params?.isLong,
   ]);
-
-  // const indexPrices = useRecoilValue(recoilIndexPrices);
-  const indexPrices = useIndexPricesById(params?.futureId);
 
   useEffect(() => {
     if (curType === "market") {
@@ -275,6 +313,67 @@ const ClosePosition: React.FC<{
           amount: _amount,
         });
         //发起交易
+        const _run = async () => {
+          const descAmount = BigNumber(amount)
+            .dividedBy(curToken.pars)
+            .toFixed(0, BigNumber.ROUND_DOWN);
+
+          const _k = params.isLong ? -1 : 1;
+          let p = [];
+
+          const isMarket = curType === "market";
+
+          if (isMarket) {
+            p = [
+              params.futureId,
+              ethers.utils
+                .parseUnits(
+                  BigNumber(indexPrices?.price || 0)
+                    .multipliedBy(
+                      1 +
+                        (_k * ((slippage as unknown as number) || 0.005)) / 100
+                    )
+                    .toFixed(6, BigNumber.ROUND_DOWN),
+                  6
+                )
+                .toString(),
+              descAmount,
+              +dayjs().unix() + 300,
+              params.isLong ? FutureType.LONG : FutureType.SHORT,
+            ];
+          } else {
+            p = [
+              params.futureId,
+              ethers.utils.parseUnits(amount, 6).toString(),
+              descAmount,
+              params.isLong ? FutureType.LONG : FutureType.SHORT,
+            ];
+          }
+
+          const encodedData = encodeTx({
+            abi: isMarket
+              ? MarketOrderContractParams.abi
+              : LimitOrderContractParams.abi,
+            functionName: isMarket ? FuncNameMap.MARKET : FuncNameMap.LIMIT,
+            args: p,
+          });
+
+          const res = await sendByDelegate({
+            data: [
+              isMarket
+                ? MarketOrderContractParams.address
+                : LimitOrderContractParams.address,
+              false,
+              appConfig.executionFee,
+              encodedData,
+            ],
+            value: appConfig.executionFee,
+            showMsg: false,
+          });
+        };
+
+        _run();
+
         setVisible(false);
       }
     }
@@ -282,6 +381,12 @@ const ClosePosition: React.FC<{
   const onCancel = () => {
     setVisible(false);
   };
+
+  useEffect(() => {
+    if (curType === "market") {
+      setPrice(filterPrecision(indexPrices?.price, curToken?.displayDecimal));
+    }
+  }, [curType, indexPrices, curToken?.displayDecimal]);
 
   return (
     <Modal
@@ -421,7 +526,6 @@ const ClosePosition: React.FC<{
           />
         </StyledSlider>
         <OrderInfo>
-          {" "}
           <div className="item">
             <p className="label">Slippage limit</p>
             <p className="value">{slippage}%</p>

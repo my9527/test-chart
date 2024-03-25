@@ -293,12 +293,19 @@ export const OpenPostionsEffects = memo(() => {
         const IncreaseLimitOrder = queryAbiEventByName('CreateIncreaseLimitOrder', LimitOrderContractParams.abi as AbiItem[]);
         const DecreaseLimitOrder = queryAbiEventByName('CreateDecreaseLimitOrder', LimitOrderContractParams.abi as AbiItem[]);
 
+        //
         const unwatchCreateIncreaseLimitOrder = txPublicClient.watchEvent({
             address: LimitOrderContractParams.address as Addr,
             events: [IncreaseLimitOrder, DecreaseLimitOrder],
             onLogs: (logs) => {
 
                 console.log("watched limited orders change", logs);
+
+                const props = decodeEventLog({
+                    abi: LimitOrderContractParams.abi,
+                    data: logs?.[0]?.data,
+                    topics: logs?.[0]?.topics,
+                  });
             }
 
         });

@@ -285,10 +285,10 @@ export const recoilBalanceAndPool = atom<BalanceAndPoolType>({
   key: 'balance_pool',
   default: {
     walletBalance: {
-      balanceReadable: '0',
+      // balanceReadable: '0',
     },
     exchangeBalance: {
-      balanceReadable: '0',
+      // balanceReadable: '0',
     },
     epoch: '',
     availableLp: {
