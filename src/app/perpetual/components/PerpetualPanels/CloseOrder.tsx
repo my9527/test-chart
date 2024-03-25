@@ -206,7 +206,11 @@ const CloseOrder: React.FC<{
 
     const tradeFee = filterPrecision(
       // BigNumber(+price * +_amount * 0.0008).toString(),
-      BigNumber(price).multipliedBy(_amount).multipliedBy(curToken.tradingFeeRatio || BasicTradingFeeRatio).div(100).toString(),
+      BigNumber(price)
+        .multipliedBy(_amount)
+        .multipliedBy(curToken.tradingFeeRatio || BasicTradingFeeRatio)
+        .div(100)
+        .toString(),
       curToken?.displayDecimal
     );
     const impactFee = "0";
@@ -277,7 +281,10 @@ const CloseOrder: React.FC<{
       <Slider
         onChange={(value) => {
           setAmountPercent(
-            +filterPrecision(value / 100, curToken?.displayDecimal)
+            +filterPrecision(
+              BigNumber(value).dividedBy(100).toString(),
+              curToken?.displayDecimal
+            )
           );
         }}
         per={amountPercent || 0}

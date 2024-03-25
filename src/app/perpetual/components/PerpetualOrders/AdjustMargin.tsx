@@ -5,10 +5,10 @@ import { tabProps } from "../Tabs";
 import { useState, useMemo } from "react";
 import Modal from "@/app/components/Modal";
 import TokenImage from "@/app/components/TokenImage";
-import { useTokenByFutureId, useTokenByName } from "@/app/hooks/useTokens";
+import { useTokenByFutureId } from "@/app/hooks/useTokens";
 import BigNumber from "bignumber.js";
 import Input from "@/app/components/Input";
-import { getExponent, filterPrecision } from "@/app/utils/tools";
+import { filterPrecision } from "@/app/utils/tools";
 import { verifyValidNumber } from "@/app/utils/tools";
 import Slider from "../Slider";
 import { useEffect } from "react";
@@ -17,6 +17,10 @@ import { recoilOpenInterests } from "@/app/models";
 import { useRecoilValue } from "recoil";
 import { useExchangeBalance } from "@/app/hooks/useBalance";
 import { DefaultRemainCollateralRatio } from "@/app/config/common";
+import { PositionType } from "@/app/models";
+import { getLeverage } from "../../lib/getLeverage";
+import { useIndexPricesById } from "@/app/hooks/useIndexPrices";
+import { getMaxProfitPrice } from "../../lib/getMaxProfitPrice";
 
 const Wrapper = styled.div`
   position: relative;
@@ -127,21 +131,13 @@ const StyledOrderInfo = styled(OrderInfo)`
   margin-top: 20px;
 `;
 type TypeMap = { [key: string]: string };
-export type ParamsProps = {
-  futureType: string;
-  margin: string;
-  fundsAvailable: string;
-  leverage: string;
-  tokenSize: string;
-  isLong: boolean;
-  futureId: string;
-  entryPriceReadable: string;
-  collateralReadable: string;
+
+export interface ParamsProps extends PositionType {
   liqPrice: string;
   pnl: string;
   feesReadable: string;
-  markPrice: string;
-};
+}
+
 const AdjustMargin: React.FC<{
   params: ParamsProps;
   visible: boolean;
@@ -154,7 +150,7 @@ const AdjustMargin: React.FC<{
   const { currentTokenAvailableLiq } = useRecoilValue(recoilOpenInterests);
   const [isMarginInput, setIsMarginInput] = useState(false);
   const balance = useExchangeBalance();
-  console.log("params", params);
+
   const typeTabList = [
     { label: "Add Margin", key: "add" },
     { label: "Reduce Margin", key: "reduce" },
@@ -164,9 +160,12 @@ const AdjustMargin: React.FC<{
     add: "Add margin",
     reduce: "Reduce margin",
   };
+  const indexPrices = useIndexPricesById(params?.futureId);
+  const markPrice = useMemo(() => {
+    return filterPrecision(indexPrices?.price, curToken?.displayDecimal);
+  }, [indexPrices?.price, curToken?.displayDecimal]);
 
   const maxAmount = useMemo(() => {
-    console.log("maxAmount", activeTypeTab);
     if (activeTypeTab === "add") {
       const v =
         Math.max(
@@ -203,7 +202,7 @@ const AdjustMargin: React.FC<{
         .toString();
 
       const minremaincollateral = BigNumber(params?.tokenSize)
-        .multipliedBy(params?.markPrice)
+        .multipliedBy(markPrice)
         .multipliedBy(
           Math.max(
             BigNumber(2)
@@ -245,27 +244,6 @@ const AdjustMargin: React.FC<{
     activeTypeTab,
   ]);
 
-  const getLeverage = ({
-    size,
-    price,
-    margin,
-    pnl,
-    fees,
-  }: {
-    size: string;
-    price: string;
-    margin: string;
-    pnl: string;
-    fees: string;
-  }) => {
-    return filterPrecision(
-      BigNumber(size)
-        .multipliedBy(price)
-        .dividedBy(BigNumber(margin).plus(BigNumber(pnl).minus(fees)))
-        .toString(),
-      2
-    );
-  };
   const origin_leverage = useMemo(() => {
     return getLeverage({
       size: params?.tokenSize,
@@ -287,7 +265,7 @@ const AdjustMargin: React.FC<{
       activeTypeTab === "add"
         ? BigNumber(params?.collateralReadable).plus(margin).toString()
         : BigNumber(params?.collateralReadable).minus(margin).toString();
-        
+
     return filterPrecision(
       getLiqPrice({
         size: params?.tokenSize,
@@ -310,36 +288,15 @@ const AdjustMargin: React.FC<{
     activeTypeTab,
   ]);
 
-  const getMaxProfitPrice = ({ margin }: { margin: string }) => {
-    const maxProfit = BigNumber(curToken?.maxProfitRatio || "1").multipliedBy(
-      margin
-    );
-    if (params?.isLong) {
-      return filterPrecision(
-        BigNumber(maxProfit)
-          .plus(
-            BigNumber(params?.entryPriceReadable).multipliedBy(
-              params?.tokenSize
-            )
-          )
-          .dividedBy(params?.tokenSize)
-          .toString(),
-        curToken?.displayDecimal
-      );
-    } else {
-      const _price = filterPrecision(
-        BigNumber(params?.entryPriceReadable)
-          .multipliedBy(params?.tokenSize)
-          .minus(maxProfit)
-          .dividedBy(params?.tokenSize)
-          .toString(),
-        curToken?.displayDecimal
-      );
-      return +_price < 0 ? 0 : _price;
-    }
-  };
   const origin_maxProfitPrice = useMemo(() => {
-    return getMaxProfitPrice({ margin: params?.collateralReadable });
+    return getMaxProfitPrice({
+      margin: params?.collateralReadable,
+      maxProfitRatio: curToken?.maxProfitRatio || 1,
+      isLong: params?.isLong,
+      price: params?.entryPriceReadable,
+      size: params?.tokenSize,
+      displayDecimal: curToken?.displayDecimal,
+    });
   }, [
     curToken?.maxProfitRatio,
     params?.collateralReadable,
@@ -356,6 +313,11 @@ const AdjustMargin: React.FC<{
         : BigNumber(params?.collateralReadable).minus(margin).toString();
     return getMaxProfitPrice({
       margin: _margin,
+      maxProfitRatio: curToken?.maxProfitRatio || 1,
+      isLong: params?.isLong,
+      price: params?.entryPriceReadable,
+      size: params?.tokenSize,
+      displayDecimal: curToken?.displayDecimal,
     });
   }, [
     curToken?.maxProfitRatio,
@@ -494,7 +456,6 @@ const AdjustMargin: React.FC<{
         </MaxAmount>
         <Slider
           onChange={(value) => {
-            console.log("value", value);
             setIsMarginInput(false);
             setMarginPercent(BigNumber(value).dividedBy(100).toNumber());
           }}
