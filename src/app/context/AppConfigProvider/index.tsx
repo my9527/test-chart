@@ -19,6 +19,7 @@ export type AppConfigType = {
   api: {
     http: string;
     wss: string;
+    common?: string;
   };
 
   rpc: {
@@ -77,7 +78,7 @@ const AppConfigOnChain: Record<number, AppConfigType> = {
 
     // config api
     api: {
-      http: "https://api-testnet.substancex.io/",
+      http: "https://api-zkfair-testnet.substancex.io/api/backend/",
       wss: "wss://api-testnet.substancex.io/",
     },
 
@@ -144,24 +145,25 @@ const AppConfigOnChain: Record<number, AppConfigType> = {
     // config graphhql
     // config graphhql
     graph: {
-      base: 'https://api.thegraph.com/subgraphs/name/substanceexchangedevelop/core',
-      perpetual: 'https://gql-testnet.substancex.io/subgraphs/name/sex/user',
-      baseBlock: 'https://api.thegraph.com/subgraphs/name/iliaazhel/arbitrum-goerli-blocklytics',
+      base: 'https://gql-testnet.substancex.io/subgraphs/name/substanceexchangedevelop/iotex_testnet',
+      perpetual: 'https://gql-testnet.substancex.io/subgraphs/name/substanceexchangedevelop/iotex_testnet',
+      baseBlock: 'https://gql-testnet.substancex.io/subgraphs/name/substanceexchangedevelop/iotex_blocks',
     },
 
     // config rpc
     rpc: {
-      http: "https://arb.substancex.io/",
+      http: "https://babel-api.testnet.iotex.io/",
       wss: "wss://babel-api.testnet.iotex.io/ws",
     },
 
     // config api
     api: {
-      http: "https://api-testnet.substancex.io/api/backend/",
+      http: "https://api-iotex-test.substancex.io/api/backend/",
+      common: "https://api-testnet.substancex.io/api/backend/",
       wss: "wss://api-testnet.substancex.io/",
     },
 
-    executionFee: '300000000000000',
+    executionFee: '500000000000000',
     contract_address: addressMap[CHAINS_ID.iotxTest],
     epoch_duration: 1,
   }

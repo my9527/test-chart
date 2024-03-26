@@ -34,6 +34,7 @@ export default function RootLayout({
 
   return (
     <html lang="en">
+      <script src="https://www.google.com/recaptcha/enterprise.js?render=6Lck5V0nAAAAABUIx8PkVTKxvII3cM3z-di43-Vg"></script>
       <body className={inter.className}>
         <Providers>
 

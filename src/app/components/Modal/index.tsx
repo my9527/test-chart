@@ -3,7 +3,7 @@ import styled from "styled-components";
 import { createPortal } from "react-dom";
 import { motion } from "framer-motion";
 import CloseIcon from "./CloseIcon";
-import { useCallback, useState } from "react";
+import { ReactElement, cloneElement, useCallback, useMemo, useState } from "react";
 
 const ModalWrapper = styled(motion.div)<{ $overlayColor?: string }>`
   position: fixed;
@@ -180,7 +180,7 @@ const Modal: React.FC<{
                     <ConfirmBtn
                       onClick={handleConfirm}
                     >
-                      <div className="label">{confirmBtnText}</div>
+                      <div className="label">{confirmBtnText} {loading ? '...' : ''}</div>
                     </ConfirmBtn>
                   </Btns>
                 )}
@@ -188,7 +188,7 @@ const Modal: React.FC<{
             )}
           </ModalBody>
         </ModalWrapper>,
-        window.document.body
+        window.document.body,
       )
     : null;
 };

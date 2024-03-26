@@ -238,6 +238,8 @@ export const OpenInterestsEffects: FC = memo(() => {
 
     const callFns = useCallback(async () => {
 
+        console.log("callFns")
+
         const [
             openInterestsCalls,
             globalUsdValueCalls,
@@ -317,6 +319,7 @@ export const OpenInterestsEffects: FC = memo(() => {
             };
 
             // 更新execution fee
+            console.log("executionFeeResults", executionFeeResults?.[0]?.result?.toString() || '0');
             updateExecutionFee(executionFeeResults?.[0]?.result?.toString() || '0');
 
             // // 更新其他信息
@@ -344,7 +347,9 @@ export const OpenInterestsEffects: FC = memo(() => {
 
     // 当 token 列表发生变化时，需要重新请求对应的数据以快速的更新显示
     useEffect(() => {
+        console.log("asdadfasfasdf")
         run();
+
         return () => {
             cancel();
         }
