@@ -96,7 +96,7 @@ export function StakeFormContent() {
   const [amount, setAmout] = useState('')
   const [duration, setDuration] = useState('')
 
-  const maturity = Number(duration) ? (Number(duration) / 30).toFixed(2) : '1.00'
+  const multiplier = Number(duration) ? (Number(duration) / 30).toFixed(2) : '1.00'
 
   const stakeDisabled = !amount || !duration
   return (
@@ -111,7 +111,8 @@ export function StakeFormContent() {
           {
             key: TradeCoin.Coin,
             title: '$Qcoin',
-            subTitle: 'APR: 147.33%'
+            subTitle: 'APR: 147.33%',
+            disabled: true,
           },
         ]}
         activeTab={tab}
@@ -136,7 +137,7 @@ export function StakeFormContent() {
           <HDivider />
           <Maturity>
             <MaturityBg />
-            <MaturityText>{`${maturity}x`}</MaturityText>
+            <MaturityText>{`${multiplier}x`}</MaturityText>
           </Maturity>
         </SelectArea>
         <Divider />

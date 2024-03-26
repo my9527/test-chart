@@ -10,13 +10,11 @@ const FlexBox = styled.div<{ justify?: string }>`
 `
 
 const Label = styled.div`
-  font-size: ${props => props.theme.fontSize.small};
   color: ${props => props.theme.colors.text4};
   margin-right: 16px;
 `
 
 const Value = styled.div`
-  font-size: ${props => props.theme.fontSize.small};
   color: ${props => props.theme.colors.text1};
 `
 
@@ -28,7 +26,7 @@ const Currency = styled.div`
 
 const Wrapper = styled.div`
   position: relative;
-
+  font-size: ${props => props.theme.fontSize.small};
 `
 
 const TextField = styled.input<{ ref: Ref<HTMLInputElement> }>`
@@ -101,8 +99,8 @@ function BalanceInput ({ title, balance, currency, action, value, onChange, bala
           </FlexBox>
         </FlexBox>
         <FlexBox justify="flex-end">
-          { action ? <Button primary padding="2px 18px" onClick={action.onClick}>{action.text}</Button> : null }
-          <Currency>{currency}</Currency>
+          { action ? <Button className="action-btn" primary padding="2px 18px" onClick={action.onClick}>{action.text}</Button> : null }
+          <Currency className="currency">{currency}</Currency>
         </FlexBox>
       </DisplayInput>
     </Wrapper>

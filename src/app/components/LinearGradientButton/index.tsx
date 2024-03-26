@@ -22,10 +22,11 @@ const StyledButton = styled.button<TProps>`
 interface TProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   minWidth?: number, 
   height?: number
+  className?: string
 }
-const Button: FCC<TProps> = (props) => {
+const Button: FCC<TProps> = ({ className, ...rest}) => {
   return (
-    <StyledButton {...props} />
+    <StyledButton className={className} {...rest} />
   )
 }
 
