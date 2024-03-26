@@ -300,7 +300,7 @@ const Position: FCC<{
     .multipliedBy(-1)
     .toString();
 
-  const feesReadable = BigNumber(fundingfeeReadable)
+  const feesReadable: string = BigNumber(fundingfeeReadable)
     .plus(borrowingfeeReadable)
     .plus(openingfeeReadable)
     .toString();
@@ -373,7 +373,7 @@ const Position: FCC<{
       </td>
       <td {...PositionTdAttrs} width={140}>
         <div className={`pos-dir ${pos.isLong ? "pos-long" : "pos-short"}`}>
-          {pos.tokenSize}
+          {pos.positionReadable}
         </div>
       </td>
       <td {...PositionTdAttrs} width={140}>

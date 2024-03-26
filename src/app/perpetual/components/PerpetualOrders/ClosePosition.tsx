@@ -170,11 +170,11 @@ const ClosePosition: React.FC<{
       !isInput &&
       setAmount(
         filterPrecision(
-          BigNumber(amountPercent).multipliedBy(params?.tokenSize).toString(),
+          BigNumber(amountPercent).multipliedBy(params?.positionReadable).toString(),
           amountDecimal
         )
       );
-  }, [amountPercent, isInput, amountDecimal, params?.tokenSize]);
+  }, [amountPercent, isInput, amountDecimal, params?.positionReadable]);
 
   useEffect(() => {
     isInput && setAmountPercent(0);
@@ -215,7 +215,7 @@ const ClosePosition: React.FC<{
     }
   }, [curType, indexPrices, curToken?.symbolName]);
 
-  const slippage = localStorage.getItem("slippage") || "0.08%";
+  const slippage = localStorage.getItem("slippage") || "0.5";
 
   const tradeFee = useMemo(() => {
     return getTradeFee({
@@ -305,7 +305,7 @@ const ClosePosition: React.FC<{
   const onClose = () => {
     setVisible(false);
   };
-  const onConfirm = () => {
+  const onConfirm = async () => {
     if (price && amount) {
       if (
         !BigNumber(price).gt(maxProfitPrice) &&
@@ -329,8 +329,8 @@ const ClosePosition: React.FC<{
                 .parseUnits(
                   BigNumber(indexPrices?.price || 0)
                     .multipliedBy(
-                      1 +
-                        (_k * ((slippage as unknown as number) || 0.005)) / 100
+                      BigNumber(_k).multipliedBy(slippage || 0.005).dividedBy(100).plus(1)
+                      // 1 + (_k * ((slippage as unknown as number) || 0.005)) / 100
                     )
                     .toFixed(6, BigNumber.ROUND_DOWN),
                   6
@@ -358,20 +358,20 @@ const ClosePosition: React.FC<{
           });
 
           const res = await sendByDelegate({
-            data: [
+            data: [[
               isMarket
                 ? MarketOrderContractParams.address
                 : LimitOrderContractParams.address,
               false,
               appConfig.executionFee,
               encodedData,
-            ],
+            ]],
             value: appConfig.executionFee,
             showMsg: false,
           });
         };
 
-        _run();
+        await _run();
 
         setVisible(false);
       }
@@ -466,7 +466,7 @@ const ClosePosition: React.FC<{
           <p className="title">Size</p>
 
           <StyledInput
-            type={BigNumber(amount).gt(params?.tokenSize) ? "warn" : "normal"}
+            type={BigNumber(amount).gt(params?.positionReadable) ? "warn" : "normal"}
             onBlur={() => {
               setAmount(amount ? filterPrecision(amount, amountDecimal) : "");
             }}

@@ -63,6 +63,7 @@ export type PositionType = {
   entryFundingFeePerTokenReadable: string;
   entryBorrowingFeePerTokenReadable: string;
   cumulativeTeamFeeReadable: string;
+  positionReadable: string;
 }
 
 
