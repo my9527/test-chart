@@ -11,7 +11,7 @@ import Box from "@/app/components/Box";
 
 const Wrapper = styled.div`
   background-color: ${props => props.theme.colors.fill1};
-  padding: 50px 0;
+  padding: 40px 0 75px;
   height: calc(100vh - 50px);
   overflow: auto;
 `
@@ -26,7 +26,7 @@ const InnerWrapper = styled.div`
 const Title = styled.h2`
   font-size: 30px;
   color: ${(props) => props.theme.colors.text1};
-  margin-bottom: 10px;
+  margin: 10px 0;
 `
 
 const SubTitle = styled.h3`

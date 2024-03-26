@@ -1,5 +1,13 @@
 import { motion } from "framer-motion";
-import styled, { css } from "styled-components";
+import { ReactNode } from "react";
+import styled from "styled-components";
+
+const Wrapper = styled.div`
+  display: flex;
+  gap: 15px;
+  align-items: center;
+  cursor: pointer;
+`
 
 const Box = styled.button<{ width?: number, height?: number, padding?: number }>`
   position: relative;
@@ -9,9 +17,7 @@ const Box = styled.button<{ width?: number, height?: number, padding?: number }>
   height: ${props => props.height || 14}px;
   background: transparent;
   cursor: pointer;
-  ${props => props.padding && css`
-    padding: ${props.padding}px;
-  `}
+  padding: ${props => props.padding || 2}px;
 `
 
 const Indicator = styled(motion.div)`
@@ -26,8 +32,10 @@ interface IProps {
   width?: number;
   height?: number;
   padding?: number;
+  label?: ReactNode;
+  className?: string;
 }
-function Checkbox ({ checked, onChange, width, height, padding }: IProps) {
+function Checkbox ({ checked, onChange, width, height, padding, label, className }: IProps) {
   const handleChange = () => {
     onChange(!checked)
   }
@@ -36,7 +44,6 @@ function Checkbox ({ checked, onChange, width, height, padding }: IProps) {
       opacity: 1,
       transition: {
         duration: 0.2,
-        delay: 0.2,
       },
     },
     unchecked: {
@@ -47,9 +54,13 @@ function Checkbox ({ checked, onChange, width, height, padding }: IProps) {
     },
   }
   return (
-    <Box onClick={handleChange} width={width} height={height} padding={padding}>
-      <Indicator initial={"unchecked"} animate={checked ? "checked" : "unchecked"} variants={tickVariants} />
-    </Box>
+    <Wrapper className={className} onClick={handleChange}>
+      <Box width={width} height={height} padding={padding}>
+        <Indicator initial={"unchecked"} animate={checked ? "checked" : "unchecked"} variants={tickVariants} />
+      </Box>
+      { label }
+    </Wrapper>
+   
   )
 }
 

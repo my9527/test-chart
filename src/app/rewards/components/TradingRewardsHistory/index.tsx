@@ -76,7 +76,7 @@ const RowInner = styled.div`
   font-size: ${props => props.theme.fontSize.medium};
 `
 
-const WeekEpochList = styled(FlexBox)`
+const WeekEpochList = styled.div`
   .col1 {
     width: 100px;
   }
@@ -91,7 +91,7 @@ const WeekEpochList = styled(FlexBox)`
     text-align: right;
   }
 `
-const EpochList = styled(FlexBox)`
+const EpochList = styled.div`
   position: absolute;
   left: 0;
   top: 0;
@@ -117,8 +117,8 @@ const EpochList = styled(FlexBox)`
 
 const Content = styled.div`
   position: relative;
-  flex-grow: 1;
   overflow-y: auto;
+  height: 257px;
 `
 
 const TradingRewardsHistory = () => {
@@ -158,7 +158,7 @@ const TradingRewardsHistory = () => {
   }
   return (
     <Wrapper>
-      <WeekEpochList direction="column" alignItems="normal">
+      <WeekEpochList>
         <Header>
           <div className="col1">Epoch</div>
           <div className="col2">Start/End Date</div>
@@ -208,7 +208,7 @@ const TradingRewardsHistory = () => {
 
       {
         epochListVisibility ? (
-          <EpochList direction="column" alignItems="normal">
+          <EpochList>
             <Header>
               <div className="col1">Date</div>
               <div className="col2">Volume</div>

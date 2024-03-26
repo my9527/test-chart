@@ -5,20 +5,28 @@ const Wrapper = styled.div`
   display: flex;
   flex-direction: column;
   gap: 10px;
+  width: 100%;
 `
 
 const FlexBox = styled.div`
   display: flex;
   gap: 10px;
+  width: 100%;
 `
-const Item = styled.div<{ active: boolean }>`
+const Item = styled.div`
   line-height: 32px;
-  padding: 0 26px;
-  background: ${props => props.active ? props.theme.colors.primary2 : props.theme.colors.fill3 };
+  flex-grow: 1;
+  text-align: center;
+  background: ${props => props.theme.colors.fill3 };
   border-radius: 30px;
-  color: ${props => props.active ? props.theme.colors.primary : props.theme.colors.text4};
+  color: ${props => props.theme.colors.text4};
   cursor: pointer;
-  border: ${props => `1px solid ${ props.active ? props.theme.colors.primary : 'transparent' }` };
+  border: 1px solid transparent;
+
+  &.active {
+    background: ${props => props.theme.colors.primary2};
+    color: ${props => props.theme.colors.text1};
+  }
 `
 
 const InputWrapper = styled.div`
@@ -68,12 +76,13 @@ const durationOptions = [
 interface IDurationProps {
   value: string
   onChange: (value: string) => void
+  className?: string
 }
 
 const minCustomDuration = 30
 const maxCustomDuration = 360
 
-const Duration = ({ value, onChange }: IDurationProps) => {
+const Duration = ({ value, onChange, className }: IDurationProps) => {
   const [customDuration, setCustomDuration] = useState('')
   const [quickSelect, setQuickSelect] = useState('')
 
@@ -98,19 +107,19 @@ const Duration = ({ value, onChange }: IDurationProps) => {
   }
 
   return (
-    <Wrapper>
+    <Wrapper className={className}>
       <FlexBox>
         {
           durationOptions.map((item) => {
             return (
-              <Item active={item.value === quickSelect} key={item.value} onClick={handleQuickSelect(item.value)}>{item.label}</Item>
+              <Item className={`duration-item ${item.value === quickSelect ? 'active' : ''}`} key={item.value} onClick={handleQuickSelect(item.value)}>{item.label}</Item>
             )
           })
         }
       </FlexBox>
       <InputWrapper>
         <Input placeholder="Customize" value={customDuration} onBlur={handleInputBlur} onChange={handleInputChange} />
-        <DisplayInput>
+        <DisplayInput className="customize-input">
           <Suffix>{ +value > 1 ? 'Days' : 'Day' }</Suffix>
         </DisplayInput>
       </InputWrapper>
