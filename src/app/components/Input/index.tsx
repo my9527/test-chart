@@ -41,15 +41,15 @@ const Wrapper = styled.div<Props>`
     }
     &:-moz-placeholder {
       color: ${(props) => props.theme.colors.text4};
-      font-size: ${(props) => props.theme.fontSize.medium};
+      font-size: ${(props) => props.theme.fontSize.small};
     }
     &::-moz-placeholder {
       color: ${(props) => props.theme.colors.text4};
-      font-size: ${(props) => props.theme.fontSize.medium};
+      font-size: ${(props) => props.theme.fontSize.small};
     }
     &:-ms-input-placeholder {
       color: ${(props) => props.theme.colors.text4};
-      font-size: ${(props) => props.theme.fontSize.medium};
+      font-size: ${(props) => props.theme.fontSize.small};
     }
     &:focus {
       border: ${(props) =>
@@ -83,8 +83,8 @@ const Input: React.FC<
     placeholder?: string;
     value?: string | number;
     onChange?: Function;
-    suffix?: React.ReactNode;
-    prefix?: React.ReactNode;
+    suffixNode?: React.ReactNode;
+    prefixNode?: React.ReactNode;
     className?: string;
     type?: string;
     onBlur?: Function;
@@ -95,8 +95,8 @@ const Input: React.FC<
   placeholder,
   value,
   onChange,
-  prefix,
-  suffix,
+  prefixNode,
+  suffixNode,
   className,
   type = "normal",
   onBlur,
@@ -113,9 +113,9 @@ const Input: React.FC<
       prefixWidth={prefixRef?.current?.clientWidth || 0}
       suffixWidth={suffixRef?.current?.clientWidth || 0}
     >
-      {prefix && (
+      {prefixNode && (
         <div className="prefix" ref={prefixRef}>
-          {prefix}
+          {prefixNode}
         </div>
       )}
       {disabled ? (
@@ -134,9 +134,9 @@ const Input: React.FC<
           }}
         />
       )}
-      {suffix && (
+      {suffixNode && (
         <div className="suffix" ref={suffixRef}>
-          {suffix}
+          {suffixNode}
         </div>
       )}
     </Wrapper>

@@ -172,7 +172,9 @@ const OrderConfirm: React.FC<{ params: ParamsProps; actionType: string }> = ({
         </div>
         <div className="item">
           <p className="label">Order price</p>
-          <p className="value">{params?.price}</p>
+          <p className="value">
+            {params?.orderType === "limit" ? params?.price : "Market"}
+          </p>
         </div>
         <div className="item">
           <p className="label">Margin</p>
