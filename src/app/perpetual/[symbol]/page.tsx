@@ -1,6 +1,6 @@
 "use client";
 import styled from "styled-components";
-import { FC, useCallback, useMemo, useState } from "react";
+import { FC, useCallback, useMemo, useState, useEffect } from "react";
 import RGL, { WidthProvider, Layout } from "react-grid-layout";
 import { useRecoilState, useRecoilValue } from "recoil";
 
