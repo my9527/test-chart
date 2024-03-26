@@ -1,0 +1,13 @@
+<svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+<g id="Frame 427321501">
+<circle id="Ellipse 1552" cx="8.35107" cy="8.20239" r="7" stroke="white" stroke-opacity="0.5"/>
+<g id="Rectangle 34625339">
+<rect x="4.85107" y="7.70239" width="7" height="1" fill="white" fill-opacity="0.5"/>
+<rect x="5.10107" y="7.95239" width="6.5" height="0.5" stroke="white" stroke-opacity="0.5" stroke-width="0.5"/>
+</g>
+<g id="Rectangle 34625340">
+<rect x="8.85107" y="4.70239" width="7" height="1" transform="rotate(90 8.85107 4.70239)" fill="white" fill-opacity="0.5"/>
+<rect x="8.60107" y="4.95239" width="6.5" height="0.5" transform="rotate(90 8.60107 4.95239)" stroke="white" stroke-opacity="0.5" stroke-width="0.5"/>
+</g>
+</g>
+</svg>

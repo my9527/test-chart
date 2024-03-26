@@ -18,6 +18,8 @@ import ClosePosition from "./ClosePosition";
 import AdjustMargin from "./AdjustMargin";
 import { ParamsProps } from "./AdjustMargin";
 import StopOrdersModal from "./StopOrdersModal";
+import AddIcon from "@/app/assets/perpetual/add.svg";
+import Image from "next/image";
 const Wrapper = styled(Row)`
   width: 100%;
   max-height: 100%;
@@ -181,12 +183,21 @@ const PositionItemWrapper = styled.tr`
   }
 
   .margin-col {
+    display: flex;
+    align-items: center;
+    gap: 10px;
     color: ${(props) => props.theme.colors.text3};
     font-family: Arial;
     font-size: ${(props) => props.theme.fontSize.medium};
     font-style: normal;
     font-weight: 400;
-    line-height: 100%; /* 14px */
+    line-height: 100%;
+    img {
+      width: 15px;
+      height: 15px;
+      flex-shrink: 0;
+      cursor: pointer;
+    }
   }
   .button_wrapper {
     display: inline-block;
@@ -247,8 +258,8 @@ const Position: FCC<{
   pos: PositionType;
   handleShowAdujustMargin: Function;
   handleClose: Function;
-  handleShowStopOrders:Function
-}> = ({ pos, handleShowAdujustMargin, handleClose,handleShowStopOrders }) => {
+  handleShowStopOrders: Function;
+}> = ({ pos, handleShowAdujustMargin, handleClose, handleShowStopOrders }) => {
   const token = useTokenByFutureId(pos.futureId);
 
   const indexPrices = useIndexPricesById(pos.futureId);
@@ -382,8 +393,20 @@ const Position: FCC<{
         </Col>
       </td>
       <td {...PositionTdAttrs} width={140}>
-        <div className="margin-col">
+        <div
+          className="margin-col"
+          onClick={() => {
+            handleShowAdujustMargin({
+              ...pos,
+              liqPrice,
+              pnl,
+              feesReadable,
+              markPrice,
+            });
+          }}
+        >
           ${filterPrecision(pos.collateralReadable, 2)}
+          <Image width={15} height={15} src={AddIcon} alt="" />
         </div>
       </td>
       <td {...PositionTdAttrs} width={140}>
