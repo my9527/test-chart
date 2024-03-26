@@ -134,6 +134,7 @@ const Modal: React.FC<{
   onConfirm,
   onCancel,
   overlayColor,
+  className,
 }) => {
 
   const [loading, updateLoading] = useState(false);
@@ -153,7 +154,7 @@ const Modal: React.FC<{
 
   return visible
     ? createPortal(
-        <ModalWrapper $overlayColor={overlayColor}>
+        <ModalWrapper $overlayColor={overlayColor} className={className}>
           <ModalBody width={width} height={height}>
             {showHeader && (
               <Header>
