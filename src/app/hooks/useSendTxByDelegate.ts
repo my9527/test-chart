@@ -18,9 +18,10 @@ export const useSendTxByDelegate = () => {
 
     // TODO: 增加 1ct 代理交易
     // & Pick<TransactionRequest, 'data' | 'value' | 'to'>
-    const _sendByDelegate = async function ({ data, value, to, showMsg = true }: { showMsg: boolean,
+    const _sendByDelegate = async function ({ data, value, to, showMsg = true }: { 
+        showMsg?: boolean,
         data: any,
-        value: any,
+        value?: any,
         to?: any,
     } ) {
 
@@ -35,7 +36,7 @@ export const useSendTxByDelegate = () => {
         const res = await sendTx({
             to: DelegationHubContractParams.address,
             data: txData,
-            value: value,
+            value: value || '0x0',
         });
 
         if(showMsg) {

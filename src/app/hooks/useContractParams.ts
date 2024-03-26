@@ -57,7 +57,7 @@ import { useChainId } from "wagmi";
 //   args?: (abi extends Abi ? UnionWiden<args> : never) | allArgs | undefined
 
 
-type ContractParamType = {
+export type IContractParam = {
     address: `0x${string}`;
     abi: AbiItem[];
     chainId: number;
@@ -157,7 +157,7 @@ export const useContractParams = (address: string) => {
                 chainId: chainId,
             }
             
-        } as Record<`0x${string}`, ContractParamType>
+        } as Record<`0x${string}`, IContractParam>
 
         return _contracts;
 

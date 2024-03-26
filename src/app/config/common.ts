@@ -51,7 +51,7 @@ export const  BasicTradingFeeRatio = 0.08; // 这里指代的是 0.0008, 计算�
 
 // 
 export const generateSignApiTokenMessage = (address: string, now: number) => `
-Welcome to HyperionX.
+Welcome!
 Your address: ${address}
 Timestamp: ${now}
 `

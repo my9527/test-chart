@@ -298,6 +298,8 @@ export const BalanceAndPoolEffects = () => {
             // dex 钱包资产
             const exchangeBalance = exchangeBalanceResults.reduce((result: any, rslt, index) => {
                 const cur = rslt.result?.toString();
+
+                console.log("depositTokens[index]", depositTokens[index], BigNumber(cur || '0').div(1e6).toString());
                 return {
                     ...result,
 

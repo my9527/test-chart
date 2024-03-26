@@ -70,9 +70,10 @@ interface IInputProps {
   };
   value: string;
   onChange: (v: string) => void;
+  decimal?: number;
 }
 
-function BalanceInput ({ title, balance, currency, action, value, onChange, balanceTxt }: IInputProps) {
+function BalanceInput ({ title, balance, currency, action, value, onChange, balanceTxt, decimal }: IInputProps) {
 
   const inputRef = useRef<HTMLInputElement>(null);
   const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
