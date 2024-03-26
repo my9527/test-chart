@@ -451,7 +451,7 @@ const ClosePosition: React.FC<{
               setPrice(value);
             }}
             placeholder="input price"
-            suffix={
+            suffixNode={
               <Select
                 curCurrency={curType}
                 list={["Limit", "Market"]}
@@ -480,7 +480,7 @@ const ClosePosition: React.FC<{
               setIsInput(true);
               setAmount(value);
             }}
-            suffix={
+            suffixNode={
               <Select showSelect={false} curCurrency={curToken?.symbolName} />
             }
           />
