@@ -218,7 +218,7 @@ export const OrderEffects = () => {
 
     const { run, error } = useRequest(fetchFutureOrders, {
         manual: true,
-        pollingInterval: 150_000,
+        pollingInterval: 5_000,
         // defaultParams: [address],
         refreshDeps: [fetchFutureOrders],
     });

@@ -456,8 +456,8 @@ const OpenOrder: React.FC<{
   const onClose = () => {
     setVisible(false);
   };
-  const onConfirm = () => {
-    submitTx(confirmedParams, confirmedParams?.futureType as string, tickerPrice.currentTickerPrice);
+  const onConfirm = async () => {
+    await submitTx(confirmedParams, confirmedParams?.futureType as string, tickerPrice.currentTickerPrice);
     setVisible(false);
   };
   const onCancel = () => {

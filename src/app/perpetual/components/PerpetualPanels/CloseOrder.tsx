@@ -19,6 +19,8 @@ import OrderConfirm from "./OrderConfirm";
 import { ParamsProps } from "./OrderConfirm";
 import BigNumber from "bignumber.js";
 import { BasicTradingFeeRatio } from "@/app/config/common";
+import { useTokenByName } from "@/app/hooks/useTokens";
+import { usePositionsById } from "@/app/hooks/usePositions";
 const Layout = styled.div`
   display: flex;
   flex-direction: column;
@@ -155,8 +157,18 @@ const CloseOrder: React.FC<{
   const [inputAmount, setInputAmount] = useState<string>("");
   const [inputType, setInputType] = useState("normal");
   const [clickType, setClickType] = useState("");
-  const longPosition = 2323;
-  const shortPosition = 2003;
+
+  // futureLongId = futureShortId 时只需一个，如果不等，那么应该分别获取
+  const positions = usePositionsById(curToken.futureLongId);
+
+  // const [shortPositionI, longPositionI] = positions.sort(po => po.isLong ? 1 : -1);
+  const longPositions = positions.filter(po => po.isLong)[0];
+  const shortPositions = positions.filter(po => !po.isLong)[0];
+
+  console.log("user pos:", positions);
+
+  const longPosition = longPositions?.tokenSize || 0;
+  const shortPosition = shortPositions?.tokenSize || 0;
 
   const [visible, setVisible] = useState(false);
   const [confirmedParams, setConfirmedParams] = useState<
@@ -183,25 +195,42 @@ const CloseOrder: React.FC<{
   useEffect(() => {
     if (clickType && inputAmount) {
       if (clickType === "long") {
-        setInputType(+inputAmount > longPosition ? "warn" : "normal");
+        setInputType(BigNumber(inputAmount).gt(longPosition) ? "warn" : "normal");
       }
       if (clickType === "short") {
-        setInputType(+inputAmount > shortPosition ? "warn" : "normal");
+        setInputType( BigNumber(inputAmount).gt(shortPosition)? "warn" : "normal");
       }
     }
   }, [inputAmount, clickType, longPosition, shortPosition]);
 
+
+  const longAmount = useMemo(() => {
+
+    return  +inputAmount || BigNumber(amountPercent).multipliedBy(longPosition).toString();
+
+  }, [amountPercent, longPosition, inputAmount]);
+
+  const shortAmount = useMemo(() => {
+
+    return  +inputAmount || BigNumber(amountPercent).multipliedBy(shortPosition).toString();
+
+  }, [amountPercent, shortPosition, inputAmount]);
+
   const handleClose = (type: string) => {
     console.log("close", type);
     setClickType(type);
-    let _amount = 0;
+    let _amount: string | number = '0';
     if (type === "long") {
-      _amount = +inputAmount || amountPercent * longPosition;
-      setInputType(+inputAmount > longPosition ? "warn" : "normal");
+      // _amount = +inputAmount || amountPercent * longPosition;
+      // _amount = +inputAmount || BigNumber(amountPercent).multipliedBy(longPosition).toNumber();
+      _amount = longAmount;
+      setInputType(BigNumber(inputAmount).gt(longPosition) ? "warn" : "normal");
     }
     if (type === "short") {
-      _amount = +inputAmount || amountPercent * shortPosition;
-      setInputType(+inputAmount > shortPosition ? "warn" : "normal");
+      // _amount = +inputAmount || amountPercent * shortPosition;
+      // _amount = +inputAmount || BigNumber(amountPercent).multipliedBy(shortPosition).toNumber();
+      _amount = shortAmount;
+      setInputType(BigNumber(inputAmount).gt(shortPosition) ? "warn" : "normal");
     }
 
     const tradeFee = filterPrecision(
@@ -218,7 +247,7 @@ const CloseOrder: React.FC<{
       symbolName,
       price,
       margin,
-      amount: _amount + "",
+      amount: BigNumber(_amount).toString(),
       futureType: type,
       orderType: activeOrderTab,
       tradeFee,
@@ -233,22 +262,26 @@ const CloseOrder: React.FC<{
       setVisible(true);
     }
   };
+
   const longPnl = useMemo(() => {
-    const _amount = +inputAmount || amountPercent * longPosition;
+    // const _amount = +inputAmount || amountPercent * longPosition;
+    // const _amount = +inputAmount || BigNumber(amountPercent).multipliedBy(longPosition).toString()
+    const _amount = longAmount;
 
     return filterPrecision(
       BigNumber(price).minus(entryPrice).multipliedBy(_amount).toString(),
       curToken?.displayDecimal
     );
-  }, [entryPrice, price, inputAmount, amountPercent, longPosition]);
+  }, [entryPrice, price, inputAmount, amountPercent, longPosition, longAmount]);
 
   const shortPnl = useMemo(() => {
-    const _amount = +inputAmount || amountPercent * shortPosition;
+    // const _amount = +inputAmount || BigNumber(amountPercent).multipliedBy(shortPosition).toString();
+    const _amount = shortAmount;
     return filterPrecision(
       BigNumber(entryPrice).minus(price).multipliedBy(_amount).toString(),
       curToken?.displayDecimal
     );
-  }, [entryPrice, price, inputAmount, amountPercent, shortPosition]);
+  }, [entryPrice, price, inputAmount, amountPercent, shortPosition, shortAmount]);
 
   return (
     <>
@@ -335,14 +368,14 @@ const CloseOrder: React.FC<{
           longSuffixChildren={
             inputAmount || amountPercent ? (
               <EstPosition>
-                ≈{inputAmount || amountPercent * longPosition} {symbolName}
+                ≈{longAmount} {symbolName}
               </EstPosition>
             ) : null
           }
           shortSuffixChildren={
             inputAmount || amountPercent ? (
               <EstPosition>
-                ≈{inputAmount || amountPercent * shortPosition} {symbolName}
+                ≈{shortAmount} {symbolName}
               </EstPosition>
             ) : null
           }
