@@ -68,7 +68,7 @@ const Price: React.FC<{
             : price
         }
         onBlur={() => {
-          setPrice(filterPrecision(price, displayDecimal));
+          setPrice(price ? filterPrecision(price, displayDecimal) : '');
         }}
         onChange={(e: React.FormEvent<HTMLInputElement>) => {
           const value = e?.currentTarget.value;

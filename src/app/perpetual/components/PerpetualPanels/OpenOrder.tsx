@@ -324,6 +324,10 @@ const OpenOrder: React.FC<{
 
 
       const curTokenParDecimal = getExponent(token_.pars);
+
+       // 是否是市价单
+       const isMarket = type === 'market';
+       const isLong = side === FutureType.LONG;
       
       const formattedTokenSizeToPar = BigNumber(amount_)
         .div(BigNumber.max(token_?.pars, 1))
@@ -333,15 +337,23 @@ const OpenOrder: React.FC<{
         .parseUnits(formatNumber(formattedTokenSizeToPar, curTokenParDecimal), curTokenParDecimal)
         .toString();
 
+      const orderPrice = isMarket ? ethers.utils
+      .parseUnits(
+        BigNumber(price_)
+          .multipliedBy(BigNumber(1).plus(BigNumber(isLong ? 1 : -1).multipliedBy((+slippage_ / 100))))
+          .toFixed(6, BigNumber.ROUND_DOWN),
+        6,
+      )
+      .toString() : ethers.utils.parseUnits(price_, 6).toString();
+
       const params = [
-        side === FutureType.LONG ? token_.futureLongId : token_.futureShortId,
-        ethers.utils.parseUnits(BigNumber(price_).toString(), 6).toString(), // 根据market 或 limit， 此处的price 有两种计算模式
+        isLong ? token_.futureLongId : token_.futureShortId,
+        orderPrice, // 根据market 或 limit， 此处的price 有两种计算模式
         formattedSize,
         ethers.utils.parseUnits(margin_, 6).toString() 
       ];
     
-      // 是否是市价单
-      const isMarket = type === 'market';
+     
       if(isMarket) {
         params.push(+dayjs().add(5, 'm').unix());
       }
@@ -409,9 +421,9 @@ const OpenOrder: React.FC<{
       const normalParams = createTx(
         isHandleTypeLong ? FutureType.LONG : FutureType.SHORT, // 方向
         params.orderType, // 市价/限价
-        params.amount, // 数量
-        BigNumber(isLimit ? params.price : tickPrice).toString(),// 价格
         params.margin, // 数量
+        BigNumber(isLimit ? params.price : tickPrice).toString(),// 价格
+        params.amount, // 数量
         params.slippage, // 滑点
         curToken,
       );

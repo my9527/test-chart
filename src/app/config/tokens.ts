@@ -2058,7 +2058,7 @@ const baseTokens: Record<string, Token[]> = {
     },
     {
       symbolName: 'WUSDC',      
-      decimal: 18,
+      decimal: 6,
       disabled: false,
       displayDecimal: 2,
       address: addressMap[CHAINS_ID.zkfairtest].USDCAddress,
@@ -8904,7 +8904,7 @@ const baseTokens: Record<string, Token[]> = {
       disabled: false,
       // coinType: 1,
       displayDecimal: 2,
-      address: addressMap[CHAINS_ID.iotxTest].USDCAddress,
+      address: addressMap[CHAINS_ID.iotxTest].USDAddress,
       tag: [],
       exchangeStable: true,
       withdraw: true,
@@ -9015,6 +9015,7 @@ const baseTokens: Record<string, Token[]> = {
       "tradeable": false,
       deposit: true,
       native: false,
+      stable: true,
      
     },
     {

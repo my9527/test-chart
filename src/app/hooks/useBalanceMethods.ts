@@ -4,7 +4,7 @@ import { ethers } from "ethers";
 import { useSendTx } from "./useSendTx";
 import { Abi, AbiItem, erc20Abi } from "viem";
 import { encodeTx } from "../lib/txTools";
-import { useAccount, useChainId } from "wagmi";
+import { useAccount, useCall, useChainId } from "wagmi";
 import BigNumber from "bignumber.js";
 import { useContractParams } from "./useContractParams";
 import { useAppConfig } from "./useAppConfig";
@@ -28,6 +28,7 @@ export const useBalanceMethods = () => {
     const readContract = useReadContract();
     const { sendByDelegate } = useSendTxByDelegate();
     const DepositContractParams = useContractParams(appConfig.contract_address.UserBalanceImplementationAddress);
+    const ExchangeStableTokenContractParams = useContractParams(appConfig.contract_address.USDAddress);
 
 
 
@@ -74,7 +75,27 @@ export const useBalanceMethods = () => {
     }, [chainId, address]);
 
 
+    const buyStableTx = useCallback(async (token_: Token, amount_: string) => {
+        const amount = ethers.utils.parseUnits(amount_, token_.decimal).toString();
+        if (!token_) return;
+    
+        try {
+          const _txData = encodeTx({
+            abi: ExchangeStableTokenContractParams.abi,
+            functionName: 'buy',
+            args: [token_.address, '0', amount]
+          })
+          return _txData;
+        } catch (e: any) {
+          throw new Error(e);
+        }
+      }, [ExchangeStableTokenContractParams]);
 
+
+
+    /**
+     * 向交易所充值, stable token 需要进行购买
+     */
     const deposit = useCallback(async (token_: Token, amount: string) => {
         const _amount = ethers.utils.parseUnits(amount, token_.decimal).toString();
 
@@ -97,9 +118,15 @@ export const useBalanceMethods = () => {
 
             delegationHubParam.push([DepositContractParams.address, false, 0, userDepositData]);
 
+            if(token_.stable) {
+                const buyStableData = await buyStableTx(token_, amount);
+                delegationHubParam.push([ExchangeStableTokenContractParams.address, false, 0, buyStableData]);
+            }
+
+            console.log("delegationHubParam --->", delegationHubParam);
+            // return;
             const res = await sendByDelegate({
                 data: delegationHubParam,
-                // value: '',
             });
             console.log("deposit: ", res);
 
@@ -107,6 +134,11 @@ export const useBalanceMethods = () => {
             console.log("deposit error: ", e);
         }
 
+
+    }, [buyStableTx]);
+
+
+    const withdraw = useCallback(async ( ) => {
 
     }, []);
 

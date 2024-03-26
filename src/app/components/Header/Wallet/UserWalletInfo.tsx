@@ -8,6 +8,7 @@ import { Col } from "../../Col";
 import { FC, ReactNode } from "react";
 import Image from "next/image";
 import { DepositModal } from "../DepositModal";
+import { WithdrawModal } from "../WithdrawModal";
 
 import IconDepositSvg from "@/app/assets/header/icon-deposit.svg";
 import IconIotxSvg from "@/app/assets/header/icon-iotx.svg";
@@ -305,7 +306,9 @@ export const UserWalletInfo: FC<{ address: `0x${string}` | undefined }> = ({ add
                     <DepositModal>
                         <ToolBtn iconUrl={IconDepositSvg} name="Deposit" />
                     </DepositModal>
-                    <ToolBtn iconUrl={IconDepositSvg} name="Withdraw" />
+                    <WithdrawModal>
+                        <ToolBtn iconUrl={IconDepositSvg} name="Withdraw" />
+                    </WithdrawModal>
                 </Row>
                 <Row className="full" gap="20px">
                     <ToolBtn iconUrl={IconDepositSvg} name="Language" />
