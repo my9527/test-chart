@@ -34,7 +34,6 @@ export function getExponent(num: number) {
  * @returns
  */
 export const verifyValidNumber = (value: string, decimal = 4) => {
-  console.log('input-value-in',value,decimal)
   const regexp =
     decimal === 0
       ? "(^(0|[1-9]\\d*)$)"
@@ -59,17 +58,20 @@ export const filterThousands = (
     isCutZero: false,
     round: BigNumber.ROUND_DOWN,
     k: 1,
-  },
+  }
 ) => {
   const { isCutZero = false, round = BigNumber.ROUND_DOWN, k = 1 } = options;
 
   if (new BigNumber(value).isNaN()) return `${value}`;
-  if (isCutZero) return new BigNumber(value).multipliedBy(k).decimalPlaces(decimal, round).toFormat();
-  const result = new BigNumber(filterPrecision(BigNumber(value).multipliedBy(k).toString(), decimal)).toFormat(
-    decimal,
-    round,
-  );
-  return +result === 0 ? '0' : result;
+  if (isCutZero)
+    return new BigNumber(value)
+      .multipliedBy(k)
+      .decimalPlaces(decimal, round)
+      .toFormat();
+  const result = new BigNumber(
+    filterPrecision(BigNumber(value).multipliedBy(k).toString(), decimal)
+  ).toFormat(decimal, round);
+  return +result === 0 ? "0" : result;
 };
 
 export const uniqArrWithObjParams = (arr: any[], key: any) => {
@@ -82,4 +84,3 @@ export const uniqArrWithObjParams = (arr: any[], key: any) => {
     }
   }, []);
 };
-

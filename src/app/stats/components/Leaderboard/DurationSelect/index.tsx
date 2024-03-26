@@ -51,15 +51,15 @@ const Item = styled.div<{ $active: boolean }>`
 `
 
 interface DurationSelectProps {
-  value: number,
-  onChange: (value: number) => void,
-  options: { value: number, label: string }[]
+  value: string,
+  onChange: (value: string) => void,
+  options: { value: string, label: string }[]
 }
 export const DurationSelect = ({ value, onChange, options }: DurationSelectProps) => {
   const [visible, setVisible] = useState(false)
   const selected = options.find(i => i.value === value)
 
-  const handleChange = (value: number) => () => {
+  const handleChange = (value: string) => () => {
     onChange(value)
     setVisible(false)
   }

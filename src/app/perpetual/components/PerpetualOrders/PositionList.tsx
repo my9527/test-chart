@@ -16,7 +16,8 @@ import { useBorrowingFeeByAddressSide } from "../../hooks/useBorrowingFees";
 import { calcPnl, calcPnlPercentage } from "../../lib/getPnl";
 import ClosePosition from "./ClosePosition";
 import AdjustMargin from "./AdjustMargin";
-
+import { ParamsProps } from "./AdjustMargin";
+import StopOrdersModal from "./StopOrdersModal";
 const Wrapper = styled(Row)`
   width: 100%;
   max-height: 100%;
@@ -246,7 +247,8 @@ const Position: FCC<{
   pos: PositionType;
   handleShowAdujustMargin: Function;
   handleClose: Function;
-}> = ({ pos, handleShowAdujustMargin, handleClose }) => {
+  handleShowStopOrders:Function
+}> = ({ pos, handleShowAdujustMargin, handleClose,handleShowStopOrders }) => {
   const token = useTokenByFutureId(pos.futureId);
 
   const indexPrices = useIndexPricesById(pos.futureId);
@@ -391,7 +393,7 @@ const Position: FCC<{
         <div
           className="button button_wrapper"
           onClick={() =>
-            handleShowAdujustMargin({
+            handleShowStopOrders({
               ...pos,
               liqPrice,
               pnl,
@@ -409,7 +411,18 @@ const Position: FCC<{
       <td {...PositionTdAttrs}>
         <div className="button_wrapper action_buttons">
           <div className="content">
-            <div className="button" onClick={() => handleClose(pos)}>
+            <div
+              className="button"
+              onClick={() =>
+                handleClose({
+                  ...pos,
+                  liqPrice,
+                  pnl,
+                  feesReadable,
+                  markPrice,
+                })
+              }
+            >
               close
             </div>
             <div className="button">share</div>
@@ -423,8 +436,11 @@ const Position: FCC<{
 export const PositionList = () => {
   const _openPositions = useRecoilValue(recoilPositions);
   const [showAdujustMargin, setShowAdujustMargin] = useState(false);
-  const [activePosition, setActivePosition] = useState({});
+  const [activePosition, setActivePosition] = useState<ParamsProps>(
+    {} as ParamsProps
+  );
   const [showClosePosition, setShowClosePosition] = useState(false);
+  const [showStopOrders, setShowStopOrders] = useState(false);
 
   // sort by futureId asc
   const openPositions = useMemo(() => {
@@ -434,15 +450,19 @@ export const PositionList = () => {
     );
   }, [_openPositions]);
 
-  const handleShowAdujustMargin = (ele: PositionType) => {
-    console.log("ele", ele);
+  const handleShowAdujustMargin = (ele: ParamsProps) => {
     setShowAdujustMargin(true);
     setActivePosition(ele);
   };
-  const handleClose = (ele: PositionType) => {
+  const handleClose = (ele: ParamsProps) => {
     setShowClosePosition(true);
     setActivePosition(ele);
   };
+  const handleShowStopOrders = (ele: ParamsProps) => {
+    setShowStopOrders(true);
+    setActivePosition(ele);
+  };
+
   return (
     <Wrapper>
       <TableWrapper>
@@ -470,32 +490,34 @@ export const PositionList = () => {
                   pos={pos}
                   handleShowAdujustMargin={handleShowAdujustMargin}
                   handleClose={handleClose}
+                  handleShowStopOrders={handleShowStopOrders}
                 />
               );
             })}
           </tbody>
         </table>
       </TableWrapper>
-      <AdjustMargin
-        visible={showAdujustMargin}
-        setVisible={setShowAdujustMargin}
-        params={activePosition}
-      />
-      <ClosePosition
-        visible={showClosePosition}
-        setVisible={setShowClosePosition}
-        params={activePosition}
-        // params={{
-        //   amount: "10",
-        //   symbolName: "ARB",
-        //   price: "233.34",
-        //   margin: "66",
-        //   futureType: "long",
-        //   fees: "233",
-        //   tradeFee: "2323",
-        //   impactFee: "2323",
-        // }}
-      />
+      {showAdujustMargin && (
+        <AdjustMargin
+          visible={showAdujustMargin}
+          setVisible={setShowAdujustMargin}
+          params={activePosition}
+        />
+      )}
+      {showClosePosition && (
+        <ClosePosition
+          visible={showClosePosition}
+          setVisible={setShowClosePosition}
+          params={activePosition}
+        />
+      )}
+      {showStopOrders && (
+        <StopOrdersModal
+          visible={showStopOrders}
+          setVisible={setShowStopOrders}
+          params={activePosition}
+        />
+      )}
     </Wrapper>
   );
 };

@@ -1,27 +1,30 @@
 "use client";
 import styled from "styled-components";
-import Btns from "../PerpetualPanels/Btns";
 import Modal from "@/app/components/Modal";
 import { useState, useEffect, useMemo } from "react";
 import TokenImage from "@/app/components/TokenImage";
 import Input from "@/app/components/Input";
-import { useRecoilValue } from "recoil";
-import { PositionType, recoilIndexPrices } from "@/app/models";
 import { getExponent, filterPrecision } from "@/app/utils/tools";
 import { verifyValidNumber } from "@/app/utils/tools";
 import CurrencySelect from "@/app/components/CurrencySelect";
 import Slider from "../Slider";
-import { useTokenByFutureId, useTokenByName } from "@/app/hooks/useTokens";
+import { useTokenByFutureId } from "@/app/hooks/useTokens";
 import BigNumber from "bignumber.js";
+import { ParamsProps } from "./AdjustMargin";
+import { getLeverage } from "../../lib/getLeverage";
+import { usePriceImpactK } from "../../hooks/usePriceImpactK";
+import { usePriceImpactDepth } from "../../hooks/usePriceImpactDepth";
+import { getTradeFee, getPriceImpactFee } from "../../lib/getFee";
+import { useIndexPricesById } from "@/app/hooks/useIndexPrices";
+import { getMaxProfitPrice } from "../../lib/getMaxProfitPrice";
 import { ethers } from "ethers";
-import useTickerPrice from "@/app/hooks/useTickerPrice";
 import dayjs from "dayjs";
 import { useContractParams } from "@/app/hooks/useContractParams";
 import { useAppConfig } from "@/app/hooks/useAppConfig";
 import { encodeTx } from "@/app/lib/txTools";
 import { useSendTxByDelegate } from "@/app/hooks/useSendTxByDelegate";
-import { useIndexPrices, useIndexPricesById } from "@/app/hooks/useIndexPrices";
 import { FutureType } from "@/app/config/common";
+
 const Wrapper = styled.div`
   position: relative;
   width: 100%;
@@ -97,10 +100,11 @@ const Layout = styled.div`
     line-height: 100%;
     margin-bottom: 5px;
   }
-  input {
+
+  .input {
     color: ${(props) => props.theme.colors.text1};
-    background: ${(props) => props.theme.colors.fill3}!important;
-    border: none !important;
+    background: ${(props) => props.theme.colors.fill3} !important;
+    border: 1px solid transparent;
   }
 `;
 
@@ -115,150 +119,274 @@ const StyledInput = styled(Input)`
   margin-bottom: 20px;
 `;
 type TypeMap = { [key: string]: string };
+
 const futureTypeMap: TypeMap = { long: "Long", short: "Short" };
 
 const FuncNameMap = {
-  MARKET: 'makeDecreaseMarketOrder',
-  LIMIT: 'makeDecreaseLimitOrder'
-}
+  MARKET: "makeDecreaseMarketOrder",
+  LIMIT: "makeDecreaseLimitOrder",
+};
 
-export type ParamsProps = {
-  symbolName: string;
-  futureType: string;
-  margin: string;
-  amount: string;
-  slippage?: string;
-  fees: string;
-  tradeFee: string;
-  impactFee: string;
-  price: string;
-  pnl?: string;
-} & PositionType;
+// export type ParamsProps = {
+//   symbolName: string;
+//   futureType: string;
+//   margin: string;
+//   amount: string;
+//   slippage?: string;
+//   fees: string;
+//   tradeFee: string;
+//   impactFee: string;
+//   price: string;
+//   pnl?: string;
+// } & PositionType;
 const ClosePosition: React.FC<{
   params: ParamsProps;
   visible: boolean;
   setVisible: Function;
 }> = ({ params, visible, setVisible }) => {
-  
   const [price, setPrice] = useState<string>("");
   const [curType, setCurType] = useState<string>("limit");
   const [amount, setAmount] = useState<string>("");
+  const [inputAmount, setInputAmount] = useState<string>("");
   const [amountPercent, setAmountPercent] = useState<number>(0);
-  
+  const [isInput, setIsInput] = useState(false);
+
   const appConfig = useAppConfig();
-  // const indexPrices = useIndexPrices();
+
   const indexPrices = useIndexPricesById(params.futureId);
 
-  const MarketOrderContractParams = useContractParams(appConfig.contract_address.MarketOrderImplementationAddress);
-  const LimitOrderContractParams = useContractParams(appConfig.contract_address.LimitOrderImplementationAddress);
-
-  // const curToken = useTokenByName(params?.symbolName);
-  const curToken = useTokenByFutureId(params.futureId);
-
-
-
-
-  const { sendByDelegate } = useSendTxByDelegate();
-
-  useEffect(() => {
-    const per = +filterPrecision(+amount / +params?.tokenSize, 4);
-    setAmountPercent(per > 1 ? 1 : per < 0 ? 0 : per);
-  }, [amount]);
-
-  const onClose = () => {
-    setVisible(false);
-  };
-  const onConfirm = () => {
-
-
-    async function _run() {
-      const descAmount = BigNumber(amount).dividedBy(curToken.pars).toFixed(0, BigNumber.ROUND_DOWN);
-
-      const _k =  params.isLong ? -1 : 1;
-      let p = [];
-
-      const isMarket = curType === 'market';
-
-      if(isMarket) {
-        p = [
-          params.futureId,
-          ethers.utils.parseUnits(
-            BigNumber(indexPrices?.price || 0)
-              .multipliedBy(1 + (_k * (params?.slippage  as unknown as number || 0.005)) / 100)
-              .toFixed(6, BigNumber.ROUND_DOWN),
-              6
-          ).toString(),
-          descAmount,
-          +dayjs().unix() + 300,
-          params.isLong ? FutureType.LONG : FutureType.SHORT
-        ]
-      }else {
-        p = [
-          params.futureId, ethers.utils.parseUnits(amount, 6).toString(), descAmount, params.isLong ? FutureType.LONG : FutureType.SHORT
-        ]
-      }
-
-
-      const encodedData = encodeTx({
-        abi: isMarket ? MarketOrderContractParams.abi : LimitOrderContractParams.abi,
-        functionName: isMarket ? FuncNameMap.MARKET : FuncNameMap.LIMIT,
-        args: p,
-      });
-
-
-      const res = await sendByDelegate({
-        data: [
-          isMarket ? MarketOrderContractParams.address : LimitOrderContractParams.address,
-          false,
-          appConfig.executionFee,
-          encodedData,
-        ],
-        value: appConfig.executionFee,
-        showMsg: false,
-      })
-
-    }
-    
-
-    _run();
-
-
-
-    setVisible(false);
-  };
-  const onCancel = () => {
-    setVisible(false);
-  };
-
-
-  const getMarketPrice = () => {
-    setPrice(
-      filterPrecision(
-        indexPrices?.price,
-        curToken?.displayDecimal
-      )
-    );
-  };
-  useEffect(() => {
-    setPrice("");
-  }, [curType]);
-
-  useEffect(() => {
-    if (curType === "market") {
-      setPrice(
-        filterPrecision(
-          indexPrices?.price,
-          curToken?.displayDecimal
-        )
-      );
-    }
-  }, [curType, indexPrices, params?.symbolName]);
+  const curToken = useTokenByFutureId(params?.futureId);
 
   const amountDecimal = useMemo(() => {
     return getExponent(Number(curToken?.perpConfig?.contractSize) || 1);
   }, [curToken]);
 
-  console.log("params", params);
+  useEffect(() => {
+    setInputAmount(amount);
+  }, [amount]);
+
+  useEffect(() => {
+    amountPercent &&
+      !isInput &&
+      setAmount(
+        filterPrecision(
+          BigNumber(amountPercent).multipliedBy(params?.tokenSize).toString(),
+          amountDecimal
+        )
+      );
+  }, [amountPercent, isInput, amountDecimal, params?.tokenSize]);
+
+  useEffect(() => {
+    isInput && setAmountPercent(0);
+  }, [isInput]);
+
+  const MarketOrderContractParams = useContractParams(
+    appConfig.contract_address.MarketOrderImplementationAddress
+  );
+  const LimitOrderContractParams = useContractParams(
+    appConfig.contract_address.LimitOrderImplementationAddress
+  );
+
+  // const curToken = useTokenByName(params?.symbolName);
+
+  const { sendByDelegate } = useSendTxByDelegate();
+
+  const maxProfitPrice = useMemo(() => {
+    return getMaxProfitPrice({
+      margin: params?.collateralReadable,
+      maxProfitRatio: curToken?.maxProfitRatio || 1,
+      isLong: params?.isLong,
+      price: params?.entryPriceReadable,
+      size: params?.tokenSize,
+      displayDecimal: curToken?.displayDecimal,
+    });
+  }, [
+    curToken?.maxProfitRatio,
+    params?.collateralReadable,
+    params?.tokenSize,
+    params?.entryPriceReadable,
+    curToken?.displayDecimal,
+    params?.isLong,
+  ]);
+
+  useEffect(() => {
+    if (curType === "market") {
+      setPrice(filterPrecision(indexPrices?.price, curToken?.displayDecimal));
+    }
+  }, [curType, indexPrices, curToken?.symbolName]);
+
+  const slippage = localStorage.getItem("slippage") || "0.08%";
+
+  const tradeFee = useMemo(() => {
+    return getTradeFee({
+      size:
+        amount ||
+        BigNumber(amountPercent).multipliedBy(params?.tokenSize).toString(),
+      price: params?.entryPriceReadable,
+      tradingFeeRatio: curToken?.tradingFeeRatio as number,
+      displayDecimal: curToken?.displayDecimal,
+    });
+  }, [
+    amount,
+    amountPercent,
+    params.tokenSize,
+    params?.entryPriceReadable,
+    curToken?.tradingFeeRatio,
+    curToken?.displayDecimal,
+  ]);
+
+  const leverage = useMemo(() => {
+    return getLeverage({
+      size: params?.tokenSize,
+      price: params?.entryPriceReadable,
+      margin: params?.collateralReadable,
+      pnl: params?.pnl,
+      fees: params?.feesReadable,
+    });
+  }, [
+    params?.tokenSize,
+    params?.entryPriceReadable,
+    params?.collateralReadable,
+    params?.pnl,
+    params?.feesReadable,
+  ]);
+  const priceImpactK = usePriceImpactK(curToken?.symbolName);
+  const { buyPriceImpactDepth, sellPriceImpactDepth } = usePriceImpactDepth();
+
+  const priceImpactFee = useMemo(() => {
+    return getPriceImpactFee({
+      leverage,
+      margin: params?.collateralReadable,
+      isLong: params?.isLong,
+      displayDecimal: curToken?.displayDecimal,
+      priceImpactK,
+      sellPriceImpactDepth: sellPriceImpactDepth as string,
+      buyPriceImpactDepth: buyPriceImpactDepth as string,
+    });
+  }, [
+    curToken?.displayDecimal,
+    params?.collateralReadable,
+    leverage,
+    params?.isLong,
+    sellPriceImpactDepth,
+    buyPriceImpactDepth,
+    priceImpactK,
+  ]);
+
+  const fees = useMemo(() => {
+    return BigNumber(tradeFee).plus(priceImpactFee).toString();
+  }, [tradeFee, priceImpactFee]);
+
+  const markPrice = useMemo(() => {
+    return filterPrecision(indexPrices?.price, curToken?.displayDecimal);
+  }, [indexPrices?.price, curToken?.displayDecimal]);
+
+  const pnl = useMemo(() => {
+    return filterPrecision(
+      BigNumber(price)
+        .minus(params?.entryPriceReadable)
+        .multipliedBy(
+          amount ||
+            BigNumber(amountPercent).multipliedBy(params?.tokenSize).toString()
+        )
+        .minus(fees)
+        .toString(),
+      2
+    );
+  }, [
+    price,
+    params?.entryPriceReadable,
+    amount,
+    amountPercent,
+    params?.tokenSize,
+    fees,
+  ]);
+
+  const onClose = () => {
+    setVisible(false);
+  };
+  const onConfirm = () => {
+    if (price && amount) {
+      if (
+        !BigNumber(price).gt(maxProfitPrice) &&
+        !BigNumber(amount).gt(params?.tokenSize)
+      ) {
+        //发起交易
+        const _run = async () => {
+          const descAmount = BigNumber(amount)
+            .dividedBy(curToken.pars)
+            .toFixed(0, BigNumber.ROUND_DOWN);
+
+          const _k = params.isLong ? -1 : 1;
+          let p = [];
+
+          const isMarket = curType === "market";
+
+          if (isMarket) {
+            p = [
+              params.futureId,
+              ethers.utils
+                .parseUnits(
+                  BigNumber(indexPrices?.price || 0)
+                    .multipliedBy(
+                      1 +
+                        (_k * ((slippage as unknown as number) || 0.005)) / 100
+                    )
+                    .toFixed(6, BigNumber.ROUND_DOWN),
+                  6
+                )
+                .toString(),
+              descAmount,
+              +dayjs().unix() + 300,
+              params.isLong ? FutureType.LONG : FutureType.SHORT,
+            ];
+          } else {
+            p = [
+              params.futureId,
+              ethers.utils.parseUnits(amount, 6).toString(),
+              descAmount,
+              params.isLong ? FutureType.LONG : FutureType.SHORT,
+            ];
+          }
+
+          const encodedData = encodeTx({
+            abi: isMarket
+              ? MarketOrderContractParams.abi
+              : LimitOrderContractParams.abi,
+            functionName: isMarket ? FuncNameMap.MARKET : FuncNameMap.LIMIT,
+            args: p,
+          });
+
+          const res = await sendByDelegate({
+            data: [
+              isMarket
+                ? MarketOrderContractParams.address
+                : LimitOrderContractParams.address,
+              false,
+              appConfig.executionFee,
+              encodedData,
+            ],
+            value: appConfig.executionFee,
+            showMsg: false,
+          });
+        };
+
+        _run();
+
+        setVisible(false);
+      }
+    }
+  };
+  const onCancel = () => {
+    setVisible(false);
+  };
+
+  useEffect(() => {
+    if (curType === "market") {
+      setPrice(filterPrecision(indexPrices?.price, curToken?.displayDecimal));
+    }
+  }, [curType, indexPrices, curToken?.displayDecimal]);
+
   return (
     <Modal
       height={600}
@@ -272,14 +400,18 @@ const ClosePosition: React.FC<{
         <Symbol>
           <TokenImage name={curToken?.symbolName} width={20} height={20} />
           <p className="symbol_name">{curToken?.symbolName}USD</p>
-          <p className={`future_type future_type_${params?.futureType}`}>
-            {futureTypeMap[params?.futureType]}
+          <p
+            className={`future_type future_type_${
+              params?.isLong ? "long" : "short"
+            }`}
+          >
+            {futureTypeMap[params?.isLong ? "long" : "short"]}
           </p>
         </Symbol>
         <OrderInfo>
           <div className="item">
             <p className="label">Current Est. PnL</p>
-            <p className="value">{}</p>
+            <p className="value">{filterPrecision(params?.pnl, 2)}</p>
           </div>
           <div className="item">
             <p className="label">Entry price</p>
@@ -287,18 +419,19 @@ const ClosePosition: React.FC<{
           </div>
           <div className="item">
             <p className="label">Market price</p>
-            <p className="margin">{indexPrices?.price} USD</p>
+            <p className="margin">{markPrice} USD</p>
           </div>
           <div className="item">
             <p className="label">Size</p>
             <p className="value">
-              {params?.tokenSize} {params?.symbolName}
+              {params?.tokenSize} {curToken?.symbolName}
             </p>
           </div>
         </OrderInfo>
         <Layout>
           <p className="title">Order Price</p>
           <Input
+            type={BigNumber(price).gt(maxProfitPrice) ? "warn" : "normal"}
             disabled={curType === "market"}
             value={
               curType === "market"
@@ -306,7 +439,9 @@ const ClosePosition: React.FC<{
                 : price
             }
             onBlur={() => {
-              setPrice(filterPrecision(price, curToken?.displayDecimal));
+              setPrice(
+                price ? filterPrecision(price, curToken?.displayDecimal) : ""
+              );
             }}
             onChange={(e: React.FormEvent<HTMLInputElement>) => {
               const value = e?.currentTarget.value;
@@ -336,12 +471,13 @@ const ClosePosition: React.FC<{
               setAmount(amount ? filterPrecision(amount, amountDecimal) : "");
             }}
             placeholder="input amount"
-            value={amount}
+            value={inputAmount}
             onChange={(e: React.FormEvent<HTMLInputElement>) => {
               const value = e?.currentTarget.value;
-              console.log("value", value, amountDecimal);
+
               if (value && verifyValidNumber(value, amountDecimal)) return;
 
+              setIsInput(true);
               setAmount(value);
             }}
             suffix={
@@ -352,8 +488,9 @@ const ClosePosition: React.FC<{
         <StyledSlider>
           <Slider
             onChange={(value) => {
-              setAmount(
-                filterPrecision((value / 100) * +params?.tokenSize, amountDecimal)
+              setIsInput(false);
+              setAmountPercent(
+                +filterPrecision(BigNumber(value).dividedBy(100).toString(), 2)
               );
             }}
             per={amountPercent || 0}
@@ -387,26 +524,25 @@ const ClosePosition: React.FC<{
           />
         </StyledSlider>
         <OrderInfo>
-          {" "}
           <div className="item">
             <p className="label">Slippage limit</p>
-            <p className="value">{params?.slippage}%</p>
+            <p className="value">{slippage}%</p>
           </div>
           <div className="item">
             <p className="label">Fees</p>
-            <p className="value">{params?.fees} USD</p>
+            <p className="value">{fees} USD</p>
           </div>
           <div className="item">
             <p className="label">--- Trading fee</p>
-            <p className="value">{params?.tradeFee} USD</p>
+            <p className="value">{tradeFee} USD</p>
           </div>
           <div className="item">
             <p className="label">--- Price impact fee</p>
-            <p className="value">{params?.impactFee} USD</p>
+            <p className="value">{priceImpactFee} USD</p>
           </div>
           <div className="item">
             <p className="label">Est. PnL</p>
-            <p className="value">{params?.impactFee} USD</p>
+            <p className="value">{pnl} USD</p>
           </div>
         </OrderInfo>
       </Wrapper>
