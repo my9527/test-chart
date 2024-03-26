@@ -7,6 +7,8 @@ import FilledIcon from "@/app/assets/message/filled.svg";
 import UnfilledIcon from "@/app/assets/message/unfilled.svg";
 import Image from "next/image";
 import TokenImage from "@/app/components/TokenImage";
+import { useRecoilState } from "recoil";
+import { recoilGlobalMessage } from "@/app/models";
 
 const Wrapper = styled.div`
   width: 400px;
@@ -142,7 +144,17 @@ const OrderMessage: React.FC<{
   symbolName: string;
   isLong: boolean;
   hash?: string;
-}> = ({ orderType, orderStatus, symbolName, isLong, hash }) => {
+  index: number;
+  position: string;
+}> = ({
+  orderType,
+  orderStatus,
+  symbolName,
+  isLong,
+  hash,
+  index,
+  position,
+}) => {
   const splitLineMap: TypeMap = {
     pending: <PendingSplitLine />,
     filled: <FilledSplitLine />,
@@ -156,6 +168,14 @@ const OrderMessage: React.FC<{
     stop: "Stop Order",
     market_close: "Market Close",
     limit_close: "Limit Close",
+  };
+
+  const [msgs, updateMsgState] = useRecoilState(recoilGlobalMessage);
+
+  const handleClose = () => {
+    const _msgs = [...msgs[position]];
+    _msgs.splice(index, 1);
+    updateMsgState({ ...msgs, [position]: _msgs });
   };
   return (
     <Wrapper>
@@ -174,7 +194,11 @@ const OrderMessage: React.FC<{
           </div>
         </div>
 
-        <StyledCloseIcon />
+        <StyledCloseIcon
+          onClick={() => {
+            handleClose();
+          }}
+        />
       </Title>
       {splitLineMap[orderStatus]}
       <Symbol>

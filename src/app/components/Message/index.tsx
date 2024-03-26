@@ -5,7 +5,6 @@ import styled from "styled-components";
 import { motion } from "framer-motion";
 import { useRecoilState } from "recoil";
 import { recoilGlobalMessage } from "@/app/models";
-import OrderMessage from "./OrderMessage";
 
 const MessageWrapper = styled(motion.div)`
   position: fixed;
@@ -159,7 +158,7 @@ type Position =
   | "left"
   | "right";
 type Msg = {
-  content: React.ReactElement | string;
+  content: React.ReactElement | string | Function;
   delay?: number | null;
   start?: number;
   position?:
@@ -253,7 +252,7 @@ const GlobalMessage = () => {
                   {msgs[key].map((msg: any, index: number) => {
                     return (
                       <MsgPotral key={index} type={msg.type} position={key}>
-                        <div>{msg.content}</div>
+                        <div>{msg.content(index)}</div>
                       </MsgPotral>
                     );
                   })}

@@ -14,7 +14,8 @@ import "react-grid-layout/css/styles.css";
 import "react-resizable/css/styles.css";
 import { recoilPanelSide } from "@/app/models";
 import useCurToken from "../hooks/useCurToken";
-
+import { useMessage } from "@/app/components/Message";
+import OrderMessage from "@/app/components/Message/OrderMessage";
 const ReactGridLayout = WidthProvider(RGL);
 
 const LAYOUT_LEFT_LIST: Layout[] = [
@@ -34,6 +35,61 @@ const LAYOUT_RIGHT_LIST: Layout[] = [
 ];
 
 const Perpetual: FC = () => {
+  const msg = useMessage();
+  useEffect(() => {
+    setTimeout(() => {
+      msg({
+        content: (index: number) => {
+          return (
+            <OrderMessage
+              position="bottom_right"
+              index={index}
+              orderType="limit_open"
+              orderStatus="filled"
+              symbolName="BTC"
+              isLong={true}
+            />
+          );
+        },
+        delay: 30000,
+        position: "bottom_right",
+      });
+      msg({
+        content: (index: number) => {
+          return (
+            <OrderMessage
+              position="bottom_right"
+              index={index}
+              orderType="limit_open"
+              orderStatus="unfilled"
+              symbolName="BTC"
+              isLong={true}
+            />
+          );
+        },
+        delay: 30000,
+        position: "bottom_right",
+      });
+      msg({
+        content: (index: number) => {
+          return (
+            <OrderMessage
+              position="bottom_right"
+              index={index}
+              orderType="limit_open"
+              orderStatus="pending"
+              symbolName="BTC"
+              isLong={false}
+              hash="www.baidu.com"
+            />
+          );
+        },
+        delay: null,
+        position: "bottom_right",
+      });
+    }, 1000);
+  }, []);
+
   const panelSide = useRecoilValue(recoilPanelSide);
   const { symbolName } = useCurToken();
 
