@@ -1,6 +1,19 @@
 "use client";
 import styled from "styled-components";
 import DraggableIcon from "../DraggableIcon";
+import { useRecoilValue } from "recoil";
+import { recoilFutureLimitOrMarketOrders, recoilPositions } from "@/app/models";
+import { calcPnl } from "../../lib/getPnl";
+import {
+  useIndexPricesIdMap,
+  useIndexPricesById,
+  useIndexPrices,
+} from "@/app/hooks/useIndexPrices";
+import { useTokensIdMap } from "@/app/hooks/useTokens";
+import BigNumber from "bignumber.js";
+import { useMemo } from "react";
+import { filterPrecision } from "@/app/utils/tools";
+import { useExchangeBalance } from "@/app/hooks/useBalance";
 
 const Wrapper = styled.div`
   position: relative;
@@ -40,14 +53,20 @@ const Content = styled.div`
     .value {
       color: ${(props) => props.theme.colors.text1};
     }
+    .long {
+      color: ${(props) => props.theme.colors.text2};
+    }
+    .short {
+      color: ${(props) => props.theme.colors.text5};
+    }
   }
 `;
 const Btns = styled.div`
   display: flex;
   align-items: center;
-  gap: 20px;
+  justify-content: center;
   .btn {
-    flex: 1;
+    width: 150px;
     border-radius: 999px;
     background: ${(props) => props.theme.colors.fill2};
     display: flex;
@@ -55,35 +74,102 @@ const Btns = styled.div`
     justify-content: center;
     padding: 7px 0;
     cursor: pointer;
-    color: ${(props) => props.theme.colors.text2};
+    color: ${(props) => props.theme.colors.text1};
     font-family: Arial;
     font-size: ${(props) => props.theme.fontSize.header2};
     font-style: normal;
     font-weight: 700;
     line-height: 100%;
     border: 1px solid transparent;
-  }
-  .deposit {
-    color: ${(props) => props.theme.colors.primary1};
-    border: ${(props) => `1px solid ${props.theme.colors.primary1}`};
-    background: ${(props) => props.theme.colors.border1};
+    &:hover,
+    &:active {
+      color: ${(props) => props.theme.colors.primary1};
+      border: ${(props) => `1px solid ${props.theme.colors.primary1}`};
+      background: ${(props) => props.theme.colors.border1};
+    }
   }
 `;
 const Account = () => {
-  const list = [
-    {
-      label: "Equity",
-      value: "1000.00 USD",
-    },
-    {
-      label: "Margin Usage",
-      value: "80%",
-    },
-    {
-      label: "Floating PNL",
-      value: "+2000.00 USD",
-    },
-  ];
+  const openPositions = useRecoilValue(recoilPositions);
+  const limitOrMarketOrder = useRecoilValue(recoilFutureLimitOrMarketOrders);
+  const prices = useIndexPricesIdMap();
+  const tokens = useTokensIdMap();
+  const balance = useExchangeBalance();
+
+  const totalMargin = useMemo(() => {
+    let _total = "0";
+    openPositions.map((pos) => {
+      _total = BigNumber(_total).plus(pos?.collateralReadable).toString();
+    });
+
+    limitOrMarketOrder.map((pos) => {
+      _total = BigNumber(_total)
+        .plus(pos?.collateralReadable === "NaN" ? "0" : pos?.collateralReadable)
+        .toString();
+    });
+
+    return _total;
+  }, [limitOrMarketOrder, openPositions]);
+
+  const totalPnl = useMemo(() => {
+    if (prices && tokens) {
+      let _total = "0";
+      openPositions.map((pos) => {
+        const token = tokens[pos.futureId];
+        const tickPrice = prices[pos.futureId];
+        const pnl = calcPnl({
+          isLong: pos.isLong,
+          entryPrice: pos.entryPriceReadable,
+          tickPrice: tickPrice?.price,
+          size: pos.tokenSize,
+          pars: token.pars,
+        });
+        _total = BigNumber(_total).plus(pnl).toString();
+      });
+      return _total;
+    }
+    return "0";
+  }, [prices, tokens, openPositions]);
+
+  const equity = useMemo(() => {
+    return filterPrecision(
+      BigNumber(balance["USDX"]?.balanceReadable)
+        .plus(totalMargin)
+        .minus(+totalPnl)
+        .toString(),
+      2
+    );
+  }, [balance, totalMargin, totalPnl]);
+  const marginUsage = useMemo(() => {
+    return filterPrecision(
+      BigNumber(totalMargin)
+        .dividedBy(
+          BigNumber(totalMargin).plus(balance["USDX"]?.balanceReadable)
+        )
+        .multipliedBy(100)
+        .toString(),
+      2
+    );
+  }, []);
+  const list = useMemo(() => {
+    return [
+      {
+        label: "Equity",
+        value: `${equity} USD`,
+        id: "equity",
+      },
+      {
+        label: "Margin Usage",
+        value: `${marginUsage}%`,
+        id: "margin",
+      },
+      {
+        label: "Floating PNL",
+        value: `${filterPrecision(totalPnl, 2)} USD`,
+        id: "pnl",
+      },
+    ];
+  }, [totalPnl]);
   return (
     <Wrapper>
       <Title>Account</Title>
@@ -92,14 +178,23 @@ const Account = () => {
           return (
             <div className="item" key={i?.label}>
               <p className="label">{i?.label}</p>
-              <p className="value">{i?.value}</p>
+              <p
+                className={`value ${
+                  i?.id === "pnl"
+                    ? BigNumber(i?.value).gt(0)
+                      ? "long"
+                      : "short"
+                    : ""
+                }`}
+              >
+                {i?.value}
+              </p>
             </div>
           );
         })}
       </Content>
       <Btns>
-        <div className="btn">Transfer</div>
-        <div className="btn deposit">Deposit</div>
+        <div className="btn">Deposit</div>
       </Btns>
       <DraggableIcon />
     </Wrapper>
