@@ -140,6 +140,7 @@ export interface ParamsProps extends PositionType {
   liqPrice: string;
   pnl: string;
   feesReadable: string;
+  markPrice:string
 }
 
 const AdjustMargin: React.FC<{
