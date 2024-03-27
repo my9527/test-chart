@@ -45,6 +45,7 @@ const Wallet: React.FunctionComponent<IWalletProps> = ({ onHide, visible }) => {
 
   const signedOnChange = useCallback((address_: string) => {
     async function _run() {
+      return;
 
       try{
         await sleep(1000);
@@ -53,7 +54,7 @@ const Wallet: React.FunctionComponent<IWalletProps> = ({ onHide, visible }) => {
         const result: any = await new Promise(resolve => {
           signMessage({
             message: messageToSign,
-            account: address,
+            account: address_ as `0x${string}`,
           }, {
             onSuccess(signed) {
               const result = {
