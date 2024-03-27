@@ -317,6 +317,8 @@ const ClosePosition: React.FC<{
             .dividedBy(curToken.pars)
             .toFixed(0, BigNumber.ROUND_DOWN);
 
+            console.log("descAmount: 111", descAmount);
+
           const _k = params.isLong ? -1 : 1;
           let p = [];
 

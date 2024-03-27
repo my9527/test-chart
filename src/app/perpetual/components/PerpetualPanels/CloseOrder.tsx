@@ -192,8 +192,6 @@ const CloseOrder: React.FC<{
   // const [shortPositionI, longPositionI] = positions.sort(po => po.isLong ? 1 : -1);
   const longPositions = positions.filter(po => po.isLong)[0];
   const shortPositions = positions.filter(po => !po.isLong)[0];
-
-  console.log("user pos:", positions);
   
 
   const longPosition = longPositions?.positionReadable || 0;
@@ -248,6 +246,8 @@ const CloseOrder: React.FC<{
           const descAmount = BigNumber(amountToClose)
             .dividedBy(curToken.pars)
             .toFixed(0, BigNumber.ROUND_DOWN);
+
+            console.log("descAmount", descAmount);
 
           const _k = confirmedParams?.isLong ? -1 : 1;
           let p = [];
@@ -347,7 +347,7 @@ const CloseOrder: React.FC<{
   }, [amountPercent, shortPosition, inputAmount]);
 
   const handleClose = (type: string) => {
-    console.log("close", type);
+
     setClickType(type);
     const targetPos = type === 'long' ? longPositions : shortPositions;
     let _amount: string | number = '0';

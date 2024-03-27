@@ -9,7 +9,7 @@ const TokenImage: React.FC<{
 
   const src = '/tokens/'+ name + '.png';
   return (
-    <Image src={src} alt="" width={width} height={height} />
+    <Image src={src}  alt="" width={width} height={height} />
   );
 };
 export default TokenImage;

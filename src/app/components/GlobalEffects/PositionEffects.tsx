@@ -138,7 +138,7 @@ export const OpenPostionsEffects = memo(() => {
     // fetch position from graphql
     const { run, error } = useRequest(queryPositions, {
         manual: true,
-        pollingInterval: 1000 * 60, // 由于使用socket 监听，这里的轮训时间将拉长，以防止数据冲突的问题，轮训时间将超过graph 收录时间
+        pollingInterval: 1000 * 10, // 由于使用socket 监听，这里的轮训时间将拉长，以防止数据冲突的问题，轮训时间将超过graph 收录时间
         // defaultParams: [address],
         refreshDeps: [queryPositions],
     });
