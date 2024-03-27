@@ -36,7 +36,7 @@ line-height: normal;
 
 
 
-export const WithdrawModal:FCC = ({ children }) => {
+export const WithdrawModal: FCC = ({ children }) => {
 
     const depositTokens = useDepositableTokens();
     const [visible, updateModalVisible] = useState(false);
@@ -46,10 +46,10 @@ export const WithdrawModal:FCC = ({ children }) => {
 
     const { deposit } = useBalanceMethods();
 
-    const [currentDepositToken, updateCurrentDepositToken] = useState<Token>(depositTokens[0]); 
+    const [currentDepositToken, updateCurrentDepositToken] = useState<Token>(depositTokens[0]);
 
     const onClose = useCallback(() => {
-        
+
         updateModalVisible(false);
         updateDepositAmount('');
     }, []);
@@ -72,35 +72,22 @@ export const WithdrawModal:FCC = ({ children }) => {
         updateCurrentDepositToken(depositTokens.find(tk => tk.symbolName === nextCurrency) as Token);
     }, [depositTokens]);
 
-    
+
 
     const exchangeBalance = useExchangeBalance();
     const walletBalance = useWalletBalance();
 
 
-
-    // 绑定弹窗事件
-    const CloneChildren = useMemo(() => {
-        return cloneElement(children as React.ReactElement, {
-        
-            onClick: ()=>{
-                updateModalVisible(true);
-            }
-        })
-    }, [children]);
-
-    const depositTokensSymbols = useMemo(()=> {
+    const depositTokensSymbols = useMemo(() => {
         return depositTokens.map(tk => tk.symbolName);
-    } ,[ depositTokens]);
+    }, [depositTokens]);
 
 
 
 
 
     return (
-        <>
-            {CloneChildren}
-            <Modal
+        <Modal
             height={600}
             onClose={onClose}
             visible={visible}
@@ -109,12 +96,12 @@ export const WithdrawModal:FCC = ({ children }) => {
             onCancel={onCancel}
         >
             <Wrapper gap="10px">
-                <BalanceInput 
-                    title="amount"  
-                    currency={<CurrencySelect className="currency-select" curCurrency={currentDepositToken.symbolName} list={depositTokensSymbols} handleClick={handleDepositTokenChange}  />} 
-                    balance={walletBalance[currentDepositToken.symbolName]?.balanceReadable} 
-                    value={depositAmount} 
-                    onChange={(v) => { updateDepositAmount(v)}} 
+                <BalanceInput
+                    title="amount"
+                    currency={<CurrencySelect className="currency-select" curCurrency={currentDepositToken.symbolName} list={depositTokensSymbols} handleClick={handleDepositTokenChange} />}
+                    balance={walletBalance[currentDepositToken.symbolName]?.balanceReadable}
+                    value={depositAmount}
+                    onChange={(v) => { updateDepositAmount(v) }}
                 />
                 <Row justify="center" align="center">
                     <svg xmlns="http://www.w3.org/2000/svg" width="41" height="41" viewBox="0 0 41 41" fill="none">
@@ -122,18 +109,17 @@ export const WithdrawModal:FCC = ({ children }) => {
                         <path d="M10.4365 16.979L20.0773 26.6197L29.718 16.979" stroke="#7C67FF" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" />
                     </svg>
                 </Row>
-                <BalanceInput 
-                    title="receive" 
-                    currency={<CurrencySelect className="currency-select" showSelect={false} curCurrency={USDX.symbolName} list={[USDX.symbolName]} />} 
-                    balance={exchangeBalance[USDX.symbolName as string]?.balanceReadable ?? '0'} 
-                    value={depositAmount} 
-                    onChange={(v) => { updateDepositAmount(v)}}
+                <BalanceInput
+                    title="receive"
+                    currency={<CurrencySelect className="currency-select" showSelect={false} curCurrency={USDX.symbolName} list={[USDX.symbolName]} />}
+                    balance={exchangeBalance[USDX.symbolName as string]?.balanceReadable ?? '0'}
+                    value={depositAmount}
+                    onChange={(v) => { updateDepositAmount(v) }}
                 />
                 <ExplainText justify="flex-start">1 USDT = 1.000000 USDQ</ExplainText>
             </Wrapper>
 
         </Modal>
-        </>
-        
+
     );
 }

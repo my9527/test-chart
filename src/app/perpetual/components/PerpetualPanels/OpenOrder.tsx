@@ -33,6 +33,7 @@ import { encodeTx } from "@/app/lib/txTools";
 import { formatNumber } from "@/app/lib/common";
 import { ethers } from "ethers";
 import dayjs from "dayjs";
+import { useCreateStopTx } from "../../hooks/useCreateStopTx";
 
 const Layout = styled.div`
   display: flex;
@@ -310,6 +311,8 @@ const OpenOrder: React.FC<{
   //usePriceImpactDepth
   const { buyPriceImpactDepth, sellPriceImpactDepth } = usePriceImpactDepth();
 
+  const createStopTxFn = useCreateStopTx();
+
 
 
   const MarketOrderContractParams = useContractParams(appConfig.contract_address.MarketOrderImplementationAddress);
@@ -380,37 +383,13 @@ const OpenOrder: React.FC<{
      * 生成 stop order tx params;
      */
     const createStopTx = useCallback((token_: Token, size: string | number,triggerPrice: string, futureType_: FutureType, isStopLoss: boolean ) => {
-
-      // futureId,
-      // size,
-      // triggerPrice,
-      // isStopLoss,
-      // futureType,
-      const paramData = encodeTx({
-        abi: StopOrderContractParams.abi,
-        functionName: MakeOrderFunctionName.STOP,
-        args: [
-          token_.futureLongId,
-          BigNumber(size).div(getExponent(token_.pars)).toFixed(0, BigNumber.ROUND_DOWN),
-          triggerPrice,
-          isStopLoss,
-          futureType_
-        ]
-      });
-
-
-      return [
-        StopOrderContractParams.address,
-        false,
-        appConfig.executionFee,
-        paramData
-      ]
+      return createStopTxFn(token_, size, triggerPrice, futureType_, isStopLoss);
 
     }, [StopOrderContractParams, appConfig]);
 
 
     // 发起交易
-    const submitTx = useCallback((params: any, handleType: string, tickPrice: string | number) => {
+    const submitTx = useCallback(async (params: any, handleType: string, tickPrice: string | number) => {
       const delegateParams = [];
 
       // 交易方向是long 或者 short
@@ -440,7 +419,7 @@ const OpenOrder: React.FC<{
         delegateParams.push(createStopTx(curToken, params.amount, params.shortStopPrice, isHandleTypeLong ? FutureType.LONG : FutureType.SHORT, true))
       }
       // 发起交易
-      sendByDelegate({
+      await sendByDelegate({
         data: delegateParams,
         // 计算需要支付的金额去执行交易
         value: delegateParams.reduce((result, cur: any) => {

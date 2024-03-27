@@ -13,6 +13,8 @@ import { WithdrawModal } from "../WithdrawModal";
 import IconDepositSvg from "@/app/assets/header/icon-deposit.svg";
 import IconIotxSvg from "@/app/assets/header/icon-iotx.svg";
 import IconArrowOuterSvg from "@/app/assets/header/icon-arrow-outer.svg";
+import { useSetRecoilState } from "recoil";
+import { recoilDepositModalShow } from "@/app/models";
 
 
 
@@ -272,6 +274,8 @@ export const UserWalletInfo: FC<{ address: `0x${string}` | undefined }> = ({ add
     const { disconnect } = useDisconnect();
     console.log("isConnectedisConnected", isConnected);
 
+    const openDepositModal = useSetRecoilState(recoilDepositModalShow);
+
     if(!isConnected) {
         return null;
     }
@@ -303,12 +307,11 @@ export const UserWalletInfo: FC<{ address: `0x${string}` | undefined }> = ({ add
             <Divider />
             <Col gap="10px" className="full" >
                 <Row className="full" gap="20px">
-                    <DepositModal>
-                        <ToolBtn iconUrl={IconDepositSvg} name="Deposit" />
-                    </DepositModal>
-                    <WithdrawModal>
-                        <ToolBtn iconUrl={IconDepositSvg} name="Withdraw" />
-                    </WithdrawModal>
+
+                    <ToolBtn onClick={()=> openDepositModal(true)} iconUrl={IconDepositSvg} name="Deposit" />
+                    
+                    <ToolBtn iconUrl={IconDepositSvg} name="Withdraw" />
+                    
                 </Row>
                 <Row className="full" gap="20px">
                     <ToolBtn iconUrl={IconDepositSvg} name="Language" />
@@ -328,8 +331,8 @@ export const UserWalletInfo: FC<{ address: `0x${string}` | undefined }> = ({ add
                 <div>Disconnect</div>
             </Row>
 
-            
-
+            <DepositModal />
+            <WithdrawModal />
 
         </Wrapper>
     );

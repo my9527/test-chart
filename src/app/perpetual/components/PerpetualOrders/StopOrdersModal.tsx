@@ -14,6 +14,9 @@ import { useIndexPricesById } from "@/app/hooks/useIndexPrices";
 import { getMaxProfitPrice } from "../../lib/getMaxProfitPrice";
 import CheckBox from "@/app/components/CheckBox";
 import { getLiqPrice } from "@/app/perpetual/lib/getLiqPrice";
+import { useCreateStopTx } from "../../hooks/useCreateStopTx";
+import { FutureType } from "@/app/config/common";
+import { useSendTxByDelegate } from "@/app/hooks/useSendTxByDelegate";
 
 const Wrapper = styled.div`
   position: relative;
@@ -245,6 +248,9 @@ const StopOrdersModal: React.FC<{
     return getExponent(Number(curToken?.perpConfig?.contractSize) || 1);
   }, [curToken]);
 
+  const createStopTx = useCreateStopTx();
+  const { sendByDelegate } = useSendTxByDelegate();
+
   //止盈
   useEffect(() => {
     setTakeProfitInputAmount(takeProfitAmount);
@@ -372,8 +378,8 @@ const StopOrdersModal: React.FC<{
         error = BigNumber(value).lt(markPrice)
           ? "TP trigger price should be higher than the mark price."
           : BigNumber(value).gt(maxProfitPrice)
-          ? "The position will be closed due to maximum profit before the take profit order is triggered."
-          : "";
+            ? "The position will be closed due to maximum profit before the take profit order is triggered."
+            : "";
       } else {
         flag =
           BigNumber(value).lt(liqPriceReadable) ||
@@ -381,8 +387,8 @@ const StopOrdersModal: React.FC<{
         error = BigNumber(value).gt(markPrice)
           ? "SL trigger price should be lower than the mark price."
           : BigNumber(value).lt(liqPriceReadable)
-          ? "The position will be liquidated before the stop loss order is triggered."
-          : "";
+            ? "The position will be liquidated before the stop loss order is triggered."
+            : "";
       }
     } else {
       if (type === "takeProfit") {
@@ -391,8 +397,8 @@ const StopOrdersModal: React.FC<{
         error = BigNumber(value).gt(markPrice)
           ? "TP trigger price should be lower than the mark price."
           : BigNumber(value).lt(maxProfitPrice)
-          ? "The position will be closed due to maximum profit before the take profit order is triggered."
-          : "";
+            ? "The position will be closed due to maximum profit before the take profit order is triggered."
+            : "";
       } else {
         flag =
           BigNumber(value).gt(liqPriceReadable) ||
@@ -400,8 +406,8 @@ const StopOrdersModal: React.FC<{
         error = BigNumber(value).lt(markPrice)
           ? "TP trigger price should be higher than the mark price."
           : BigNumber(value).gt(liqPriceReadable)
-          ? "The position will be liquidated before the stop loss order is triggered."
-          : "";
+            ? "The position will be liquidated before the stop loss order is triggered."
+            : "";
       }
     }
     return { flag, error };
@@ -413,14 +419,39 @@ const StopOrdersModal: React.FC<{
   const onClose = () => {
     setVisible(false);
   };
-  const onConfirm = () => {
+  const onConfirm = async () => {
     const takeProfitPriceError = handleError("takeProfit", takeProfitPrice);
     setTakeProfitError(takeProfitPriceError);
     const stopLossPriceError = handleError("stopLoss", stopLossPrice);
     setStopLossError(stopLossPriceError);
-    if (!takeProfitPriceError?.flag && !stopLossPriceError?.flag) {
-      //发起交易
-      setVisible(false);
+    try {
+      if (!takeProfitPriceError?.flag && !stopLossPriceError?.flag) {
+        //发起交易
+
+        const delegateParams = [];
+
+        if (showTakeProfit) {
+          delegateParams.push(createStopTx(curToken, takeProfitAmount, takeProfitPrice, params.isLong ? FutureType.LONG : FutureType.SHORT, false));
+        }
+        if (showStopLoss) {
+          delegateParams.push(createStopTx(curToken, stopLossAmount, stopLossPrice, params.isLong ? FutureType.LONG : FutureType.SHORT, true));
+        }
+
+        await sendByDelegate({
+          data: delegateParams,
+          // 计算需要支付的金额去执行交易
+          value: delegateParams.reduce((result, cur: any) => {
+            return result.plus(cur[2] as string)
+          }, BigNumber(0)).toString(),
+          showMsg: false,
+        });
+
+
+
+        setVisible(false);
+      }
+    } catch (e) {
+      console.log("handle stop error", e);
     }
   };
   return (
@@ -437,9 +468,8 @@ const StopOrdersModal: React.FC<{
           <TokenImage name={curToken?.symbolName} width={20} height={20} />
           <p className="symbol_name">{curToken?.symbolName}USD</p>
           <p
-            className={`future_type future_type_${
-              params?.isLong ? "long" : "short"
-            }`}
+            className={`future_type future_type_${params?.isLong ? "long" : "short"
+              }`}
           >
             {futureTypeMap[params?.isLong ? "long" : "short"]}
           </p>
@@ -494,9 +524,9 @@ const StopOrdersModal: React.FC<{
             />
             {takeProfitError?.error && <Error>{takeProfitError?.error}</Error>}
             <div className="tips">
-              When the price reaches 
+              When the price reaches
               <span className="price">{takeProfitPrice}</span>, the order will
-              trigger, and your est. pnl will be 
+              trigger, and your est. pnl will be
               <span className="pnl">{takeProfitPnl}</span> USD.
             </div>
             <Input
@@ -587,9 +617,9 @@ const StopOrdersModal: React.FC<{
             />
             {stopLossError?.error && <Error>{stopLossError?.error}</Error>}
             <div className="tips">
-              When the price reaches 
+              When the price reaches
               <span className="price">{stopLossPrice}</span>, the order will
-              trigger, and your est. pnl will be 
+              trigger, and your est. pnl will be
               <span className="pnl">{stopLossPnl}</span> USD.
             </div>
             <Input

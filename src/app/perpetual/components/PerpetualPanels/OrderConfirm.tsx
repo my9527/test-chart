@@ -149,6 +149,7 @@ const OrderConfirm: React.FC<{ params: ParamsProps; actionType: string }> = ({
     limit: "Limit Open",
     market: "Market Open",
   };
+  const slippageLocal = localStorage.getItem("slippage") || '0.5';
   const [showAgain, setShowAgain] = useState(true);
   useEffect(() => {
     localStorage.setItem(
@@ -188,7 +189,7 @@ const OrderConfirm: React.FC<{ params: ParamsProps; actionType: string }> = ({
         </div>
         <div className="item">
           <p className="label">Slippage limit</p>
-          <p className="value">{params?.slippage}%</p>
+          <p className="value">{params?.slippage || slippageLocal}%</p>
         </div>
         <div className="item">
           <p className="label">Fees</p>

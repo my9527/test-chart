@@ -8,12 +8,13 @@ import { menus } from "@/app/config/menu";
 import { useAccount } from "wagmi";
 import { useAppConfig } from "@/app/hooks/useAppConfig";
 import { useFetch } from "@/app/hooks/useFetch";
+import Link from "next/link";
 const Wrapper = styled.div`
   display: flex;
   align-items: center;
   gap: 20px;
 `;
-const Item = styled.div`
+const Item = styled(Link)`
   cursor: pointer;
   display: flex;
   align-items: center;
@@ -33,8 +34,6 @@ const Item = styled.div`
   }
 `;
 const Menu = () => {
-  const router = useRouter();
-
   const { address } = useAccount();
 
   const request = useFetch();
@@ -73,9 +72,7 @@ const Menu = () => {
         return (
           <Item
             key={item.key}
-            onClick={() => {
-              router.push(item?.route);
-            }}
+            href={item.route}
           >
             <p className="label">{item?.label}</p>
             {item?.showArrow && (
@@ -90,7 +87,7 @@ const Menu = () => {
           </Item>
         );
       })}
-      <Item onClick={handleFaucet} >
+      <Item onClick={handleFaucet} href="">
       <p className="label">faucet</p>
       </Item>
     </Wrapper>
