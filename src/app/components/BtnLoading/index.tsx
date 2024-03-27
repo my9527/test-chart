@@ -10,9 +10,13 @@ const Wapper = styled.div`
   left: 50%;
   transform: translate(-50%, -50%);
 `;
+
 const BtnLoading: React.FC<{
   loading: boolean;
-}> = ({ loading }) => {
+  width?: number;
+  height?: number;
+  className?: string;
+}> = ({ loading, width = 20, height = 20, className }) => {
   const ref: any = useRef(null);
   useEffect(() => {
     let timer: any = null,
@@ -32,8 +36,8 @@ const BtnLoading: React.FC<{
     };
   }, [loading, ref?.current]);
   return (
-    <Wapper>
-      <Image src={Loading} alt="" width={20} height={20} ref={ref} />
+    <Wapper className={className}>
+      <Image src={Loading} alt="" width={width} height={height} ref={ref} />
     </Wapper>
   );
 };
