@@ -15,7 +15,9 @@ import "react-resizable/css/styles.css";
 import { recoilPanelSide } from "@/app/models";
 import useCurToken from "../hooks/useCurToken";
 import { useMessage } from "@/app/components/Message";
-import OrderMessage from "@/app/components/Message/OrderMessage";
+import { useOverview } from "@/app/hooks/useOverview";
+import { useAccount } from "wagmi";
+
 const ReactGridLayout = WidthProvider(RGL);
 
 const LAYOUT_LEFT_LIST: Layout[] = [
@@ -36,7 +38,12 @@ const LAYOUT_RIGHT_LIST: Layout[] = [
 
 const Perpetual: FC = () => {
   const msg = useMessage();
+  const { run } = useOverview();
+  const { address } = useAccount();
   useEffect(() => {
+    if (address) {
+      run(address);
+    }
     // setTimeout(() => {
     //   msg({
     //     content: (index: number) => {
@@ -88,7 +95,7 @@ const Perpetual: FC = () => {
     //     position: "bottom_right",
     //   });
     // }, 1000);
-  }, []);
+  }, [address]);
 
   const panelSide = useRecoilValue(recoilPanelSide);
   const { symbolName } = useCurToken();
