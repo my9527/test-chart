@@ -1,8 +1,9 @@
 "use client";
 import styled from "styled-components";
-import Loading from "@/app/assets/share/loading.svg";
+import Loading from "@/app/assets/btn/loading.svg";
 import Image from "next/image";
 import { useEffect, useRef } from "react";
+
 const Wapper = styled.div`
   position: absolute;
   top: 50%;
