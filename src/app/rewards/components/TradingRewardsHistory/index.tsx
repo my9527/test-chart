@@ -44,18 +44,14 @@ const HighlightHoverOverlay = styled(Overlay)`
   opacity: 0;
 `
 
-const EpochHoverOverlay = styled(Overlay)`
-  background: linear-gradient(90deg, rgba(124, 103, 255, 0.10) 0%, rgba(124, 103, 255, 0.00) 100%);
-  padding-left: 10px;
-`
-
 const Row = styled.div`
   position: relative;
+  cursor: pointer;
 
   &:hover {
     ${HighlightHoverOverlay} {
       opacity: 1;
-    }
+    };
   }
 
   .col4 {
@@ -77,6 +73,7 @@ const RowInner = styled.div`
 `
 
 const WeekEpochList = styled.div`
+  padding-bottom: 20px;
   .col1 {
     width: 100px;
   }
@@ -115,16 +112,65 @@ const EpochList = styled.div`
   }
 `
 
+const WeekContent = styled.div`
+  position: relative;
+  overflow-y: auto;
+  height: 234px;
+
+  &:hover {
+    ${HoverOverlay} {
+      opacity: 0;
+    }
+  }
+`
+
 const Content = styled.div`
   position: relative;
   overflow-y: auto;
-  height: 257px;
+  height: 234px;
+  background: linear-gradient(90deg, rgba(124, 103, 255, 0.10) 0%, rgba(124, 103, 255, 0.00) 100%);
+  cursor: pointer;
+`
+
+const StyledImage = styled(Image)`
+  transform: rotate(180deg);
+  position: absolute;
+  bottom: 137px;
+  left: 10px;
 `
 
 const TradingRewardsHistory = () => {
   const [epochListVisibility, setEpochListVisibility] = useState(false)
 
   const data = [
+    {
+      epochStartTime: "2021-04-28 06:53",
+      epochEndTime: "2021-04-28 06:53",
+      volumn: '123,123,123.00',
+      earnedExchangeToken: '123,123,123.00',
+      earnedChainToken: '123,123,123.00',
+    },
+    {
+      epochStartTime: "2021-04-28 06:53",
+      epochEndTime: "2021-04-28 06:53",
+      volumn: '123,123,123.00',
+      earnedExchangeToken: '123,123,123.00',
+      earnedChainToken: '123,123,123.00',
+    },
+    {
+      epochStartTime: "2021-04-28 06:53",
+      epochEndTime: "2021-04-28 06:53",
+      volumn: '123,123,123.00',
+      earnedExchangeToken: '123,123,123.00',
+      earnedChainToken: '123,123,123.00',
+    },
+    {
+      epochStartTime: "2021-04-28 06:53",
+      epochEndTime: "2021-04-28 06:53",
+      volumn: '123,123,123.00',
+      earnedExchangeToken: '123,123,123.00',
+      earnedChainToken: '123,123,123.00',
+    },
     {
       epochStartTime: "2021-04-28 06:53",
       epochEndTime: "2021-04-28 06:53",
@@ -165,7 +211,7 @@ const TradingRewardsHistory = () => {
           <div className="col3">Volume</div>
           <div className="col4">Rewards Earned</div>
         </Header>
-        <Content>
+        <WeekContent>
           {
             data.map((i, rowInd) => (
               <Row key={rowInd}>
@@ -203,7 +249,7 @@ const TradingRewardsHistory = () => {
               </Row>
             ))
           }
-        </Content>
+        </WeekContent>
       </WeekEpochList>
 
       {
@@ -215,7 +261,7 @@ const TradingRewardsHistory = () => {
               <div className="col3">Total Volume/Share</div>
               <div className="col4">Rewards Earned</div>
             </Header>
-            <Content>
+            <Content onClick={hideEpochList}>
               {
                 data.map((i, rowInd) => (
                   <Row key={rowInd}>
@@ -242,10 +288,8 @@ const TradingRewardsHistory = () => {
                   </Row>
                 ))
               }
-              <EpochHoverOverlay onClick={hideEpochList}>
-                <Image src={ArrowIcon} alt="" />
-              </EpochHoverOverlay>
             </Content>
+            <StyledImage src={ArrowIcon} alt="" />
           </EpochList>
         ) : null
       }
