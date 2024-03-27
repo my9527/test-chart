@@ -17,6 +17,8 @@ import { AbiItem, createPublicClient, decodeEventLog, fallback, http, webSocket 
 import { useContractParams } from "@/app/hooks/useContractParams";
 import { queryAbiEventByName } from "@/app/lib/queryAbiEventByName";
 import { compareAddress } from "@/app/lib/compareAddress";
+import { useMessage } from "../Message";
+import OrderMessage from "../Message/OrderMessage";
 
 
 
@@ -87,6 +89,8 @@ export const OpenPostionsEffects = memo(() => {
     const getFuturesPositions = useGraphqlFetch('perpetual', futurePositionsGql);
     const tokens = useTokensIdMap();
     const appConfig = useAppConfig();
+
+    const msg = useMessage();
 
 
 
@@ -230,9 +234,12 @@ export const OpenPostionsEffects = memo(() => {
                     isLong: LongContractParams.address === appConfig.contract_address.LongAddress,
                 }, tokens);
 
+
+
                 updatePositionList((preList) => {
                     return _replaceOrPush(preList, pos, 'id');
                 });
+
 
             }
         });
@@ -330,7 +337,7 @@ export const OpenPostionsEffects = memo(() => {
                 const createBlock = blockNumber;
                 if (user?.toLowerCase() !== address?.toLowerCase()) return;
                 const id = `${user.toLowerCase()}-${nonce.toString()}`;
-                const futureType = compareAddress(LongContractParams.address, future) ? FutureType.LONG : FutureType.SHORT;
+                const isLong = compareAddress(LongContractParams.address, future);
 
                 const paramInGraph: AnyObjec = {
                     id: id.toString(),
@@ -342,7 +349,7 @@ export const OpenPostionsEffects = memo(() => {
                     executionFee: executionFee.toString(),
                     createHash: createHash.toString(),
                     createBlock: createBlock.toString(),
-                    isLong: futureType === FutureType.LONG,
+                    isLong: isLong,
                 };
 
                 if (props.eventName === DecreaseLimitOrder.name) {
@@ -356,6 +363,22 @@ export const OpenPostionsEffects = memo(() => {
                 const curToken = tokens[futureId];
 
                 console.log("event: ", props.eventName, curToken.symbolName, createHash);
+
+                // OrderMessage
+                msg({
+                    content: (index: number) => {
+                        return (
+                            <OrderMessage
+                                position="bottom_right"
+                                index={index}
+                                orderType="limit_open"
+                                orderStatus="Created"
+                                symbolName={curToken.symbolName}
+                                isLong={isLong}
+                            />
+                        );
+                    },
+                });
             }
 
         });
@@ -398,6 +421,7 @@ export const OpenPostionsEffects = memo(() => {
                 const createBlock = blockNumber;
                 if (user?.toLowerCase() !== address?.toLowerCase()) return;
                 const id = `${user.toLowerCase()}-${nonce.toString()}`;
+                const isLong = compareAddress(LongContractParams.address, future);
                 const futureType = compareAddress(LongContractParams.address, future) ? FutureType.LONG : FutureType.SHORT;
 
                 const paramInGraph: AnyObjec = {
@@ -411,7 +435,7 @@ export const OpenPostionsEffects = memo(() => {
                     createHash: createHash.toString(),
                     createBlock: createBlock.toString(),
                     deadline: deadline.toString(),
-                    isLong: futureType === FutureType.LONG,
+                    isLong: isLong,
                     executePrice: executePrice.toString(),
                     status: 0,
                 };
@@ -427,6 +451,20 @@ export const OpenPostionsEffects = memo(() => {
                 const curToken = tokens[futureId];
 
                 console.log("event: ", props.eventName, curToken.symbolName, createHash);
+                msg({
+                    content: (index: number) => {
+                        return (
+                            <OrderMessage
+                                position="bottom_right"
+                                index={index}
+                                orderType="limit_open"
+                                orderStatus="Created"
+                                symbolName={curToken.symbolName}
+                                isLong={isLong}
+                            />
+                        );
+                    },
+                });
             }
 
         });
@@ -451,6 +489,7 @@ export const OpenPostionsEffects = memo(() => {
                 const createBlock = blockNumber;
                 if (user?.toLowerCase() !== address?.toLowerCase()) return;
                 const id = `${user.toLowerCase()}-${nonce.toString()}`;
+                const isLong = compareAddress(LongContractParams.address, future);
                 const futureType = compareAddress(LongContractParams.address, future) ? FutureType.LONG : FutureType.SHORT;
                 const paramInGraph = {
                     id: id.toString(),
@@ -471,6 +510,23 @@ export const OpenPostionsEffects = memo(() => {
                     isLong: futureType === FutureType.LONG,
                     status: 0,
                 };
+
+                const curToken = tokens[futureId];
+                msg({
+                    content: (index: number) => {
+                        return (
+                            <OrderMessage
+                                position="bottom_right"
+                                index={index}
+                                orderType="stop"
+                                orderStatus="Created"
+                                symbolName={curToken.symbolName}
+                                isLong={isLong}
+                            />
+                        );
+                    },
+                });
+
 
 
 
@@ -500,6 +556,7 @@ export const OpenPostionsEffects = memo(() => {
 
                 if (user?.toLowerCase() !== address?.toLowerCase()) return;
                 const id = `${user.toLowerCase()}-${nonce.toString()}`;
+                const isLong = compareAddress(LongContractParams.address, future);
                 const paramInGraph = {
                     id: id.toString(),
                     offset: offset.toString(),
@@ -517,6 +574,21 @@ export const OpenPostionsEffects = memo(() => {
                     createBlock: createBlock.toString(),
                     status: 0,
                 };
+                const curToken = tokens[futureId];
+                msg({
+                    content: (index: number) => {
+                        return (
+                            <OrderMessage
+                                position="bottom_right"
+                                index={index}
+                                orderType="margin_update"
+                                orderStatus="Updated"
+                                symbolName={curToken.symbolName}
+                                isLong={isLong}
+                            />
+                        );
+                    },
+                });
 
             }
         })
@@ -560,6 +632,22 @@ export const OpenPostionsEffects = memo(() => {
                     createHash: createHash.toString(),
                     createBlock: createBlock.toString(),
                 };
+
+                msg({
+                    content: (index: number) => {
+                        return (
+                            <OrderMessage
+                                position="bottom_right"
+                                index={index}
+                                orderType="limit_cancel"
+                                orderStatus="Canceld"
+                                symbolName={""}
+                                isLong={false}
+                            />
+                        );
+                    },
+                });
+                
             }
         });
 

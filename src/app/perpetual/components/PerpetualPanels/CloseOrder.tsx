@@ -336,13 +336,13 @@ const CloseOrder: React.FC<{
 
   const longAmount = useMemo(() => {
 
-    return  +inputAmount || BigNumber(amountPercent).multipliedBy(longPosition).toString();
+    return  inputAmount || BigNumber(amountPercent).multipliedBy(longPosition).toString();
 
   }, [amountPercent, longPosition, inputAmount]);
 
   const shortAmount = useMemo(() => {
 
-    return  +inputAmount || BigNumber(amountPercent).multipliedBy(shortPosition).toString();
+    return  inputAmount || BigNumber(amountPercent).multipliedBy(shortPosition).toString();
 
   }, [amountPercent, shortPosition, inputAmount]);
 
@@ -542,6 +542,7 @@ const CloseOrder: React.FC<{
         onCancel={onCancel}
       >
         {confirmedParams && (
+          // @ts-ignore
           <OrderConfirm params={confirmedParams} actionType="close" />
         )}
       </Modal>

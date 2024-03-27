@@ -5,7 +5,7 @@ import styled from "styled-components";
 import Image from "next/image";
 import FlexBox from "@/app/components/FlexBox";
 import SimpleText from "@/app/components/SimpleText";
-import StakeDuration from '../staking/StakeDuration';
+import StakeDuration from '../Staking/StakeDuration';
 
 
 export const Wrapper = styled.div`

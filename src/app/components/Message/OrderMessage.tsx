@@ -146,6 +146,7 @@ const OrderMessage: React.FC<{
   hash?: string;
   index: number;
   position: string;
+  reason?: string;
 }> = ({
   orderType,
   orderStatus,
@@ -154,6 +155,7 @@ const OrderMessage: React.FC<{
   hash,
   index,
   position,
+  reason
 }) => {
   const splitLineMap: TypeMap = {
     pending: <PendingSplitLine />,
@@ -168,6 +170,9 @@ const OrderMessage: React.FC<{
     stop: "Stop Order",
     market_close: "Market Close",
     limit_close: "Limit Close",
+    limit_cancel: "Limit Cancel",
+    market_cancel: 'Market Cancel',
+    margin_update: 'Margin Update',
   };
 
   const [msgs, updateMsgState] = useRecoilState(recoilGlobalMessage);

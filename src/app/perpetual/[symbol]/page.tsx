@@ -37,57 +37,57 @@ const LAYOUT_RIGHT_LIST: Layout[] = [
 const Perpetual: FC = () => {
   const msg = useMessage();
   useEffect(() => {
-    setTimeout(() => {
-      msg({
-        content: (index: number) => {
-          return (
-            <OrderMessage
-              position="bottom_right"
-              index={index}
-              orderType="limit_open"
-              orderStatus="filled"
-              symbolName="BTC"
-              isLong={true}
-            />
-          );
-        },
-        delay: 30000,
-        position: "bottom_right",
-      });
-      msg({
-        content: (index: number) => {
-          return (
-            <OrderMessage
-              position="bottom_right"
-              index={index}
-              orderType="limit_open"
-              orderStatus="unfilled"
-              symbolName="BTC"
-              isLong={true}
-            />
-          );
-        },
-        delay: 30000,
-        position: "bottom_right",
-      });
-      msg({
-        content: (index: number) => {
-          return (
-            <OrderMessage
-              position="bottom_right"
-              index={index}
-              orderType="limit_open"
-              orderStatus="pending"
-              symbolName="BTC"
-              isLong={false}
-              hash="www.baidu.com"
-            />
-          );
-        },
-        delay: null,
-        position: "bottom_right",
-      });
-    }, 1000);
+    // setTimeout(() => {
+    //   msg({
+    //     content: (index: number) => {
+    //       return (
+    //         <OrderMessage
+    //           position="bottom_right"
+    //           index={index}
+    //           orderType="limit_open"
+    //           orderStatus="filled"
+    //           symbolName="BTC"
+    //           isLong={true}
+    //         />
+    //       );
+    //     },
+    //     delay: 30000,
+    //     position: "bottom_right",
+    //   });
+    //   msg({
+    //     content: (index: number) => {
+    //       return (
+    //         <OrderMessage
+    //           position="bottom_right"
+    //           index={index}
+    //           orderType="limit_open"
+    //           orderStatus="unfilled"
+    //           symbolName="BTC"
+    //           isLong={true}
+    //         />
+    //       );
+    //     },
+    //     delay: 30000,
+    //     position: "bottom_right",
+    //   });
+    //   msg({
+    //     content: (index: number) => {
+    //       return (
+    //         <OrderMessage
+    //           position="bottom_right"
+    //           index={index}
+    //           orderType="limit_open"
+    //           orderStatus="pending"
+    //           symbolName="BTC"
+    //           isLong={false}
+    //           hash="www.baidu.com"
+    //         />
+    //       );
+    //     },
+    //     delay: null,
+    //     position: "bottom_right",
+    //   });
+    // }, 1000);
   }, []);
 
   const panelSide = useRecoilValue(recoilPanelSide);

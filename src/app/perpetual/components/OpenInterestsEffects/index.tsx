@@ -319,7 +319,6 @@ export const OpenInterestsEffects: FC = memo(() => {
             };
 
             // 更新execution fee
-            console.log("executionFeeResults", executionFeeResults?.[0]?.result?.toString() || '0');
             updateExecutionFee(executionFeeResults?.[0]?.result?.toString() || '0');
 
             // // 更新其他信息

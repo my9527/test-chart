@@ -186,10 +186,6 @@ export const FundingFeeRate: FC = memo(() => {
         shortPosPayfeeRate,
     ]);
 
-    console.log("longOIFee", longOIFee);
 
-
-
-
-    return <span>longOIFee: {longOIFee}</span>;
+    return <span>{longOIFee || '-'}</span>;
 });

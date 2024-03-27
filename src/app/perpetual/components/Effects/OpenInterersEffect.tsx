@@ -317,7 +317,6 @@ export const OpenInterestsEffects: FC = memo(() => {
             };
 
             // 更新execution fee
-            console.log("executionFeeResults", executionFeeResults?.[0]?.result?.toString() || '0');
             updateExecutionFee(executionFeeResults?.[0]?.result?.toString() || '0');
 
             // // 更新其他信息
@@ -338,7 +337,7 @@ export const OpenInterestsEffects: FC = memo(() => {
 
     const { run, cancel } = useRequest(callFns, {
         manual: true,
-        pollingInterval: 150_000,
+        pollingInterval: 15_000,
         // refreshDeps: [callFns]
     });
 

@@ -14,11 +14,6 @@ import { useAccount, useClient } from "wagmi";
 
 
 
-// @ts-ignore
-window.BigNumber = BigNumber;
-
-
-
 
 
 export const BalanceAndPoolEffects = () => {
@@ -283,8 +278,6 @@ export const BalanceAndPoolEffects = () => {
             const walletBalance = walletBalanceResults.reduce((result: any, rslt, index) => {
                 const cur = rslt.result?.toString();
 
-                console.log("walletbalance ---", depositTokens[index].symbolName, BigNumber(cur || '0').div(1e6).toString(10))
-
                 return {
                     ...result,
 
@@ -308,7 +301,6 @@ export const BalanceAndPoolEffects = () => {
                 }
             }, {});
 
-            console.log("exchangeBalance", exchangeBalance);
 
             updateBalancePool({
                 walletBalance,

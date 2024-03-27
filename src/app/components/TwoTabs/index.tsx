@@ -63,7 +63,7 @@ export function TwoTabs({ tabs, activeTab, onTabChange }: ITwoTabsProps) {
     <Box>
       {
         tabs.map(i => (
-          <TabPanel $disabled={i.disabled} key={i.key} active={i.key === activeTab} onClick={handleTabChange(i)}>
+          <TabPanel $disabled={!!i.disabled} key={i.key} active={i.key === activeTab} onClick={handleTabChange(i)}>
             <Title active={i.key === activeTab}>{i.title}</Title>
             {/* { i.subTitle ? <SubTitle>{i.subTitle}</SubTitle> : null } */}
             <Hilight active={i.key === activeTab} />

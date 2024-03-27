@@ -38,7 +38,7 @@ export function useClaimableInfo () {
 
       //合约查询
       if (!epochNumber && !address) return [];
-      if (BigNumber(epochNumber).lt(1)) return [];
+      if (BigNumber(epochNumber as string).lt(1)) return [];
 
       const getClaimableSlpContracts = userProvideLiquidities?.length
       ? userProvideLiquidities.map((epochNum: any) => {

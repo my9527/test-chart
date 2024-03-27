@@ -5,6 +5,7 @@ import { useMemo, useState } from "react";
 import styled from "styled-components";
 import { TextField } from "../TextField";
 import Checkbox from "../Checkbox";
+import BigNumber from "bignumber.js";
 
 const Title = styled.div`
   font-size: ${({ theme }) => theme.fontSize.medium};
@@ -119,7 +120,7 @@ export const CreateNewCode = ({
             min={0} 
             max={totalRation} 
             onChange={setRatio}
-            value={ratio}
+            value={BigNumber(ratio).toString()}
             marks={marks}
             unit="%"
             per={50}

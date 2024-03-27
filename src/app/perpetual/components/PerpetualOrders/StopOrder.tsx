@@ -4,7 +4,7 @@ import { TokenById } from "@/app/components/Token";
 import { useTokenByFutureId } from "@/app/hooks/useTokens";
 import { recoilFutureLimitOrMarketOrders, recoilFutureStopOrders } from "@/app/models";
 import { filterPrecision } from "@/app/utils/tools";
-import { FC, ThHTMLAttributes } from "react";
+import { FC, ThHTMLAttributes, useCallback, useRef, useState } from "react";
 import { useRecoilValue } from "recoil";
 import styled from "styled-components";
 import { FutureType } from "@/app/config/common";
@@ -12,6 +12,9 @@ import { formatTime } from "@/app/lib/common";
 import { ethers } from "ethers";
 import { compareAddress } from "@/app/lib/compareAddress";
 import { useAppConfig } from "@/app/hooks/useAppConfig";
+import { ActionButton, ActionButtonWrapper } from "./ActionButton";
+import Modal from "@/app/components/Modal";
+import { useCancelOrder } from "../../hooks/useCancelOrder";
 
 
 
@@ -184,6 +187,20 @@ const PositionItemWrapper = styled.tr`
     }
 `
 
+const CancelModalContent = styled.div`
+// color: var(--Quenta--FFFFFF, var(--text1, #FFF));
+color: ${(props) => props.theme.colors.text1};
+padding: 12px 0;
+
+/* medium */
+font-family: Arial;
+font-size: ${(props) => props.theme.fontSize.medium};
+font-style: normal;
+font-weight: 400;
+line-height: 100%; /* 14px */
+
+`
+
 type OrderType = {
     side: FutureType;
     createTime: number;
@@ -220,7 +237,7 @@ const getSide = (ele: any, isLong: boolean) => {
 };
 
 
-const StopOrderItem: FCC<{ pos: any }> = ({ pos }) => {
+const StopOrderItem: FCC<{ pos: any, onCancel: AnyFunc }> = ({ pos, onCancel }) => {
 
     const token = useTokenByFutureId(pos.futureId);
     const appConfig = useAppConfig();
@@ -253,7 +270,7 @@ const StopOrderItem: FCC<{ pos: any }> = ({ pos }) => {
             </td>
             <td {...PositionTdAttrs} width={140}>
                 <div className={`margin-col'}`}>
-                    {filterPrecision(pos.size, token.displayDecimal)}
+                    {filterPrecision(pos.positionReadable, token.displayDecimal)}
                 </div>
             </td>
             <td {...PositionTdAttrs} width={200}>
@@ -262,7 +279,9 @@ const StopOrderItem: FCC<{ pos: any }> = ({ pos }) => {
                 </div>
             </td>
             <td {...PositionTdAttrs} >
-                close
+                <ActionButtonWrapper>
+                    <ActionButton onClick={() => onCancel(pos)}>close</ActionButton>
+                </ActionButtonWrapper>
             </td>
         </PositionItemWrapper>
     );
@@ -271,9 +290,30 @@ const StopOrderItem: FCC<{ pos: any }> = ({ pos }) => {
 
 
 export const StopOrderList: FC = () => {
-
+    const [cancelModalVisible, updateCancelModalVisible] = useState(false);
 
     const stopOrder = useRecoilValue(recoilFutureStopOrders);
+    const cancelOrder = useCancelOrder();
+
+    const targetOrder = useRef<any>();
+
+    const handleItemConfirm = useCallback((pos: any) => {
+        targetOrder.current = pos;
+        updateCancelModalVisible(true);
+    }, []);
+
+    const handleCancel = useCallback(async () => {
+        if (!targetOrder.current) return;
+        try {
+            await cancelOrder(targetOrder.current);
+            updateCancelModalVisible(false);
+
+        } catch (e) {
+            console.log("error handleCancel stop order", e);
+        }
+
+    }, []);
+
     return (
         <Wrapper>
             <TableWrapper >
@@ -295,12 +335,23 @@ export const StopOrderList: FC = () => {
                     <tbody>
                         {
                             stopOrder.map((pos: any, index) => {
-                                return <StopOrderItem key={`${pos.id}-${pos.isLong ? 'long' : 'short'}-${pos.symbol}`} pos={pos} />
+                                return <StopOrderItem onCancel={handleItemConfirm} key={`${pos.id}-${pos.isLong ? 'long' : 'short'}-${pos.symbol}`} pos={pos} />
                             })
                         }
                     </tbody>
                 </table>
             </TableWrapper>
+
+            <Modal
+                title="Cancel"
+                visible={cancelModalVisible}
+                onClose={() => updateCancelModalVisible(false)}
+                onCancel={() => updateCancelModalVisible(false)}
+                onConfirm={handleCancel}
+            >
+
+                <CancelModalContent className="cancel-tip">Are you sure to cancel</CancelModalContent>
+            </Modal>
         </Wrapper>
     );
 

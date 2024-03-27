@@ -77,7 +77,7 @@ const Price: React.FC<{
           setPrice(value);
         }}
         placeholder="input price"
-        suffix={
+        suffixNode={
           activeOrderTab === "limit" ? (
             <div
               className="market"
