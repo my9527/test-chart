@@ -209,7 +209,7 @@ const Share: React.FC<{
   const futureTypeMap: TypeMap = { long: "Long", short: "Short" };
 
   const [loading, setLoading] = useState<boolean>(false);
-  const [shareCanvas, setShareCanvas] = useState<string>("");
+
   const [copyText, setCopyText] = useState("Copy");
   const shareLink = `Quenta Perpetual Trading https://app.quenta.io/perpetual`;
 
@@ -227,7 +227,7 @@ const Share: React.FC<{
       })
     ).toDataURL("image/png");
 
-    setShareCanvas(canvas);
+    return canvas;
   }, []);
 
   const onClose = () => {
@@ -265,7 +265,7 @@ const Share: React.FC<{
     }
     return new Blob([u8arr], { type: mime });
   };
-  const copyBlobToClipboard = (base64: string) => {
+  const copyBlobToClipboard = async (base64: string) => {
     return new Promise((resolve, reject) => {
       let blob = dataURLToBlob(base64);
       navigator.clipboard
@@ -288,8 +288,8 @@ const Share: React.FC<{
   const handleCopy = async () => {
     if (!loading) {
       setLoading(true);
-      await loadCanvas();
-      await copyBlobToClipboard(shareCanvas);
+      const canvas = await loadCanvas();
+      await copyBlobToClipboard(canvas);
       setLoading(false);
       setCopyText("Copied");
       setTimeout(() => {
