@@ -5,6 +5,7 @@ import Image from "next/image"
 import styled from "styled-components"
 import DotIcon from "@/app/assets/referral/middle.svg";
 import TerminalIcon from "@/app/assets/referral/terminal.svg";
+import LevelBg from "@/app/assets/portfolio/vip-level-bg.png";
 
 
 const Content = styled(FlexBox)`
@@ -14,11 +15,16 @@ const Content = styled(FlexBox)`
 
 const Level = styled.div`
   background-color: ${props => props.theme.colors.fill3};
-  padding: 27px 35px;
-  background-image: url('/src/app/assets/portfolio/vip-level-bg.png');
+  padding: 27px 35px 100px;
+  background-image: url(${LevelBg.src});
   background-repeat: no-repeat;
-  background-size: cover;
+  background-size: contain;
   border-radius: 8px;
+`
+const LevelTitle = styled.h3`
+  font-size: ${props => props.theme.fontSize.header0};
+  color: ${props => props.theme.colors.primary1};
+  margin-bottom: 2px;
 `
 
 const StyledBox = styled(Box)`
@@ -79,8 +85,8 @@ export const LevelInfo = () => {
   return (
     <StyledBox>
       <Level>
-        <SimpleText $size="header0" $color="primary1">Your VIP Level</SimpleText>
-        <SimpleText $size="header0" $color="primary1">VIP {level}</SimpleText>
+        <LevelTitle>Your VIP Level</LevelTitle>
+        <SimpleText $size="medium" $color="primary1">VIP {level}</SimpleText>
       </Level>
       <Content direction="column" justifyContent="space-between">
         <Title>VIP Progress</Title>
