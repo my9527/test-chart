@@ -166,11 +166,11 @@ const PerpetualDetail = memo((props) => {
 
   const tickerPrice = useTickerPrice();
 
-  const [currentTokenOpenLongInterest] = useOpenInterestsBySideId(
+  const currentTokenOpenLongInterest = useOpenInterestsBySideId(
     FutureType.LONG,
     curToken.futureLongId
   );
-  const [currentTokenOpenShortInterest] = useOpenInterestsBySideId(
+  const currentTokenOpenShortInterest = useOpenInterestsBySideId(
     FutureType.SHORT,
     curToken.futureShortId
   );
@@ -312,7 +312,7 @@ const PerpetualDetail = memo((props) => {
           </div>
           <div className="content">
             <p className="rate">
-              <FundingFeeRate /> / -0.1%{" "}
+              <FundingFeeRate />
             </p>
             <p className="short">
               |<FundingFeeCountDown />

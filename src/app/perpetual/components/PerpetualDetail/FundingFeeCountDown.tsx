@@ -35,6 +35,7 @@ export const FundingFeeCountDown: FC = memo(() => {
                 
                 const lastTime = BigNumber((countDownResults[0] as any)?.result.toString()).multipliedBy(1000).toString();
                 const targetTime = dayjs(+lastTime).add(appConfig.epoch_duration, 'h');
+                console.log("count down: ", lastTime, targetTime.unix());
                 updateFundingFeeCountDown(targetTime);
             } catch(e) {
                 // 请求失败，等待2s 后进行重试
@@ -44,7 +45,7 @@ export const FundingFeeCountDown: FC = memo(() => {
         }
 
         _run();
-    }, [LongContractParams]);
+    }, [LongContractParams, appConfig]);
 
     const [, fundingFormattedRes] = useCountDown({
         targetDate: fundingDate,

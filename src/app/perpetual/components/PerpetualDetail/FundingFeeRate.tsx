@@ -7,6 +7,7 @@ import { useUSDTokens } from "@/app/hooks/useTokens";
 import BigNumber from "bignumber.js";
 import { useOpenInterestsBySideId } from "../../hooks/useOpenInterest";
 import { FutureType } from "@/app/config/common";
+import { formatNumber } from "@/app/lib/common";
 
 
 
@@ -20,6 +21,9 @@ export const FundingFeeRate: FC = memo(() => {
 
     const [longUSD, shortUSD] = useGlobalUSDValue();
 
+    
+
+    console.log("shortOIFee 2222", longUSD, shortUSD);
     const { tokenSize: currentTokenUSDValueLong } = longUSD || { tokenSize: 0 };
     const { tokenSize: currentTokenUSDValueShort } = shortUSD || { tokenSize: 0 };
     const usdTokens = useUSDTokens();
@@ -124,6 +128,8 @@ export const FundingFeeRate: FC = memo(() => {
     }, [currentTokenUSDValueLong, totalLiquidity, currentToken.token]);
 
     const shortPosPayfeeRate = useMemo(() => {
+
+        console.log("shortOIFee 111", currentTokenUSDValueShort, totalLiquidity);
         if (
             !currentTokenUSDValueShort ||
             BigNumber(currentTokenUSDValueShort).isNaN() ||
@@ -176,7 +182,7 @@ export const FundingFeeRate: FC = memo(() => {
                 .toString();
         }
 
-        return BigNumber(resV2).isNaN() ? '-' : resV2;
+        return BigNumber(resV2).isNaN() ? undefined : formatNumber(resV2, 4);
     }, [
         currentTokenOpenInterestLong,
         currentTokenOpenInterestShort,
@@ -186,6 +192,46 @@ export const FundingFeeRate: FC = memo(() => {
         shortPosPayfeeRate,
     ]);
 
+    const shortOIFee= useMemo(() => {
 
-    return <span>{longOIFee || '-'}</span>;
+        console.log("shortOIFee", shortPosPayfeeRate, longPosPayfeeRate);
+        if (!shortPosPayfeeRate || !longPosPayfeeRate) return undefined;
+        let resV2 = '0';
+        if (
+          BigNumber(currentTokenOpenInterestLong?.tokenSize).isZero() &&
+          BigNumber(currentTokenOpenInterestLong?.tokenSize).eq(currentTokenOpenInterestShort?.tokenSize)
+        ) {
+          resV2 = '0';
+        } else if (BigNumber(currentTokenOpenInterestLong?.tokenSize).gte(currentTokenOpenInterestShort?.tokenSize)) {
+          // ( longPosPayfeerate - shortPosPayfeerate ) * ( 1 )
+          resV2 = BigNumber(1)
+            .multipliedBy(BigNumber(longPosPayfeeRate).minus(shortPosPayfeeRate))
+            .multipliedBy(100)
+            .toString();
+        } else {
+          // longPosPayfeerate * longGlobalUsdValue / shortGlobalUsdValue - shortPosPayfeerate
+          resV2 = BigNumber(longPosPayfeeRate)
+            .multipliedBy(currentTokenOpenInterestLong?.tokenSize)
+            .div(currentTokenOpenInterestShort?.tokenSize)
+            .minus(shortPosPayfeeRate)
+            .multipliedBy(100)
+            .toString();
+        }
+    
+        return BigNumber(resV2).isNaN() ? undefined : formatNumber(resV2, 4);
+    }, [
+        currentTokenOpenInterestLong,
+        currentTokenOpenInterestShort,
+        currentTokenUSDValueShort,
+        currentTokenUSDValueLong,
+        longPosPayfeeRate,
+        shortPosPayfeeRate,
+    ]);
+
+    console.log("long IO fee", longOIFee, shortOIFee);
+
+    
+
+
+    return <span>{longOIFee ?? '-'}% | {shortOIFee ?? '-'}%</span>;
 });

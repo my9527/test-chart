@@ -42,6 +42,6 @@ export const sortArrByKey = (arr: any[], prop: string, dir: string)=> {
  */
 export const formatNumber = (str: string, decimal?: number) => {
   if (!str) return '';
-  if (BigNumber(str).isZero()) return '';
+  // if (BigNumber(str).isZero()) return '0';
   return BigNumber(str).toFixed(decimal === undefined ? 6 : decimal, BigNumber.ROUND_DOWN);
 };

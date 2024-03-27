@@ -79,6 +79,13 @@ export const OpenInterestsEffects: FC = memo(() => {
 
     const currentTokenPrice = useIndexPricesById(currentToken.token.futureLongId);
 
+    const hasTickPriceReady = useRef(false);
+
+
+    useEffect(() => {
+        hasTickPriceReady.current = !!(currentTokenPrice && currentTokenPrice.price);
+    }, [currentTokenPrice])
+
 
 
     // 获取当前交易对 可用liquidity
@@ -200,17 +207,20 @@ export const OpenInterestsEffects: FC = memo(() => {
     
     //
     const globalUsdValueCalls = useMemo(() => {
+        if(!currentTokenPrice || !currentTokenPrice?.price){
+            return [];
+        }
         return [{
             ...LongContractParams,
             chainId: chainId,
             functionName: 'getGlobalUSDValue',
-            args: [currentToken.token.futureLongId, currentTokenPrice?.price * 10 ** 6 || Math.random()],
+            args: [currentToken.token.futureLongId, BigNumber(currentTokenPrice?.price).multipliedBy(1e6).toString(10)],
         },
         {
             ...ShortContractParams,
             chainId: chainId,
             functionName: 'getGlobalUSDValue',
-            args: [currentToken.token.futureShortId, currentTokenPrice?.price * 10 ** 6],
+            args: [currentToken.token.futureShortId, BigNumber(currentTokenPrice?.price).multipliedBy(1e6).toString(10)],
         }];
     }, [chainId, currentTokenPrice, LongContractParams, ShortContractParams, currentToken.token])
 
@@ -269,6 +279,7 @@ export const OpenInterestsEffects: FC = memo(() => {
 
             const globalUsdValues = globalUsdValueResults?.map((rslt: any, index) => {
                 const targetCall = globalUsdValueCalls[index];
+                console.log("globalUsdValues",rslt, rslt?.result?.toString(), targetCall.args);
 
                 return {
                     id: `${targetCall?.address}-${targetCall?.args?.[0]}`,
@@ -340,6 +351,15 @@ export const OpenInterestsEffects: FC = memo(() => {
         pollingInterval: 15_000,
         // refreshDeps: [callFns]
     });
+
+    // 由于需要价格导致fundingfee 等无法计算，所以在价格ready 之后重新获取
+    useEffect(() => {
+        if(hasTickPriceReady.current) {
+            console.log("hasTickPriceReady", hasTickPriceReady.current);
+            cancel();
+            run();
+        }
+    }, [hasTickPriceReady.current]);
 
 
     // 当 token 列表发生变化时，需要重新请求对应的数据以快速的更新显示

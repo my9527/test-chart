@@ -27,7 +27,7 @@ export const useOpenInterestsBySideId = (side: FutureType, futureId: number | st
     const openInterests = useRecoilValue(recoilOpenInterests);
 
     return useMemo(() => {
-        return openInterests.openInterests.filter((interest: any) => interest.side === side && futureId === interest.futureId);
+        return openInterests.openInterests.filter((interest: any) => interest.side === side && futureId === interest.futureId)[0];
     }, [side, futureId, openInterests]);
     
 
