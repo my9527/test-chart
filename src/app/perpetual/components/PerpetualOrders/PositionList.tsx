@@ -20,6 +20,8 @@ import { ParamsProps } from "./AdjustMargin";
 import StopOrdersModal from "./StopOrdersModal";
 import AddIcon from "@/app/assets/perpetual/add.svg";
 import Image from "next/image";
+import Share from "./Share";
+
 const Wrapper = styled(Row)`
   width: 100%;
   max-height: 100%;
@@ -259,7 +261,14 @@ const Position: FCC<{
   handleShowAdujustMargin: Function;
   handleClose: Function;
   handleShowStopOrders: Function;
-}> = ({ pos, handleShowAdujustMargin, handleClose, handleShowStopOrders }) => {
+  handleShare: Function;
+}> = ({
+  pos,
+  handleShowAdujustMargin,
+  handleClose,
+  handleShowStopOrders,
+  handleShare,
+}) => {
   const token = useTokenByFutureId(pos.futureId);
 
   const indexPrices = useIndexPricesById(pos.futureId);
@@ -448,7 +457,21 @@ const Position: FCC<{
             >
               close
             </div>
-            <div className="button">share</div>
+            <div
+              className="button"
+              onClick={() =>
+                handleShare({
+                  ...pos,
+                  liqPrice,
+                  pnl,
+                  feesReadable,
+                  markPrice,
+                  pnlPercent
+                })
+              }
+            >
+              share
+            </div>
           </div>
         </div>
       </td>
@@ -464,7 +487,7 @@ export const PositionList = () => {
   );
   const [showClosePosition, setShowClosePosition] = useState(false);
   const [showStopOrders, setShowStopOrders] = useState(false);
-
+  const [showShare, setShowShare] = useState(false);
   // sort by futureId asc
   const openPositions = useMemo(() => {
     if (!_openPositions.length) return [];
@@ -485,7 +508,10 @@ export const PositionList = () => {
     setShowStopOrders(true);
     setActivePosition(ele);
   };
-
+  const handleShare = (ele: ParamsProps) => {
+    setShowShare(true);
+    setActivePosition(ele);
+  };
   return (
     <Wrapper>
       <TableWrapper>
@@ -514,6 +540,7 @@ export const PositionList = () => {
                   handleShowAdujustMargin={handleShowAdujustMargin}
                   handleClose={handleClose}
                   handleShowStopOrders={handleShowStopOrders}
+                  handleShare={handleShare}
                 />
               );
             })}
@@ -539,6 +566,13 @@ export const PositionList = () => {
           visible={showStopOrders}
           setVisible={setShowStopOrders}
           params={activePosition}
+        />
+      )}
+      {showShare && (
+        <Share
+          params={activePosition}
+          visible={showShare}
+          setVisible={setShowShare}
         />
       )}
     </Wrapper>
