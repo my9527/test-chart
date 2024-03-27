@@ -256,7 +256,7 @@ const Share: React.FC<{
 
   const dataURLToBlob = (dataurl: string) => {
     let arr = dataurl.split(",");
-    let mime = arr[0].match(/:(.*?);/)[1];
+    let mime = (arr[0] || '').match(/:(.*?);/)?.[1];
     let bstr = atob(arr[1]);
     let n = bstr.length;
     let u8arr = new Uint8Array(n);

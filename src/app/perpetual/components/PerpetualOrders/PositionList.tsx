@@ -479,12 +479,12 @@ const Position: FCC<{
   );
 };
 
+type IShareParams = ParamsProps & { pnlPercent: string}
+
 export const PositionList = () => {
   const _openPositions = useRecoilValue(recoilPositions);
   const [showAdujustMargin, setShowAdujustMargin] = useState(false);
-  const [activePosition, setActivePosition] = useState<ParamsProps>(
-    {} as ParamsProps
-  );
+  const [activePosition, setActivePosition] = useState<IShareParams>();
   const [showClosePosition, setShowClosePosition] = useState(false);
   const [showStopOrders, setShowStopOrders] = useState(false);
   const [showShare, setShowShare] = useState(false);
@@ -496,19 +496,19 @@ export const PositionList = () => {
     );
   }, [_openPositions]);
 
-  const handleShowAdujustMargin = (ele: ParamsProps) => {
+  const handleShowAdujustMargin = (ele: IShareParams) => {
     setShowAdujustMargin(true);
     setActivePosition(ele);
   };
-  const handleClose = (ele: ParamsProps) => {
+  const handleClose = (ele: IShareParams) => {
     setShowClosePosition(true);
     setActivePosition(ele);
   };
-  const handleShowStopOrders = (ele: ParamsProps) => {
+  const handleShowStopOrders = (ele: IShareParams) => {
     setShowStopOrders(true);
     setActivePosition(ele);
   };
-  const handleShare = (ele: ParamsProps) => {
+  const handleShare = (ele: IShareParams) => {
     setShowShare(true);
     setActivePosition(ele);
   };
@@ -547,28 +547,28 @@ export const PositionList = () => {
           </tbody>
         </table>
       </TableWrapper>
-      {showAdujustMargin && (
+      {showAdujustMargin && activePosition && (
         <AdjustMargin
           visible={showAdujustMargin}
           setVisible={setShowAdujustMargin}
           params={activePosition}
         />
       )}
-      {showClosePosition && (
+      {showClosePosition && activePosition && (
         <ClosePosition
           visible={showClosePosition}
           setVisible={setShowClosePosition}
           params={activePosition}
         />
       )}
-      {showStopOrders && (
+      {showStopOrders && activePosition && (
         <StopOrdersModal
           visible={showStopOrders}
           setVisible={setShowStopOrders}
           params={activePosition}
         />
       )}
-      {showShare && (
+      {showShare && activePosition && (
         <Share
           params={activePosition}
           visible={showShare}

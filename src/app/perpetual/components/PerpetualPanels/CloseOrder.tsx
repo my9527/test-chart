@@ -389,7 +389,7 @@ const CloseOrder: React.FC<{
       feesReadable: '',
       ...targetPos,
     };
-    console.log("handleClose", params);
+    // @ts-ignore
     setConfirmedParams(params);
     const show = localStorage.getItem("showAgain_open");
     if (show === "true") {
