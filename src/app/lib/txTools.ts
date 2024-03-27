@@ -13,6 +13,7 @@ export type SendTxParams = {
 
     signer: WalletClient;
     data?: `0x${string}`;
+    chain?: string | number;
 }
 
 interface SendTxInterface {
@@ -21,7 +22,7 @@ interface SendTxInterface {
 
 
 
-export const sendTx: SendTxInterface = async ({client, signer, to, value, data }) => {
+export const sendTx: SendTxInterface = async ({client, signer, to, value, data, chain }) => {
     try{
         let p: any = {
             to,
@@ -49,6 +50,7 @@ export const sendTx: SendTxInterface = async ({client, signer, to, value, data }
     
           const hash = await signer.sendTransaction({
             ...p,
+            chain
             // account: signer?.account?.address,
           });
     

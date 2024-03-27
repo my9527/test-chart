@@ -3,6 +3,7 @@ import { encodeTx } from "../lib/txTools";
 import { useContractParams } from "./useContractParams";
 import { useAppConfig } from "./useAppConfig";
 import { useSendTx } from "./useSendTx";
+import { useChainId } from "wagmi";
 
 
 
@@ -14,6 +15,7 @@ export const useSendTxByDelegate = () => {
     const appConfig = useAppConfig();
     const DelegationHubContractParams = useContractParams(appConfig.contract_address.DelegationHubImplementationAddress);
     const sendTx = useSendTx();
+    const chainId = useChainId();
 
 
     // TODO: 增加 1ct 代理交易

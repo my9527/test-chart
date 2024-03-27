@@ -245,6 +245,8 @@ const StopOrderItem: FCC<{ pos: any, onCancel: AnyFunc }> = ({ pos, onCancel }) 
     // const side = getSide(pos, isLong);
     const isBuy = !pos.isStopLoss;
 
+    console.log("StopOrderItem", pos);
+
     return (
         <PositionItemWrapper>
             <td align="left" width={140}>
@@ -265,7 +267,7 @@ const StopOrderItem: FCC<{ pos: any, onCancel: AnyFunc }> = ({ pos, onCancel }) 
             </td>
             <td {...PositionTdAttrs} width={140}>
                 <div >
-                    {filterPrecision(ethers.utils.formatUnits(pos?.triggerPrice || 0, 6), token.displayDecimal)}
+                    {filterPrecision(pos?.triggerPrice, token.displayDecimal)}
                 </div>
             </td>
             <td {...PositionTdAttrs} width={140}>

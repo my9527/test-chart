@@ -1,8 +1,8 @@
 "use client";
 import styled from "styled-components";
 import DraggableIcon from "../DraggableIcon";
-import { useRecoilValue } from "recoil";
-import { recoilFutureLimitOrMarketOrders, recoilPositions } from "@/app/models";
+import { useRecoilValue, useSetRecoilState } from "recoil";
+import { recoilDepositModalShow, recoilFutureLimitOrMarketOrders, recoilPositions } from "@/app/models";
 import { calcPnl } from "../../lib/getPnl";
 import {
   useIndexPricesIdMap,
@@ -95,6 +95,8 @@ const Account = () => {
   const prices = useIndexPricesIdMap();
   const tokens = useTokensIdMap();
   const balance = useExchangeBalance();
+
+  const openDepositionModal = useSetRecoilState(recoilDepositModalShow);
 
   const totalMargin = useMemo(() => {
     let _total = "0";
@@ -194,7 +196,7 @@ const Account = () => {
         })}
       </Content>
       <Btns>
-        <div className="btn">Deposit</div>
+        <div className="btn" onClick={() => openDepositionModal(true)}>Deposit</div>
       </Btns>
       <DraggableIcon />
     </Wrapper>

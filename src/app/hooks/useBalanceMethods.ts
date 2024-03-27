@@ -108,7 +108,7 @@ export const useBalanceMethods = () => {
 
         try{
             const allownace = await checkApprove(token_, DepositContractParams.address, _amount);
-            console.log("allownace", allownace);
+            console.log("allownace-----", allownace);
 
             const userDepositData = encodeTx({
                 abi: DepositContractParams.abi,

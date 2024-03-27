@@ -313,3 +313,10 @@ export const recoilLpEpochEndTime = atom<any>({
     startTime: '-',
   },
 });
+
+
+
+export const recoilDepositModalShow = atom<boolean>({
+  key: 'depositModal',
+  default: false,
+})
