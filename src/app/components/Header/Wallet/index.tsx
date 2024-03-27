@@ -45,12 +45,12 @@ const Wallet: React.FunctionComponent<IWalletProps> = ({ onHide, visible }) => {
 
   const signedOnChange = useCallback((address_: string) => {
     async function _run() {
-      return;
+  
 
       try{
         await sleep(1000);
         const time = Date.now();
-        const messageToSign = generateSignApiTokenMessage(address as string, time);
+        const messageToSign = generateSignApiTokenMessage(address_ as string, time);
         const result: any = await new Promise(resolve => {
           signMessage({
             message: messageToSign,
@@ -58,7 +58,7 @@ const Wallet: React.FunctionComponent<IWalletProps> = ({ onHide, visible }) => {
           }, {
             onSuccess(signed) {
               const result = {
-                user: address as string,
+                user: address_ as string,
                 signed: signed,
                 signedAt: time
               }
