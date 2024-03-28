@@ -4,10 +4,11 @@
   "private": true,
   "scripts": {
     "dev": "yarn build-script && next dev",
-    "build": "yarn build-script && next build",
-    "start": "next start -p 5000",
+    "build": "yarn build-script && next build && rm -rf .next/cache",
+    "start": "next start",
     "lint": "next lint",
-    "build-script": "node scripts/index.js"
+    "build-script": "node scripts/index.js",
+    "export": "next export"
   },
   "dependencies": {
     "@rainbow-me/rainbowkit": "^2.0.1",
@@ -35,6 +36,7 @@
     "react-share": "^5.1.0",
     "recharts": "^2.12.2",
     "recoil": "^0.7.7",
+    "sharp": "^0.33.3",
     "styled-components": "^6.1.8",
     "uuid": "^9.0.1",
     "viem": "^2.7.16",

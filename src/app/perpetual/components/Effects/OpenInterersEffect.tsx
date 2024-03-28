@@ -279,7 +279,6 @@ export const OpenInterestsEffects: FC = memo(() => {
 
             const globalUsdValues = globalUsdValueResults?.map((rslt: any, index) => {
                 const targetCall = globalUsdValueCalls[index];
-                console.log("globalUsdValues",rslt, rslt?.result?.toString(), targetCall.args);
 
                 return {
                     id: `${targetCall?.address}-${targetCall?.args?.[0]}`,

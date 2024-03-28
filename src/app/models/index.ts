@@ -169,11 +169,26 @@ export const recoilWalletConnectPanel = atom<boolean>({
   default: false,
 });
 
-type FutureOrderType = {
+export type FutureOrderType = {
   orders: any[];
   validOrders: any[];
   inValidOrders: any[];
+  offsetObject: AnyObjec;
 };
+
+
+export const recoilOriginFuturesOrders = atom({
+  key: 'origin_future_orders',
+  default: {
+    updateOffsets: [],
+    updateCollateralOrders: [],
+    futureStopOrders: [],
+    increaseMarketOrders: [],
+    decreaseMarketOrders: [],
+    increaseLimitOrders: [],
+    decreaseLimitOrders: [],
+  }
+});
 
 export const recoilFutureOrders = atom<FutureOrderType>({
   key: "future_orders",
@@ -181,6 +196,7 @@ export const recoilFutureOrders = atom<FutureOrderType>({
     orders: [],
     validOrders: [],
     inValidOrders: [],
+    offsetObject: {},
   },
 });
 

@@ -12,7 +12,6 @@ export const useIndexPrices = () => {
 export const useIndexPricesById = (futureId: number | string) => {
   const prices = useRecoilValue(recoilIndexPrices);
 
-  console.log("prices: ", prices);
 
   const token = useTokenByFutureId(futureId);
 

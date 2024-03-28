@@ -57,6 +57,7 @@ export const OrderEffects = () => {
                     orders: [],
                     inValidOrders: [],
                     validOrders: [],
+                    offsetObject: {},
                 });
                 return ;
             }
@@ -89,35 +90,6 @@ export const OrderEffects = () => {
                         offsetObject[kLineSymbol][orderType] = item;
                     }
                 }
-
-
-
-
-
-
-
-
-                
-
-
-            //   const kLineSymbol = getTokenByIdAndContract(i?.futureId, i?.future)?.kLineSymbol;
-            //   const ifLong = getIsLongByContractAddress(i?.future);
-            //   if (!kLineSymbol) return;
-            //   if (!offsetObject[kLineSymbol]) {
-            //     offsetObject[kLineSymbol] = {
-            //       long: {},
-            //       short: {},
-            //     };
-      
-            //     offsetObject[kLineSymbol][ifLong ? 'long' : 'short'] = i;
-            //   } else {
-            //     if (
-            //       !offsetObject[kLineSymbol][ifLong ? 'long' : 'short']?.blockNumber ||
-            //       BigNumber(offsetObject[kLineSymbol][ifLong ? 'long' : 'short']?.blockNumber).lte(i?.blockNumber)
-            //     ) {
-            //       offsetObject[kLineSymbol][ifLong ? 'long' : 'short'] = i;
-            //     }
-            //   }
             });
 
 
@@ -205,6 +177,7 @@ export const OrderEffects = () => {
                 orders: allOrders,
                 validOrders,
                 inValidOrders,
+                offsetObject,
             });
 
 
@@ -218,7 +191,7 @@ export const OrderEffects = () => {
 
     const { run, error } = useRequest(fetchFutureOrders, {
         manual: true,
-        pollingInterval: 5_000,
+        pollingInterval: 500_000,
         // defaultParams: [address],
         refreshDeps: [fetchFutureOrders],
     });

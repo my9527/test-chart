@@ -22,8 +22,6 @@ export const FundingFeeRate: FC = memo(() => {
     const [longUSD, shortUSD] = useGlobalUSDValue();
 
     
-
-    console.log("shortOIFee 2222", longUSD, shortUSD);
     const { tokenSize: currentTokenUSDValueLong } = longUSD || { tokenSize: 0 };
     const { tokenSize: currentTokenUSDValueShort } = shortUSD || { tokenSize: 0 };
     const usdTokens = useUSDTokens();
@@ -129,7 +127,6 @@ export const FundingFeeRate: FC = memo(() => {
 
     const shortPosPayfeeRate = useMemo(() => {
 
-        console.log("shortOIFee 111", currentTokenUSDValueShort, totalLiquidity);
         if (
             !currentTokenUSDValueShort ||
             BigNumber(currentTokenUSDValueShort).isNaN() ||
@@ -194,7 +191,6 @@ export const FundingFeeRate: FC = memo(() => {
 
     const shortOIFee= useMemo(() => {
 
-        console.log("shortOIFee", shortPosPayfeeRate, longPosPayfeeRate);
         if (!shortPosPayfeeRate || !longPosPayfeeRate) return undefined;
         let resV2 = '0';
         if (
@@ -228,7 +224,6 @@ export const FundingFeeRate: FC = memo(() => {
         shortPosPayfeeRate,
     ]);
 
-    console.log("long IO fee", longOIFee, shortOIFee);
 
     
 

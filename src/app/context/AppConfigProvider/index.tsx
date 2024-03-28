@@ -152,8 +152,8 @@ const AppConfigOnChain: Record<number, AppConfigType> = {
 
     // config rpc
     rpc: {
-      http: "https://babel-api.testnet.iotex.io/",
-      wss: "wss://babel-api.testnet.iotex.io/ws",
+      http: "https://babel-api.testnet.iotex.one",
+      wss: "https://babel-api.testnet.iotex.one/wss",
     },
 
     // config api
