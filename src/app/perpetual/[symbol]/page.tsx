@@ -147,4 +147,3 @@ const Perpetual: FC = () => {
 export default Perpetual;
 
 // export const dynamicParams = false;
-export const runtime = "edge";
