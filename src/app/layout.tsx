@@ -20,6 +20,8 @@ const Providers = dynamic(() => import("./providers"), {
 });
 
 
+export const runtime = 'nodejs';
+
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
