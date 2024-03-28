@@ -6,8 +6,10 @@ const TokenImage: React.FC<{
   width?: number;
   height?: number;
 }> = ({ name, width = 15, height = 15 }) => {
+
+  const src = '/tokens/'+ name.toLowerCase() + '.png';
   return (
-    <Image src={`/tokens/${name}.png`} alt="" width={width} height={height} />
+    <Image src={src}  alt="" width={width} height={height} />
   );
 };
 export default TokenImage;

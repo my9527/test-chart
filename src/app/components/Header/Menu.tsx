@@ -5,12 +5,16 @@ import Image from "next/image";
 import ArrowIcon from "@/app/assets/header/arrow.svg";
 import { useRouter } from "next/navigation";
 import { menus } from "@/app/config/menu";
+import { useAccount } from "wagmi";
+import { useAppConfig } from "@/app/hooks/useAppConfig";
+import { useFetch } from "@/app/hooks/useFetch";
+import Link from "next/link";
 const Wrapper = styled.div`
   display: flex;
   align-items: center;
   gap: 20px;
 `;
-const Item = styled.div`
+const Item = styled(Link)`
   cursor: pointer;
   display: flex;
   align-items: center;
@@ -30,7 +34,37 @@ const Item = styled.div`
   }
 `;
 const Menu = () => {
-  const router = useRouter();
+  const { address } = useAccount();
+
+  const request = useFetch();
+
+  const handleFaucet = async () => {
+    
+    if (!address) return;
+    // @ts-ignore
+    window?.grecaptcha?.enterprise?.ready?.(async () => {
+      try {
+        // @ts-ignore
+        const token = await window?.grecaptcha?.enterprise?.execute?.('6Lck5V0nAAAAABUIx8PkVTKxvII3cM3z-di43-Vg', {
+          action: 'FAUCET',
+        });
+
+        const url = `/mint_tokens?address=${address}`;
+        await request({
+          url,
+          headers: {
+            grecaptcha: token,
+          }
+        })
+      
+      } catch (e: any) {
+        console.log("error: ", e);
+      }
+
+    });
+
+    return;
+  };
 
   return (
     <Wrapper>
@@ -38,9 +72,7 @@ const Menu = () => {
         return (
           <Item
             key={item.key}
-            onClick={() => {
-              router.push(item?.route);
-            }}
+            href={item.route}
           >
             <p className="label">{item?.label}</p>
             {item?.showArrow && (
@@ -55,6 +87,9 @@ const Menu = () => {
           </Item>
         );
       })}
+      <Item onClick={handleFaucet} href="">
+      <p className="label">faucet</p>
+      </Item>
     </Wrapper>
   );
 };

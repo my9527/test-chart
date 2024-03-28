@@ -1,6 +1,6 @@
 "use client";
 import styled from "styled-components";
-import { FC, useCallback, useMemo, useState } from "react";
+import { FC, useCallback, useMemo, useState, useEffect } from "react";
 import RGL, { WidthProvider, Layout } from "react-grid-layout";
 import { useRecoilState, useRecoilValue } from "recoil";
 
@@ -13,6 +13,10 @@ import PerpetualDetail from "../components/PerpetualDetail";
 import "react-grid-layout/css/styles.css";
 import "react-resizable/css/styles.css";
 import { recoilPanelSide } from "@/app/models";
+import useCurToken from "../hooks/useCurToken";
+import { useMessage } from "@/app/components/Message";
+import { useOverview } from "@/app/hooks/useOverview";
+import { useAccount } from "wagmi";
 
 const ReactGridLayout = WidthProvider(RGL);
 
@@ -33,7 +37,68 @@ const LAYOUT_RIGHT_LIST: Layout[] = [
 ];
 
 const Perpetual: FC = () => {
+  const msg = useMessage();
+  const { run } = useOverview();
+  const { address } = useAccount();
+  useEffect(() => {
+    if (address) {
+      run(address);
+    }
+    // setTimeout(() => {
+    //   msg({
+    //     content: (index: number) => {
+    //       return (
+    //         <OrderMessage
+    //           position="bottom_right"
+    //           index={index}
+    //           orderType="limit_open"
+    //           orderStatus="filled"
+    //           symbolName="BTC"
+    //           isLong={true}
+    //         />
+    //       );
+    //     },
+    //     delay: 30000,
+    //     position: "bottom_right",
+    //   });
+    //   msg({
+    //     content: (index: number) => {
+    //       return (
+    //         <OrderMessage
+    //           position="bottom_right"
+    //           index={index}
+    //           orderType="limit_open"
+    //           orderStatus="unfilled"
+    //           symbolName="BTC"
+    //           isLong={true}
+    //         />
+    //       );
+    //     },
+    //     delay: 30000,
+    //     position: "bottom_right",
+    //   });
+    //   msg({
+    //     content: (index: number) => {
+    //       return (
+    //         <OrderMessage
+    //           position="bottom_right"
+    //           index={index}
+    //           orderType="limit_open"
+    //           orderStatus="pending"
+    //           symbolName="BTC"
+    //           isLong={false}
+    //           hash="www.baidu.com"
+    //         />
+    //       );
+    //     },
+    //     delay: null,
+    //     position: "bottom_right",
+    //   });
+    // }, 1000);
+  }, [address]);
+
   const panelSide = useRecoilValue(recoilPanelSide);
+  const { symbolName } = useCurToken();
 
   const [layout, setLayout] = useState<Layout[]>(
     panelSide === "left" ? LAYOUT_LEFT_LIST : LAYOUT_RIGHT_LIST
@@ -60,7 +125,7 @@ const Perpetual: FC = () => {
         isBounded
       >
         <div key="trades">
-          <PerpetualTrades />
+          <PerpetualTrades key={`trades_${symbolName}`} />
         </div>
 
         <div key="charts">
@@ -70,7 +135,7 @@ const Perpetual: FC = () => {
           <PerpetualOrders />
         </div>
         <div key="panels">
-          <PerpetualPanels />
+          <PerpetualPanels key={`panels_${symbolName}`} />
         </div>
         <div key="account">
           <Account />
@@ -80,3 +145,6 @@ const Perpetual: FC = () => {
   );
 };
 export default Perpetual;
+
+// export const dynamicParams = false;
+export const runtime = "edge";

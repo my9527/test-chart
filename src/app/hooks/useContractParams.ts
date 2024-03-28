@@ -1,7 +1,7 @@
 import { ethers } from "ethers";
 import { useAppConfig } from "./useAppConfig"
 import { multicall } from "viem/actions";
-import { ContractFunctionParameters } from "viem";
+import { AbiItem, ContractFunctionParameters } from "viem";
 import { useMemo } from "react";
 import { erc20Abi } from "viem";
 
@@ -23,15 +23,15 @@ import LimitOrderImplementationContractAbi from "@/app/config/abis/limitOrder.js
 
 
 // import WETHContract from "@/app/config/abis/";
-import WithdrawContractAbi from "@/app/config/abis/userBalance.json";
-
-import DepositContractAbi from "@/app/config/abis/userBalance.json";
+import UserBalanceContractAbi from "@/app/config/abis/userBalance.json";
 
 import ExchangeStableTokenContractAbi from "@/app/config/abis/usd.json";
 import StakeSexContractAbi from "@/app/config/abis/stSEX.json";
 
 import StakeSlpContractAbi from "@/app/config/abis/stSLP.json";
 import FutureManagerContractAbi from "@/app/config/abis/futureManager.json";
+import DelegationHubAbi from '@/app/config/abis/delegationHub.json';
+
 import { useChainId } from "wagmi";
 
 
@@ -56,6 +56,12 @@ import { useChainId } from "wagmi";
 //     | (functionName extends allFunctionNames ? functionName : never) // infer value
 //   args?: (abi extends Abi ? UnionWiden<args> : never) | allArgs | undefined
 
+
+export type IContractParam = {
+    address: `0x${string}`;
+    abi: AbiItem[];
+    chainId: number;
+}
 
 
 
@@ -110,8 +116,48 @@ export const useContractParams = (address: string) => {
                 abi: UpdateCollateralOrderImplementationContractAbi,
                 chainId: chainId,
             },
+            [config.contract_address.USDAddress]: {
+                address: config.contract_address.USDAddress,
+                abi: ExchangeStableTokenContractAbi,
+            },
+            [config.contract_address.UserBalanceImplementationAddress]: {
+                address: config.contract_address.UserBalanceImplementationAddress,
+                abi: UserBalanceContractAbi,
+                chainId: chainId,
+            },
+            [config.contract_address.USDCAddress]: {
+                address: config.contract_address.USDCAddress,
+                abi: ExchangeStableTokenContractAbi,
+                chainId: chainId,
+            },
+            [config.contract_address.WETHAddress]: {
+                address: config.contract_address.WETHAddress,
+                abi: ExchangeStableTokenContractAbi,
+                chainId: chainId,
+            },
+            [config.contract_address.stSEXAddress]: {
+                address: config.contract_address.stSEXAddress,
+                abi: StakeSexContractAbi,
+                chainId: chainId,
+            },
+            [config.contract_address.stSLPAddress]: {
+                address: config.contract_address.stSLPAddress,
+                abi: StakeSlpContractAbi,
+                chainId: chainId,
+            },
+            [config.contract_address.ExchangeManagerImplementationAddress] : {
+                address: config.contract_address.ExchangeManagerImplementationAddress,
+                abi: ExchangeContractAbi,
+                chainId: chainId,
+
+            },
+            [config.contract_address.DelegationHubImplementationAddress] : {
+                address: config.contract_address.DelegationHubImplementationAddress,
+                abi: DelegationHubAbi,
+                chainId: chainId,
+            }
             
-        }
+        } as Record<`0x${string}`, IContractParam>
 
         return _contracts;
 
@@ -120,7 +166,7 @@ export const useContractParams = (address: string) => {
 
     }, [config, chainId]);
 
-    return contracts[address];
+    return contracts[address as `0x${string}`];
 
 
 }

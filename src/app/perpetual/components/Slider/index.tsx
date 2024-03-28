@@ -2,6 +2,12 @@
 import React, { useMemo } from "react";
 import styled from "styled-components";
 import { useEffect, useState, useRef } from "react";
+import {
+  filterPrecision,
+  getExponent,
+  filterThousands,
+} from "@/app/utils/tools";
+import BigNumber from "bignumber.js";
 const Wrapper = styled.div`
   position: relative;
 `;
@@ -49,7 +55,7 @@ const CurDot = styled(Dot)<PercentProps>`
   z-index: 6;
   right: 0;
   transform: ${(props) => {
-    if (props?.percent === 0) {
+    if (props?.percent < 0.1) {
       return "translate(100%,-50%)";
     } else if (props?.percent === 1) {
       return "translate(0,-50%)";
@@ -66,10 +72,10 @@ const CurDot = styled(Dot)<PercentProps>`
     line-height: 120%;
     position: relative;
     transform: ${(props) => {
-      if (props?.percent === 0) {
+      if (props?.percent < 0.1) {
         return "translate(0, -100%)";
       } else if (props?.percent === 1) {
-        return "translate(-100%,-100%)";
+        return "translate(-310%,-100%)";
       } else {
         return "translate(-100%,-100%)";
       }
@@ -125,7 +131,7 @@ const Mark = styled.div<PercentProps>`
 export interface SliderProps {
   className?: string;
   disabled?: boolean;
-  value: number;
+  value?: string;
   min: number;
   max: number;
   step?: number; // 步长，取值必须大于 0，并且可被 (max - min) 整除。
@@ -133,6 +139,7 @@ export interface SliderProps {
   marks?: { label: string; value: number }[];
   tooltip?: React.ReactNode;
   onChange?: (value: number) => void;
+  per: number;
 }
 
 const Slider: React.FC<SliderProps> = ({
@@ -140,25 +147,17 @@ const Slider: React.FC<SliderProps> = ({
   min = 0,
   max = 100,
   step = 1,
-  value = 0,
+  value,
   unit,
   onChange,
+  per,
 }) => {
-  const [selectedValue, setSelectedValue] = useState(0);
   const trackRef = useRef<HTMLDivElement | null>(null);
   const thumbRef = useRef<HTMLDivElement | null>(null);
 
   const [percent, setPercent] = useState<number>(0);
   const [isDragging, setIsDragging] = useState(false);
   const [isChange, setIsChange] = useState(false);
-
-  useEffect(() => {
-    if (value < min) {
-      setPercent(0);
-    } else {
-      setPercent((value - min) / (max - min));
-    }
-  }, [value, min, max]);
 
   const trackWidth = useMemo(() => {
     return trackRef?.current?.clientWidth || 0;
@@ -185,7 +184,8 @@ const Slider: React.FC<SliderProps> = ({
 
       if (distanceX) {
         setIsChange(true);
-        setPercent((distanceX - 5) / trackWidth);
+        const _per = (distanceX - 5) / trackWidth;
+        setPercent(_per > 1 ? 1 : _per < 0 ? 0 : _per);
       }
     }
   }, [startX, zeroX, isDragging]);
@@ -213,29 +213,63 @@ const Slider: React.FC<SliderProps> = ({
   }, [isDragging]);
 
   useEffect(() => {
-    onChange && isChange && onChange(Math.floor((max - min) * percent + min));
+    if (onChange && isChange) {
+      const v = BigNumber(max)
+        .minus(min)
+        .multipliedBy(percent)
+        .plus(min)
+        .toNumber();
+
+      onChange(BigNumber(v).lt(1) ? v : +filterPrecision(v, 2));
+    }
   }, [percent, isChange]);
+
+  const showValue = useMemo(() => {
+    if (value || value === "") {
+      return value || min;
+    } else {
+      const v = BigNumber(max)
+        .minus(min)
+        .multipliedBy(per)
+        .plus(min)
+        .toNumber();
+
+      return v ? +filterPrecision(v, 2) : 0;
+    }
+  }, [max, min, per, value]);
   return (
     <Wrapper>
       <Track
         ref={trackRef}
         onClick={(e) => {
           setIsChange(true);
-          setPercent((e.clientX - zeroX - 5) / trackWidth);
+          setPercent(
+            BigNumber(e.clientX)
+              .minus(zeroX)
+              .minus(5)
+              .dividedBy(trackWidth)
+              .toNumber()
+          );
         }}
       />
       <SliderThumb
         ref={thumbRef}
-        percent={percent < 0 ? 0 : percent > 1 ? 1 : percent}
+        percent={per < 0 ? 0 : per > 1 ? 1 : per}
         onClick={(e) => {
           if (!isDragging) {
             setIsChange(true);
-            setPercent((e.clientX - zeroX - 5) / trackWidth);
+            setPercent(
+              BigNumber(e.clientX)
+                .minus(zeroX)
+                .minus(5)
+                .dividedBy(trackWidth)
+                .toNumber()
+            );
           }
         }}
       >
         <CurDot
-          percent={percent < 0 ? 0 : percent > 1 ? 1 : percent}
+          percent={per < 0 ? 0 : per > 1 ? 1 : per}
           onMouseDown={(e) => {
             e.nativeEvent.stopImmediatePropagation();
 
@@ -244,14 +278,18 @@ const Slider: React.FC<SliderProps> = ({
           }}
         >
           <p className="value">
-            {Math.floor((max - min) * percent + min)}
+            {showValue}
             {unit}
           </p>
         </CurDot>
       </SliderThumb>
       <Marks>
         {marks.map((i, index) => {
-          const left = (i?.value - min) / (max - min);
+          // const left = (i?.value - min) / (max - min);
+          const left = BigNumber(i?.value)
+            .minus(min)
+            .dividedBy(BigNumber(max).minus(min))
+            .toNumber();
           const _left = index === 0 ? 0 : left > 1 ? 1 : left;
 
           return (
@@ -262,7 +300,7 @@ const Slider: React.FC<SliderProps> = ({
                 handleDotClick(_left);
               }}
             >
-              {left > percent ? <Dot /> : <SelectedDot />}
+              {left > per ? <Dot /> : <SelectedDot />}
               <p className="label">{i?.label}</p>
             </Mark>
           );

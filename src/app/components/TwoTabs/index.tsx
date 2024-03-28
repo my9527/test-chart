@@ -1,4 +1,4 @@
-import styled from "styled-components"
+import styled, { css } from "styled-components"
 
 
 const Title = styled.h2<{ active: boolean }>`
@@ -15,16 +15,21 @@ const Box = styled.div`
   display: flex;
 `
 
-const TabPanel = styled.div<{ active: boolean }>`
+const TabPanel = styled.div<{ active: boolean, $disabled: boolean }>`
   flex-grow: 1;
   text-align: center;
   line-height: 55px;
   background: ${props => props.active ? 'unset' : props.theme.colors.fill3};
   cursor: pointer;
   position: relative;
-  &:hover h2 {
-    color: ${props => props.theme.colors.primary1};
-  }
+  ${props => props.$disabled && css`
+    cursor: not-allowed;
+  `}
+  ${props => !props.$disabled && css`
+    &:hover ${Title} {
+      color: ${props => props.theme.colors.primary1};
+    }
+  `};
 `
 
 const Hilight = styled.div<{ active: boolean }>`
@@ -40,6 +45,7 @@ type TTabType = {
   key: string,
   title: string,
   subTitle?: string
+  disabled?: boolean
 }
 interface ITwoTabsProps {
   tabs: TTabType[]
@@ -48,15 +54,16 @@ interface ITwoTabsProps {
   onTabChange: (v: string) => void
 }
 export function TwoTabs({ tabs, activeTab, onTabChange }: ITwoTabsProps) {
-  const handleTabChange = (v: string) => () => {
-    onTabChange(v)
+  const handleTabChange = (v: TTabType) => () => {
+    if (v.disabled) return
+    onTabChange(v.key)
   }
 
   return (
     <Box>
       {
         tabs.map(i => (
-          <TabPanel key={i.key} active={i.key === activeTab} onClick={handleTabChange(i.key)}>
+          <TabPanel $disabled={!!i.disabled} key={i.key} active={i.key === activeTab} onClick={handleTabChange(i)}>
             <Title active={i.key === activeTab}>{i.title}</Title>
             {/* { i.subTitle ? <SubTitle>{i.subTitle}</SubTitle> : null } */}
             <Hilight active={i.key === activeTab} />

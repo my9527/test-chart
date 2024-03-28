@@ -44,7 +44,7 @@ export const FundingFeeCountDown: FC = memo(() => {
         }
 
         _run();
-    }, [LongContractParams]);
+    }, [LongContractParams, appConfig]);
 
     const [, fundingFormattedRes] = useCountDown({
         targetDate: fundingDate,

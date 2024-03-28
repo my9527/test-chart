@@ -23,7 +23,7 @@ export const useTokenByName = (tokenName: string) => {
 
   
   const token = useMemo(() => {
-    return tokens.filter((token_) => token_.symbolName.toLowerCase() === tokenName.toLowerCase());
+    return tokens.filter((token_) => token_.symbolName.toLowerCase() === tokenName?.toLowerCase());
   }, [tokens, tokenName]);
 
   return token[0];
@@ -85,5 +85,40 @@ export const useUSDTokens = () => {
   const tokens = useTokens();
   return useMemo(() => {
     return tokens.filter(token_ => token_.exchangeStable)
+  }, [tokens]);
+}
+
+
+export const useTradeTokens = () => {
+
+  const tokens = useTokens();
+
+  return useMemo(() => {
+    return tokens.filter(token_ => token_.tradeable !== false)
+  }, [tokens]);
+
+}
+
+export const useDepositableTokens = () => {
+  const tokens = useTokens();
+
+  return useMemo(() => {
+    return tokens.filter(token_ => token_.deposit === true);
+  }, [tokens]);
+}
+
+export const useWithdrawableTokens = () => {
+  const tokens = useTokens();
+
+  return useMemo(() => {
+    return tokens.filter(token_ => token_.withdraw === true)
+  }, [tokens]);
+}
+
+
+export const useStableTokens = () => {
+  const tokens = useTokens();
+  return useMemo(() => {
+    return tokens.filter(token_ => token_.stable && token_.address);
   }, [tokens]);
 }

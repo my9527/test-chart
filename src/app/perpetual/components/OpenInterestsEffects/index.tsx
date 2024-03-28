@@ -66,13 +66,13 @@ export const OpenInterestsEffects: FC = memo(() => {
     
 
     const availableTokens = useMemo(() => {
-        return [...positionTokens, currentToken.token]
-    }, [positionTokens, currentToken.token]);
+        return [...positionTokens, currentToken?.token]
+    }, [positionTokens, currentToken?.token]);
 
 
     // 用于监听仓位或当前 token 的变化，一遍重新请求相关数据
     const availableTokensString = useMemo(() => {
-        return availableTokens.map(t => t.symbolName).join("_");
+        return availableTokens.map(t => t?.symbolName).join("_");
     }, [availableTokens]);
 
 
@@ -238,6 +238,8 @@ export const OpenInterestsEffects: FC = memo(() => {
 
     const callFns = useCallback(async () => {
 
+        console.log("callFns")
+
         const [
             openInterestsCalls,
             globalUsdValueCalls,
@@ -337,14 +339,16 @@ export const OpenInterestsEffects: FC = memo(() => {
 
     const { run, cancel } = useRequest(callFns, {
         manual: true,
-        pollingInterval: 15 * 1000,
+        pollingInterval: 150_000,
         // refreshDeps: [callFns]
     });
 
 
     // 当 token 列表发生变化时，需要重新请求对应的数据以快速的更新显示
     useEffect(() => {
+        console.log("asdadfasfasdf")
         run();
+
         return () => {
             cancel();
         }

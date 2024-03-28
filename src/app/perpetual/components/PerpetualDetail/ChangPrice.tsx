@@ -27,13 +27,18 @@ const Wrapper = styled.div<WrapperProps>`
   }
 `;
 
-const ChangPrice: React.FC<{ symbolName: string }> = ({ symbolName }) => {
+const ChangPrice: React.FC<{ symbolName: string; displayDecimal: number }> = ({
+  symbolName,
+  displayDecimal,
+}) => {
   const indexPrices = useRecoilValue(recoilIndexPrices);
   const change = indexPrices[symbolName]?.change;
 
   return (
     <Wrapper change={change}>
-      <p className="price">{indexPrices[symbolName]?.price || "-"}</p>
+      <p className="price">
+        {filterPrecision(indexPrices[symbolName]?.price, displayDecimal)}
+      </p>
       <p className="change">{filterPrecision(change || 0, 2)}%</p>
     </Wrapper>
   );

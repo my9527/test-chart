@@ -1,5 +1,7 @@
+import { useEpoch } from "@/app/hooks/useEpoch"
 import { motion } from "framer-motion"
-import styled from "styled-components"
+import styled, { css } from "styled-components"
+import { useEpochEndTime } from '../../hooks/useEpochEndTime'
 
 const Fields = styled.div`
   display: flex;
@@ -10,7 +12,7 @@ const Fields = styled.div`
 const FieldColumn = styled.div`
   display: flex;
   flex-direction: column;
-  gap: 26px;
+  gap: 20px;
 `
 
 const FieldItem = styled.div`
@@ -44,9 +46,13 @@ const FieldAnimateItem = styled.div`
   }
 `
 
-const FieldLabel= styled.div`
+const FieldLabel= styled.div<{ width?: number }>`
   color: ${props => props.theme.colors.text4};
   font-size: ${props => props.theme.fontSize.small};
+  white-space: nowrap;
+  ${props => props.width && css`
+    width: ${props.width}px;
+  `}
 `
 
 const FieldTime = styled.div`
@@ -71,16 +77,19 @@ const Divider = styled.div`
 
 const token = 'QLP'
 export function CurrentEpochContent () {
+  const epoch = useEpoch()
+  const { epochEndTime } = useEpochEndTime()
+
   const epochFieldsLeft = [
     {
       key: 'start-in',
       label: "Start in",
-      value: "2024-2-26 00:00",
+      value: epochEndTime.startTime,
     },
     {
       key: 'end-in',
       label: "End in",
-      value: "2024-2-26 00:00",
+      value: epochEndTime.endTime,
     }
   ]
   const epochFieldsMiddle = [
@@ -109,13 +118,13 @@ export function CurrentEpochContent () {
   ]
   return (
     <>
-      <EpochTitle>Current Epoch 100</EpochTitle>
+      <EpochTitle>Current Epoch {epoch}</EpochTitle>
       <Fields>
         <FieldColumn>
           {
             epochFieldsLeft.map(field => (
               <FieldItem key={field.key}>
-                <FieldLabel>{field.label}</FieldLabel>
+                <FieldLabel width={39}>{field.label}</FieldLabel>
                 <FieldTime>{field.value}</FieldTime>
               </FieldItem>
             ))
@@ -126,7 +135,7 @@ export function CurrentEpochContent () {
           {
             epochFieldsMiddle.map(field => (
               <FieldAnimateItem key={field.key}>
-                <FieldLabel className="label">{field.label}</FieldLabel>
+                <FieldLabel width={53} className="label">{field.label}</FieldLabel>
                 <FieldValue className="value">{field.value}</FieldValue>
               </FieldAnimateItem>
             ))
@@ -137,7 +146,7 @@ export function CurrentEpochContent () {
           {
             epochFieldsRight.map(field => (
               <FieldAnimateItem key={field.key}>
-                <FieldLabel className="label">{field.label}</FieldLabel>
+                <FieldLabel width={95} className="label">{field.label}</FieldLabel>
                 <FieldValue className="value">{field.value}</FieldValue>
               </FieldAnimateItem>
             ))

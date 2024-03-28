@@ -44,8 +44,6 @@ export const recoilFavoriateList = atom<ITokenList>({
   effects_UNSTABLE: [localStorageEffect<ITokenList>("LOCALE_TOKEN_LIST")],
 });
 
-
-
 export type PositionType = {
   futureId: string | number;
   id: string;
@@ -63,31 +61,34 @@ export type PositionType = {
   entryFundingFeePerTokenReadable: string;
   entryBorrowingFeePerTokenReadable: string;
   cumulativeTeamFeeReadable: string;
-}
-
+  positionReadable: string;
+};
 
 /**
  * open position list
  */
 
 export const recoilPositions = atom<PositionType[]>({
-  key: 'open_positions',
-  default: []
+  key: "open_positions",
+  default: [],
 });
-
 
 /**
  * 获取当前仓位的币种，避免因为仓位其他数据变化导致重复渲染
  * 此处获取的事futureId, 所以需要自行处
  */
 export const recoilPositionTokens = selector({
-  key: 'open_positions_tokens',
-  get: ({get}) => {
+  key: "open_positions_tokens",
+  get: ({ get }) => {
     const list = get(recoilPositions);
 
-    return Array.from(new Set(list.map(li => {
-      return li.futureId
-    }))).join("_");
+    return Array.from(
+      new Set(
+        list.map((li) => {
+          return li.futureId;
+        })
+      )
+    ).join("_");
   },
 });
 
@@ -95,37 +96,32 @@ export const recoilPositionTokens = selector({
  * position 长度
  */
 export const recoilPositionNums = selector({
-  key: 'open_positions_length',
-  get: ({get}) => {
+  key: "open_positions_length",
+  get: ({ get }) => {
     const list = get(recoilPositions);
 
     return list.length;
   },
 });
 
-
 /**
  * 所有交易对的标记价格
  */
 export const recoilIndexPrices = atom<Record<string, any>>({
-  key: 'index_prices',
+  key: "index_prices",
   default: {},
 });
 
-
 export const recoilCurrentToken = atom<Token | null>({
-  key: 'current_token',
+  key: "current_token",
   default: null, // use default token;
-})
-
-
+});
 
 // 交易执行的 exeution fee
 export const recoilExecutionFee = atom<string | BigNumber | number>({
-  key: 'execution_fee',
+  key: "execution_fee",
   default: 2000000, //
 });
-
 
 // openInterests,
 //                 globalUsdValues,
@@ -139,99 +135,219 @@ export type OpenInterestsType = {
   openInterests: any;
   borrowingFees: any;
   currentTokenAvailableLiq: any;
-
-}
+};
 
 export const recoilOpenInterests = atom<OpenInterestsType>({
-  key: 'open_interests',
+  key: "open_interests",
   default: {
-        openInterests: [],
-        globalUsdValues: [],
-        fundingFees: [],
-        borrowingFees: [],
-        currentTokenAvailableLiq: [],
-  }
+    openInterests: [],
+    globalUsdValues: [],
+    fundingFees: [],
+    borrowingFees: [],
+    currentTokenAvailableLiq: [],
+  },
 });
-
 
 export type LPInfoType = {
   poolAmount: number | string;
   poolLockedAmount: number | string;
-}
+};
 
 export const recoilLPInfo = atom<LPInfoType>({
-  key: 'lp_info',
+  key: "lp_info",
   default: {
     poolAmount: 0,
     poolLockedAmount: 0,
-  }
-})
-
+  },
+});
 
 /**
  * 钱包链接侧边栏是否打开
  */
 export const recoilWalletConnectPanel = atom<boolean>({
-  key: 'wallet_connect_panel',
+  key: "wallet_connect_panel",
   default: false,
-})
+});
+
+export type FutureOrderType = {
+  orders: any[];
+  validOrders: any[];
+  inValidOrders: any[];
+  offsetObject: AnyObjec;
+};
 
 
-
-type FutureOrderType = {
-    orders: any[],
-    validOrders: any[],
-    inValidOrders: any[]
-}
+export const recoilOriginFuturesOrders = atom({
+  key: 'origin_future_orders',
+  default: {
+    updateOffsets: [],
+    updateCollateralOrders: [],
+    futureStopOrders: [],
+    increaseMarketOrders: [],
+    decreaseMarketOrders: [],
+    increaseLimitOrders: [],
+    decreaseLimitOrders: [],
+  }
+});
 
 export const recoilFutureOrders = atom<FutureOrderType>({
-
-  key: 'future_orders',
+  key: "future_orders",
   default: {
     orders: [],
     validOrders: [],
-    inValidOrders: []
+    inValidOrders: [],
+    offsetObject: {},
   },
-})
+});
 
 export const recoilFutureLimitOrMarketOrders = selector({
-  key: 'future_orders_limit',
-  get: ({get}) => {
+  key: "future_orders_limit",
+  get: ({ get }) => {
     const { validOrders } = get(recoilFutureOrders);
 
-    return validOrders.filter(order => {
-      return ['increaseMarketOrders', 'increaseLimitOrders', 'decreaseLimitOrders', 'decreaseMarketOrders'].includes(order.type);
-    })
+    return validOrders.filter((order) => {
+      return [
+        "increaseMarketOrders",
+        "increaseLimitOrders",
+        "decreaseLimitOrders",
+        "decreaseMarketOrders",
+      ].includes(order.type);
+    });
     // .sort((a, b) => b.futureId - a.futureId);
   },
 });
 
 export const recoilFutureStopOrders = selector({
-  key: 'future_orders_stop',
-  get: ({get}) => {
+  key: "future_orders_stop",
+  get: ({ get }) => {
     const { validOrders } = get(recoilFutureOrders);
 
-    return validOrders.filter(order => {
-      return ['futureStopOrders'].includes(order.type);
+    return validOrders.filter((order) => {
+      return ["futureStopOrders"].includes(order.type);
     });
   },
 });
 
-
-
 export const recoilOrdersLen = selector({
-  key: 'future_orders_len',
-  get:({ get }) => {
+  key: "future_orders_len",
+  get: ({ get }) => {
     const positionList = get(recoilPositions);
     const limitList = get(recoilFutureLimitOrMarketOrders);
     const stopList = get(recoilFutureStopOrders);
 
     return {
       position: positionList.length,
-      limit:  limitList.length,
+      limit: limitList.length,
       stop: stopList.length,
       history: 0,
-    }
+    };
+  },
+});
 
-  }
-})
+/**
+ * 交易页面当前的币种, 如果没有，将默认为ETH
+ */
+export const recoilPerpetualToken = atom<string>({
+  key: "perpetual_token",
+  default: "",
+});
+
+type WalletBalanceType = {
+  balance?: string;
+  balanceReadable: string;
+};
+
+type BalanceAndPoolType = {
+  walletBalance: Record<string, WalletBalanceType>;
+  exchangeBalance: Record<string, WalletBalanceType>;
+  epoch: string | number | undefined;
+  stableTokenPrice: Record<
+    `0x${string}`,
+    {
+      deposit: {
+        balance: string | number;
+        balanceReadable: string | number;
+      };
+      withdraw: {
+        balance: string | number;
+        balanceReadable: string | number;
+      };
+      poolBalance: {
+        balance: string | number;
+        balanceReadable: string | number;
+      };
+    }
+  >;
+
+  availableLp: {
+    futureLong: string;
+    futureShort: string;
+    option: string;
+    futureTotalUsdAvailableReadable: string;
+    totalUsdAvailableReadable: string;
+  };
+};
+
+export const recoilBalanceAndPool = atom<BalanceAndPoolType>({
+  key: "balance_pool",
+  default: {
+    walletBalance: {
+      // balanceReadable: '0',
+    },
+    exchangeBalance: {
+      // balanceReadable: '0',
+    },
+    epoch: "",
+    availableLp: {
+      futureLong: "0",
+      futureShort: "0",
+      option: "0",
+      futureTotalUsdAvailableReadable: "0",
+      totalUsdAvailableReadable: "0",
+    },
+    stableTokenPrice: {},
+  },
+});
+
+export const recoilLpEpochEndTime = atom<any>({
+  key: "lpEpochEndTime",
+  default: {
+    timestamp: NaN,
+    format: "-",
+    startTime: "-",
+  },
+});
+
+export const recoilDepositModalShow = atom<boolean>({
+  key: "depositModal",
+  default: false,
+});
+
+export interface createdUserInfo {
+  id: number;
+  address: string;
+  name: string;
+  email: string;
+  referral_code: string;
+  vip_level: number;
+  fee_discount_rate: number;
+  referral_level: number;
+  last_referral_pass_date: null | string;
+  weekly_activate_user: number;
+  total_first_level_user: number;
+  is_second_level_referral: boolean;
+  second_referral_commission_rate: number;
+  weekly_second_activate_user: number;
+  total_second_level_user: number;
+  total_second_rebate: string;
+  created_time: string;
+  updated_time: string;
+  is_custom_vip: boolean;
+  is_custom_referral: boolean;
+}
+
+// reading datas
+export const recoilProfileOverview = atom<createdUserInfo | undefined>({
+  key: "profileOverview",
+  default: undefined,
+});

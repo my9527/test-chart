@@ -1,26 +1,40 @@
 import styled, { css } from "styled-components";
 
 
-interface IButtonProps {
+interface IButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   primary?: boolean;
   secondary?: boolean;
   borderRadius?: number;
   padding: string;
+  bgColor?: string;
+  hoverBgColor?: string;
+  textColor?: string;
+  borderColor?: string;
+  minWidth?: number;
 }
 
-const Button = styled.button<IButtonProps>`
+const StyledButton = styled.button<IButtonProps>`
   cursor: pointer;
-  color: ${props => props.theme.colors.primary1};
+  color: ${props => props.textColor || props.theme.colors.primary1};
   padding: ${props => props.padding};
-  background: ${props => props.theme.colors.fill3};
+  background: ${props => props.bgColor || props.theme.colors.fill3};
   border-radius: ${props => props.borderRadius || 99}px;
-  border: 1px solid transparent;
+  border: 1px solid ${props => props.borderColor || 'transparent'};
+  font-size: ${props => props.theme.fontSize.small};
+  line-height: 14px;
+  min-width: ${props => props.minWidth}px;
+
+  ${props => props.hoverBgColor && css`
+    &:hover {
+      background: ${props.hoverBgColor};
+    }
+  `}
 
   /* Adapt the colors based on primary prop */
   ${props => props.primary && css`
-    background-color: ${props => props.theme.colors.fill2};
+    background: ${props => props.theme.colors.fill2};
     &:hover {
-      background-color: ${props => props.theme.colors.primary1};
+      background: ${props => props.theme.colors.primary1};
       color: ${props => props.theme.colors.text1};
     }
   `}
@@ -33,5 +47,13 @@ const Button = styled.button<IButtonProps>`
     }
   `}
 `;
+
+
+
+const Button: FCC<IButtonProps> = (props) => {
+  return (
+    <StyledButton {...props} />
+  )
+}
 
 export default Button;

@@ -19,6 +19,9 @@ const Wrapper = styled.div`
 const Box = styled.div`
   background-color: ${props => props.theme.colors.fill2};
   border-radius: 8px;
+  &:hover {
+    box-shadow: ${props => props.theme.colors.fill2Hover}
+  }
 `
 
 const CurrentEpoch = styled(Box)`
@@ -33,6 +36,9 @@ const BuySellPanel = styled.div`
   grid-area: buy-sell;
   background-color: ${props => props.theme.colors.fill2};
   border-radius: 0 0 8px 8px;
+  &:hover {
+    box-shadow: ${props => props.theme.colors.fill2Hover}
+  }
 `
 
 const PriceChart = styled(Box)`

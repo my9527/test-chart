@@ -34,18 +34,18 @@ const motionConfig: Record<string, object> = {
   },
   bottom: {
     initial: { opacity: 0, bottom: 0, left: "50%", x: "-50%" },
-    animate: { opacity: 1, bottom: 100, left: "50%", x: "-50%" },
+    animate: { opacity: 1, bottom: 40, left: "50%", x: "-50%" },
     exit: { opacity: 0, bottom: 0, left: "50%", x: "-50%" },
   },
   bottom_left: {
-    initial: { opacity: 0, bottom: 10, left: 0 },
-    animate: { opacity: 1, bottom: 10, left: 100 },
-    exit: { opacity: 0, bottom: 10, left: 0 },
+    initial: { opacity: 0, bottom: 40, left: 0 },
+    animate: { opacity: 1, bottom: 40, left: 10 },
+    exit: { opacity: 0, bottom: 40, left: 0 },
   },
   bottom_right: {
-    initial: { opacity: 0, bottom: 10, right: 0 },
-    animate: { opacity: 1, bottom: 10, right: 100 },
-    exit: { opacity: 0, bottom: 10, right: 0 },
+    initial: { opacity: 0, bottom: 40, right: 0 },
+    animate: { opacity: 1, bottom: 40, right: 10 },
+    exit: { opacity: 0, bottom: 40, right: 0 },
   },
   left: {
     initial: { opacity: 0, left: 0, top: "50%", y: "-50%" },
@@ -121,11 +121,11 @@ interface PotralProps {
 }
 
 const MsgItem = styled(motion.div)`
-  display: flex;
+  /* display: flex;
   align-items: center;
   padding: 4px 8px;
   background: gray;
-  border-radius: 14px;
+  border-radius: 14px; */
 `;
 
 const IconImg = styled.img`
@@ -144,13 +144,6 @@ const MsgPotral = (props: PotralProps) => {
         duration: 1,
       }}
     >
-      {/* {
-            type === 'error' ? <IconImg src={getImageUrl('@/assets/CmptMessage/error.png')} /> : null
-          } 
-          {
-            type === 'info' ? <IconImg src={getImageUrl('@/assets/CmptMessage/info.png')} /> : null
-          }   */}
-
       {props.children}
     </MsgItem>
   );
@@ -165,8 +158,8 @@ type Position =
   | "left"
   | "right";
 type Msg = {
-  content: React.ReactElement | string;
-  delay?: number;
+  content: React.ReactElement | string | Function;
+  delay?: number | null;
   start?: number;
   position?:
     | "top"
@@ -193,7 +186,7 @@ export const useMessage = () => {
       };
 
       updateMsgState((_state: any) => {
-        const position = msg?.position || "top";
+        const position = msg?.position || "bottom_right";
         let list: any = [];
         if (position === "top") {
           list = [_msg, ...(_state[position] || [])];
@@ -229,7 +222,7 @@ const GlobalMessage = () => {
         let newMsgs: Record<string, object> = {};
         keys.map((key) => {
           let _msgs = msgsRef.current[key].filter((v: any) => {
-            return v.start + v.delay > Date.now();
+            return v.delay ? v.start + v.delay > Date.now() : true;
           });
           newMsgs[key] = _msgs;
         });
@@ -259,7 +252,7 @@ const GlobalMessage = () => {
                   {msgs[key].map((msg: any, index: number) => {
                     return (
                       <MsgPotral key={index} type={msg.type} position={key}>
-                        <div>{msg.content}</div>
+                        <div>{msg.content(index)}</div>
                       </MsgPotral>
                     );
                   })}

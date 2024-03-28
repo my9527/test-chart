@@ -3,10 +3,12 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
-    "build": "next build",
+    "dev": "yarn build-script && next dev",
+    "build": "yarn build-script && next build && rm -rf .next/cache",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "build-script": "node scripts/index.js",
+    "export": "next export"
   },
   "dependencies": {
     "@rainbow-me/rainbowkit": "^2.0.1",
@@ -22,20 +24,26 @@
     "framer-motion": "^11.0.8",
     "graphql": "^16.8.1",
     "graphql-request": "^6.1.0",
+    "html2canvas": "1.0.0-alpha.12",
+    "lottie-react": "^2.4.0",
+    "mac-scrollbar": "^0.13.6",
     "next": "14.1.0",
     "pino-pretty": "^10.3.1",
     "react": "^18",
     "react-dom": "^18",
     "react-grid-layout": "^1.4.4",
     "react-remove-scroll": "^2.5.9",
+    "react-share": "^5.1.0",
     "recharts": "^2.12.2",
     "recoil": "^0.7.7",
+    "sharp": "^0.33.3",
     "styled-components": "^6.1.8",
     "uuid": "^9.0.1",
     "viem": "^2.7.16",
     "wagmi": "^2.5.7"
   },
   "devDependencies": {
+    "@types/html2canvas": "^1.0.0",
     "@types/node": "^20",
     "@types/react": "^18",
     "@types/react-dom": "^18",

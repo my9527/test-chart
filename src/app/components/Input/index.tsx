@@ -4,6 +4,7 @@ import { useRef } from "react";
 type Props = {
   prefixWidth: number;
   suffixWidth: number;
+  type: string;
 };
 const Wrapper = styled.div<Props>`
   display: flex;
@@ -16,7 +17,12 @@ const Wrapper = styled.div<Props>`
     display: flex;
     align-items: center;
     border-radius: 8px;
-    border: ${(props) => `1px solid ${props.theme.colors.border1}`};
+    border: ${(props) =>
+      `1px solid ${
+        props.type === "warn"
+          ? props.theme.colors.text5
+          : props.theme.colors.border1
+      }`};
     background: ${(props) => props.theme.colors.fill2};
     outline-style: none;
     padding-left: ${(props) =>
@@ -31,22 +37,27 @@ const Wrapper = styled.div<Props>`
     line-height: 100%;
     &::-webkit-input-placeholder {
       color: ${(props) => props.theme.colors.text4};
-      font-size: ${(props) => props.theme.fontSize.medium};
+      font-size: ${(props) => props.theme.fontSize.small};
     }
     &:-moz-placeholder {
       color: ${(props) => props.theme.colors.text4};
-      font-size: ${(props) => props.theme.fontSize.medium};
+      font-size: ${(props) => props.theme.fontSize.small};
     }
     &::-moz-placeholder {
       color: ${(props) => props.theme.colors.text4};
-      font-size: ${(props) => props.theme.fontSize.medium};
+      font-size: ${(props) => props.theme.fontSize.small};
     }
     &:-ms-input-placeholder {
       color: ${(props) => props.theme.colors.text4};
-      font-size: ${(props) => props.theme.fontSize.medium};
+      font-size: ${(props) => props.theme.fontSize.small};
     }
     &:focus {
-      border: ${(props) => `1px solid ${props.theme.colors.primary1}`};
+      border: ${(props) =>
+        `1px solid ${
+          props.type === "warn"
+            ? props.theme.colors.text5
+            : props.theme.colors.primary1
+        }`};
     }
   }
   .prefix {
@@ -67,45 +78,51 @@ const Wrapper = styled.div<Props>`
   }
 `;
 
-const Input: React.FC<{
-  placeholder?: string;
-  value?: string | number;
-  onChange?: Function;
-  suffix?: React.ReactNode;
-  prefix?: React.ReactNode;
-  className?: string;
-  type?: string;
-  onBlur?: Function;
-  disabled?: boolean;
-}> = ({
+const Input: React.FC<
+  {
+    placeholder?: string;
+    value?: string | number;
+    onChange?: Function;
+    suffixNode?: React.ReactNode;
+    prefixNode?: React.ReactNode;
+    className?: string;
+    type?: string;
+    onBlur?: Function;
+    disabled?: boolean;
+    maxLength?: number;
+  } & React.HTMLProps<HTMLInputElement>
+> = ({
   placeholder,
   value,
   onChange,
-  prefix,
-  suffix,
+  prefixNode,
+  suffixNode,
   className,
-  type = "number",
+  type = "normal",
   onBlur,
   disabled,
+  maxLength,
 }) => {
   const prefixRef = useRef<HTMLDivElement | null>(null);
   const suffixRef = useRef<HTMLDivElement | null>(null);
 
   return (
     <Wrapper
+      type={type}
       className={className}
       prefixWidth={prefixRef?.current?.clientWidth || 0}
       suffixWidth={suffixRef?.current?.clientWidth || 0}
     >
-      {prefix && (
+      {prefixNode && (
         <div className="prefix" ref={prefixRef}>
-          {prefix}
+          {prefixNode}
         </div>
       )}
       {disabled ? (
         <div className="input">{value}</div>
       ) : (
         <input
+          maxLength={maxLength}
           onBlur={(e) => {
             onBlur && onBlur(e);
           }}
@@ -113,13 +130,13 @@ const Input: React.FC<{
           placeholder={placeholder}
           value={value}
           onChange={(e) => {
-            onChange && onChange(e, type);
+            onChange && onChange(e);
           }}
         />
       )}
-      {suffix && (
+      {suffixNode && (
         <div className="suffix" ref={suffixRef}>
-          {suffix}
+          {suffixNode}
         </div>
       )}
     </Wrapper>

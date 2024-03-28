@@ -1,11 +1,12 @@
 "use client";
 import styled from "styled-components";
-import { useState, useRef, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import useCurToken from "../../hooks/useCurToken";
 import TokenImage from "@/app/components/TokenImage";
 import Input from "@/app/components/Input";
 import Slider from "../Slider";
-
+import { verifyValidNumber } from "@/app/utils/tools";
+import BigNumber from "bignumber.js";
 const Wrapper = styled.div`
   position: relative;
   width: 100%;
@@ -67,21 +68,47 @@ const Tips = styled.p`
   font-style: normal;
   font-weight: 400;
   line-height: 120%;
+  margin-top: 30px;
 `;
 const AdjustLeverage: React.FC<{
-  leverage: number;
-  setLeverage: (value: number) => any;
-}> = ({ leverage, setLeverage }) => {
+  leverage: string;
+  max: number;
+  setLeverage: (value: string) => any;
+}> = ({ leverage, setLeverage, max }) => {
   const { symbolName } = useCurToken();
-  const [value, setValue] = useState<number>(leverage);
-  const max = 100;
+  const [value, setValue] = useState<string>(leverage + "");
   const min = 1;
-  const valueRef = useRef<number>();
+
+  const [percent, setPercent] = useState<string>("0");
+
+  const marks = useMemo(() => {
+    const _step = (max - min + 1) / 4;
+    const arr = Array.from({ length: 5 });
+    return arr.map((item, index) => {
+      const v = Math.ceil(index === 0 ? min : _step * index);
+
+      return {
+        label: `${v}X`,
+        value: v,
+      };
+    });
+  }, [min, max]);
 
   useEffect(() => {
-    valueRef.current = value;
     setLeverage(value);
-  }, [value, valueRef?.current]);
+    if (BigNumber(value).lt(min)) {
+      setPercent("0");
+    } else {
+      setPercent(
+        value
+          ? BigNumber(value)
+              .minus(min)
+              .dividedBy(BigNumber(max).minus(min))
+              .toString()
+          : "0"
+      );
+    }
+  }, [value]);
 
   return (
     <Wrapper>
@@ -96,74 +123,43 @@ const AdjustLeverage: React.FC<{
           placeholder="input amount"
           value={value}
           onBlur={() => {
-            if (value < min) {
-              setValue(min);
+            if (BigNumber(value).lt(min)) {
+              setValue(value ? min + "" : "");
+            } else {
+              setValue(value ? BigNumber(value).toString() : "");
             }
           }}
-          onChange={(e: React.FormEvent<HTMLInputElement>, type: string) => {
-            const reg = /^\+?[1-9][0-9]*$/;
-            const flag = reg.test(e?.currentTarget?.value);
-            if (!e?.currentTarget?.value) {
-              setValue(0);
+          onChange={(e: React.FormEvent<HTMLInputElement>) => {
+            const _value = e?.currentTarget.value;
+
+            if (_value && verifyValidNumber(_value, 2)) {
               return;
             }
-            if (type === "number" && flag) {
-              if (valueRef?.current === +e?.currentTarget?.value) {
-              } else {
-                if (+e?.currentTarget.value > max) {
-                  setValue(max);
-                } else {
-                  setValue(+e?.currentTarget.value || 0);
-                }
-              }
+
+            if (BigNumber(_value).gt(max)) {
+              setValue(_value ? max + "" : "");
+            } else {
+              setValue(_value || "");
             }
           }}
         />
       </LeverageRatio>
       <Slider
+        value={value}
+        per={+percent}
         onChange={(value) => {
-          if (valueRef?.current === value) {
-          } else {
-            setValue(value);
-          }
+          setValue(value + "");
         }}
-        value={value || 0}
-        marks={[
-          {
-            label: "1X",
-            value: 1,
-          },
-          {
-            label: "25X",
-            value: 25,
-          },
-          {
-            label: "50X",
-            value: 50,
-          },
-
-          {
-            label: "75X",
-            value: 75,
-          },
-          {
-            label: "100X",
-            value: 100,
-          },
-        ]}
+        marks={marks}
         min={min}
         max={max}
-        step={25}
         unit="X"
       />
-      <Desc>
-        The maximum opening after adjusting the leverage ratio is{" "}
-        <span className="highlight">0.00BTC</span>
-        Required deposit of <span className="highlight">0 USD</span>
-      </Desc>
-      <Tips>
-        The current leverage ratio is high, please be aware of the risk
-      </Tips>
+      {+value > 20 && (
+        <Tips>
+          The current leverage ratio is high, please be aware of the risk
+        </Tips>
+      )}
     </Wrapper>
   );
 };

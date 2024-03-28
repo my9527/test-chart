@@ -1,20 +1,33 @@
-import styled, { css } from "styled-components";
+import styled from "styled-components";
 
-const Button = styled.div`
-  font-size: ${props => props.theme.fontSize.header2};
+const StyledButton = styled.button<TProps>`
   color: ${props => props.theme.colors.text1};
-  line-height: 40px;
-  min-width: 200px;
+  font-size: ${props => props.theme.fontSize.header2};
+  line-height: ${props => props.height || 40}px;
+  height: ${props => props.height || 40}px;
+  min-width: ${props => props.minWidth || 200}px;
   padding: 0 14px;
   background: ${props => props.theme.colors.primary3};
-  border: none;
+  text-align: center;
   border-radius: 999px;
   cursor: pointer;
-  display: flex;
-  justify-content: center;
+  outline: none;
+  border: none;
+
   &:hover {
     background: ${props => props.theme.colors.primary1};
   }
 `
+
+interface TProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
+  minWidth?: number, 
+  height?: number
+  className?: string
+}
+const Button: FCC<TProps> = ({ className, ...rest}) => {
+  return (
+    <StyledButton className={className} {...rest} />
+  )
+}
 
 export default Button

@@ -48,14 +48,14 @@ const WalletList = styled.div`
 `
 
 
-type AA =  Parameters<typeof WalletButton.Custom>[0];
+type IWalletItem =  Parameters<typeof WalletButton.Custom>[0];
 // WalletButtonRendererProps
-const WalletItem = ({ ready, connected, connect, connector, name, icon, onClick }: Parameters<AA['children']>[0] & {name: string, icon: JSX.Element, onClick: () => void}) => {
+const WalletItem = ({ ready, connected, connect, connector, name, icon, onClick }: Parameters<IWalletItem['children']>[0] & {name: string, icon: JSX.Element, onClick: AnyFunc}) => {
   
 
     const handleClick = useCallback(async () => {
-        await connector.connect();
-        onClick();
+        const res = await connector.connect();
+        onClick(res.accounts[0]);
     }, []);
 
     return (

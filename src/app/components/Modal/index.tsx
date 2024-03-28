@@ -3,10 +3,11 @@ import styled from "styled-components";
 import { createPortal } from "react-dom";
 import { motion } from "framer-motion";
 import CloseIcon from "./CloseIcon";
+import { ReactElement, cloneElement, useCallback, useMemo, useState } from "react";
 
-const ModalWrapper = styled(motion.div)`
+const ModalWrapper = styled(motion.div)<{ $overlayColor?: string }>`
   position: fixed;
-  background: transparent;
+  background: ${props => props.$overlayColor || "transparent"};
   display: flex;
   justify-content: center;
   align-items: center;
@@ -17,15 +18,16 @@ const ModalWrapper = styled(motion.div)`
   bottom: 0;
 `;
 type Props = {
-  width?: number;
-  height?: number;
+  width?: number | string;
+  height?: number | string;
 };
 const ModalBody = styled.div<Props>`
   border-radius: 8px;
   border: ${(props) => `1px solid ${props.theme.colors.fill2}`};
   background: ${(props) => props.theme.colors.fill2};
-  width: ${(props) => props?.width + "px"};
-  height: ${(props) => props?.height + "px"};
+  width: ${(props) => (props?.width === "auto" ? "auto" : props?.width + "px")};
+  height: ${(props) =>
+    props?.height === "auto" ? "auto" : props?.height + "px"};
   padding: 15px 20px;
   display: flex;
   flex-direction: column;
@@ -57,6 +59,7 @@ const Header = styled.div`
 `;
 const Content = styled.div`
   flex: 1;
+  overflow: auto;
 `;
 const Footer = styled.div`
   border-top: ${(props) => `1px solid ${props.theme.colors.border1}`};
@@ -99,8 +102,8 @@ const CancelBtn = styled(Button)`
 `;
 const Modal: React.FC<{
   className?: string;
-  width?: number;
-  height?: number;
+  width?: number|string;
+  height?: number|string;
   visible: boolean;
   onClose?: Function;
   showHeader?: boolean;
@@ -113,6 +116,8 @@ const Modal: React.FC<{
   showCancelBtn?: boolean;
   onConfirm?: Function;
   onCancel?: Function;
+  /** 遮罩颜色 */
+  overlayColor?: string;
 }> = ({
   width = 400,
   height = 400,
@@ -128,10 +133,28 @@ const Modal: React.FC<{
   showCancelBtn = true,
   onConfirm,
   onCancel,
+  overlayColor,
+  className,
 }) => {
+
+  const [loading, updateLoading] = useState(false);
+
+  const handleConfirm = useCallback(() => {
+    async function run() {
+      updateLoading(true);
+      if(onConfirm){
+        await onConfirm();
+      }
+      updateLoading(false);
+    }
+    return run();
+    
+  }, [onConfirm]);
+
+
   return visible
     ? createPortal(
-        <ModalWrapper>
+        <ModalWrapper $overlayColor={overlayColor} className={className}>
           <ModalBody width={width} height={height}>
             {showHeader && (
               <Header>
@@ -156,11 +179,9 @@ const Modal: React.FC<{
                       </CancelBtn>
                     )}
                     <ConfirmBtn
-                      onClick={() => {
-                        onConfirm && onConfirm();
-                      }}
+                      onClick={handleConfirm}
                     >
-                      <div className="label">{confirmBtnText}</div>
+                      <div className="label">{confirmBtnText} {loading ? '...' : ''}</div>
                     </ConfirmBtn>
                   </Btns>
                 )}
@@ -168,7 +189,7 @@ const Modal: React.FC<{
             )}
           </ModalBody>
         </ModalWrapper>,
-        window.document.body
+        window.document.body,
       )
     : null;
 };

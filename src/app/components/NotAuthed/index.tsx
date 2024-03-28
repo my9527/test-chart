@@ -5,13 +5,14 @@ import { useCallback, useContext, useMemo } from "react";
 import { useSetRecoilState } from "recoil";
 import styled from "styled-components";
 import { useAccount, useSignMessage } from "wagmi";
+import LinearGradientButton from "../LinearGradientButton";
+import { Row } from "../Row";
 
 
 
-const Wrapper = styled.div`
+const Wrapper = styled(Row)`
     width: 100%;
     height: 100%;
-    color: red;
 `;
 
 
@@ -60,9 +61,9 @@ export const NotAuthed: FCC = ({ children }) => {
         let _content = null;
 
         if(!address || !isConnected) {
-            _content = <div onClick={() => updateWalletPanelStatu(true)}> sign in </div>;
+            _content = <LinearGradientButton onClick={() => updateWalletPanelStatu(true)}> sign in </LinearGradientButton>;
         } else if(!signed) {
-            _content = <div onClick={signMsg}>Sign Message</div>;
+            _content = <LinearGradientButton onClick={signMsg}>Sign Message</LinearGradientButton>;
         }
         
         return _content;
@@ -71,7 +72,7 @@ export const NotAuthed: FCC = ({ children }) => {
 
 
     if(content) {
-        return <Wrapper>{content}</Wrapper>;
+        return <Wrapper justify="center">{content}</Wrapper>;
     }
 
 

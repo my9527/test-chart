@@ -1,23 +1,32 @@
-import { useCallback } from "react"
+import { useCallback, useState } from "react"
 import styled from "styled-components"
 
 const Wrapper = styled.div`
   display: flex;
   flex-direction: column;
   gap: 10px;
+  width: 100%;
 `
 
 const FlexBox = styled.div`
   display: flex;
   gap: 10px;
+  width: 100%;
 `
-const Item = styled.div<{ active: boolean }>`
-  padding: 9px 32.5px;
-  background: ${props => props.active ? props.theme.colors.primary2 : props.theme.colors.fill3 };
+const Item = styled.div`
+  line-height: 32px;
+  flex-grow: 1;
+  text-align: center;
+  background: ${props => props.theme.colors.fill3 };
   border-radius: 30px;
-  color: ${props => props.active ? props.theme.colors.primary : props.theme.colors.text4};
+  color: ${props => props.theme.colors.text4};
   cursor: pointer;
-  border: ${props => `1px solid ${ props.active ? props.theme.colors.primary : 'transparent' }` };
+  border: 1px solid transparent;
+
+  &.active {
+    background: ${props => props.theme.colors.primary2};
+    color: ${props => props.theme.colors.text1};
+  }
 `
 
 const InputWrapper = styled.div`
@@ -58,45 +67,59 @@ const Suffix = styled.span`
 `
 
 const durationOptions = [
-  { label: "1M", value: '30' },
-  { label: "3M", value: '90' },
-  { label: "6M", value: '180' },
-  { label: "1Y", value: '365' },
+  { label: "30D", value: '30' },
+  { label: "90D", value: '90' },
+  { label: "180D", value: '180' },
+  { label: "360D", value: '360' },
 ]
 
 interface IDurationProps {
   value: string
   onChange: (value: string) => void
+  className?: string
 }
-const Duration = ({ value, onChange }: IDurationProps) => {
+
+const minCustomDuration = 30
+const maxCustomDuration = 360
+
+const Duration = ({ value, onChange, className }: IDurationProps) => {
+  const [customDuration, setCustomDuration] = useState('')
+  const [quickSelect, setQuickSelect] = useState('')
+
   const handleQuickSelect = (v: string) => () => {
+    setQuickSelect(v)
     onChange && onChange(v)
   }
 
   const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const input = event.target.value;
-    
+    setQuickSelect('')
     const numericValue = input.replace(/[^0-9]/g, '');
     //filter non-numeric input
     if (numericValue !== input) {
       event.preventDefault();
     }
-    onChange(numericValue);
+    setCustomDuration((Math.min(maxCustomDuration, +numericValue)).toString());
   }
+
+  const handleInputBlur = () => {
+    onChange && onChange(`${Math.max(minCustomDuration, +customDuration)}`);
+  }
+
   return (
-    <Wrapper>
+    <Wrapper className={className}>
       <FlexBox>
         {
           durationOptions.map((item) => {
             return (
-              <Item active={value === item.value} key={item.value} onClick={handleQuickSelect(item.value)}>{item.label}</Item>
+              <Item className={`duration-item ${item.value === quickSelect ? 'active' : ''}`} key={item.value} onClick={handleQuickSelect(item.value)}>{item.label}</Item>
             )
           })
         }
       </FlexBox>
       <InputWrapper>
-        <Input placeholder="Customize" value={value} onChange={handleInputChange} />
-        <DisplayInput>
+        <Input placeholder="Customize" value={customDuration} onBlur={handleInputBlur} onChange={handleInputChange} />
+        <DisplayInput className="customize-input">
           <Suffix>{ +value > 1 ? 'Days' : 'Day' }</Suffix>
         </DisplayInput>
       </InputWrapper>

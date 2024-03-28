@@ -13,6 +13,7 @@ const Wrapper = styled.div`
     height: 41px;
     padding-right: 8px;
     .label {
+      text-transform: capitalize;
       color: ${(props) => props.theme.colors.text1};
       font-family: Arial;
       font-size: ${(props) => props.theme.fontSize.medium};
@@ -57,27 +58,41 @@ const Wrapper = styled.div`
 `;
 
 const CurrencySelect: React.FC<{
-  list: string[];
+  list?: string[];
   curCurrency: string;
-  handleClick: Function;
+  handleClick?: Function;
   className?: string;
-}> = ({ list, curCurrency, handleClick, className }) => {
+  showSelect?: boolean;
+}> = ({
+  list = [],
+  curCurrency,
+  handleClick,
+  className,
+  showSelect = true,
+}) => {
   const [showList, setShowList] = useState(false);
   return (
     <Wrapper className={className}>
       <div className="cur_currency" onClick={() => setShowList(!showList)}>
         <p className="label">{curCurrency}</p>
-        <Image src={ArrowIcon} width={10} height={5} alt="" />
+        {showSelect && <Image src={ArrowIcon} width={10} height={5} alt="" />}
       </div>
-      {showList && (
+      {showList && showSelect && (
         <div className="currency_list">
           {list.map((item: string) => {
             return (
               <div
                 key={item}
-                className={`item ${curCurrency === item ? "active" : ""}`}
-                onClick={() => {
-                  handleClick(item);
+                className={`item ${
+                  curCurrency.toLocaleLowerCase() === item.toLocaleLowerCase()
+                    ? "active"
+                    : ""
+                }`}
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  e.nativeEvent.stopImmediatePropagation();
+                  handleClick && handleClick(item);
                   setShowList(false);
                 }}
               >

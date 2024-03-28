@@ -59,6 +59,8 @@ class TradingViewSocket {
 
     changingInterval: boolean = false;
 
+    paused: boolean = false;
+
 
     constructor(url_: string) {
         this.url = url_;
@@ -80,6 +82,14 @@ class TradingViewSocket {
                 this.subscribe(symbolInfo, interval, limit, onRealtimeCallback);
             }
         });
+    }
+
+    pause() {
+        this.paused = true;
+    }
+
+    resume() {
+        this.paused = false;
     }
 
 
@@ -219,6 +229,7 @@ class TradingViewSocket {
         }
 
         if (d.type === 'candle.stick.chart') {
+            if(this.paused) return;
 
             let _data = d?.data;
             if (_data) {
@@ -333,8 +344,10 @@ class TradingViewSocket {
                 param: this.curSubscriptionInfo?.interval
             });
             this.curSubscriptionInfo = undefined;
-
+            // 更新订阅topic 时，清空历史数据，避免出现数据错乱的情况
             await sleep(1000);
+
+            this.clearData();
         }
     }
 
@@ -367,6 +380,7 @@ class TradingViewSocket {
         to: number,
         onHistoryCallback?: HistoryCallback,
     ) {
+
         // if (!this.connection || !this.inited) return;
 
         const result = await getHistoryChartData({

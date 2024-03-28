@@ -2,6 +2,9 @@ import styled, { keyframes } from "styled-components"
 import Image from "next/image";
 import DotBg from "@/app/assets/stake/breath-light.png";
 import RoundImg from "@/app/assets/stake/round.svg"
+import RoundBgGif from "@/app/assets/stake/round-bg.gif"
+import AnimateJson from './data.json'
+import Lottie from 'lottie-react';
 
 const Wrapper = styled.div`
   position: relative;
@@ -56,6 +59,12 @@ const StyledImage = styled(Image)`
   top: 0;
 `
 
+const StyledAnimate = styled(Lottie)`
+  position: absolute;
+  left: 0;
+  top: 0;
+`
+
 const FlexItem = styled.div`
   display: flex;
   align-items: center;
@@ -87,8 +96,8 @@ const SharePanel = styled.div`
   justify-content: center;
   flex-direction: column;
   gap: 45px;
-  border: 1px solid ${props => props.theme.colors.primary1};
   border-radius: 50%;
+  position: relative;
 `
 
 export function ChartContent() {
@@ -98,6 +107,7 @@ export function ChartContent() {
       <BreathLight alt="" src={DotBg} />
       <ChartWrapper>
         <SharePanel>
+          <StyledAnimate animationData={AnimateJson} loop={true}/>
           <FlexItem>
             <Label>Your Score</Label>
             <Share>123,123.00</Share>

@@ -3,7 +3,11 @@ import Footer from "../components/Footer";
 import styled from "styled-components";
 
 import { CmptMarketSocket } from "../components/SocketMarket";
-import { OpenInterestsEffects } from "../components/OpenInterestsEffects";
+import { PerpetualEffects } from "../components/Effects";
+import { useParams } from "next/navigation";
+import { useEffect } from "react";
+import { useSetRecoilState } from "recoil";
+import { recoilPerpetualToken } from "@/app/models";
 
 const Wrapper = styled.div`
   height: calc(100vh - 50px);
@@ -36,10 +40,19 @@ const Content = styled.div`
   }
 `;
 const PerpetualLayout = ({ children }: { children: React.ReactNode }) => {
+
+  const params = useParams<{ symbol: string }>();
+  const updateSymbol = useSetRecoilState(recoilPerpetualToken);
+
+  useEffect(() => {
+    updateSymbol(params.symbol);
+  }, [params.symbol]);
+
+
   return (
     <Wrapper>
       <CmptMarketSocket />
-      <OpenInterestsEffects />
+      <PerpetualEffects />
       <Content>{children}</Content>
       <Footer />
     </Wrapper>

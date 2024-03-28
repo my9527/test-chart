@@ -1,6 +1,6 @@
 
 
-import { zkFair, arbitrumOne, zkFairTestnet, arbitrumGoerliTest } from "./chains";
+import { zkFair, arbitrumOne, zkFairTestnet, arbitrumGoerliTest, arbitrumSepoliaTest, iotexTest } from "./chains";
 
 export const IS_LOCAL = process.env.NODE_ENV === "development";
 
@@ -15,6 +15,8 @@ export enum CHAINS_ID {
     'arbitrum' = arbitrumOne.id,
     'zkfairtest' = zkFairTestnet.id,
     'arbitrumGoerli' = arbitrumGoerliTest.id,
+    'arbitrumSepolia' = arbitrumSepoliaTest.id,
+    'iotxTest' = iotexTest.id,
 }
 
 // default chain id for app
@@ -44,12 +46,12 @@ export const DefaultRemainCollateralRatio = 0.5 / 100;
 
 
 // default tradingFeeRatio
-export const  BasicTradingFeeRatio = 0.08;
+export const  BasicTradingFeeRatio = 0.08; // 这里指代的是 0.0008, 计算使用时需要 0.08 / 100;
 
 
 // 
 export const generateSignApiTokenMessage = (address: string, now: number) => `
-Welcome to HyperionX.
+Welcome!
 Your address: ${address}
 Timestamp: ${now}
 `

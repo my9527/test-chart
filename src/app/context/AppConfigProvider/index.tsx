@@ -5,7 +5,7 @@ import { defineChain } from "viem";
 import { useChainId } from "wagmi";
 
 import { CHAINS_ID, DEFAULT_CHAIN_ID } from "@/app/config/common";
-import { arbitrumGoerliTest, arbitrumOne, zkFair, zkFairTestnet } from "@/app/config/chains";
+import { arbitrumGoerliTest, arbitrumOne, iotexTest, zkFair, zkFairTestnet } from "@/app/config/chains";
 
 import addressMap from "@/app/config/contract_address";
 
@@ -19,6 +19,7 @@ export type AppConfigType = {
   api: {
     http: string;
     wss: string;
+    common?: string;
   };
 
   rpc: {
@@ -27,7 +28,9 @@ export type AppConfigType = {
   };
 
     executionFee: string | number | BigNumber;
-    contract_address: typeof addressMap[CHAINS_ID.zkfair];
+    contract_address: {
+      [key in keyof typeof addressMap[CHAINS_ID.zkfair]]: `0x${string}`
+    };
     epoch_duration: number; // 每个epoch 的周期 ， h 为单位
 
 }
@@ -75,7 +78,7 @@ const AppConfigOnChain: Record<number, AppConfigType> = {
 
     // config api
     api: {
-      http: "https://api-testnet.substancex.io/",
+      http: "https://api-zkfair-testnet.substancex.io/api/backend/",
       wss: "wss://api-testnet.substancex.io/",
     },
 
@@ -135,6 +138,33 @@ const AppConfigOnChain: Record<number, AppConfigType> = {
     executionFee: '300000000000000',
     contract_address: addressMap[CHAINS_ID.arbitrumGoerli],
 
+    epoch_duration: 1,
+  },
+  [CHAINS_ID.iotxTest]: {
+    chain: iotexTest,
+    // config graphhql
+    // config graphhql
+    graph: {
+      base: 'https://gql-testnet.substancex.io/subgraphs/name/substanceexchangedevelop/iotex_testnet',
+      perpetual: 'https://gql-testnet.substancex.io/subgraphs/name/substanceexchangedevelop/iotex_testnet',
+      baseBlock: 'https://gql-testnet.substancex.io/subgraphs/name/substanceexchangedevelop/iotex_blocks',
+    },
+
+    // config rpc
+    rpc: {
+      http: "https://babel-api.testnet.iotex.one",
+      wss: "https://babel-api.testnet.iotex.one/wss",
+    },
+
+    // config api
+    api: {
+      http: "https://api-iotex-test.substancex.io/api/backend/",
+      common: "https://api-testnet.substancex.io/api/backend/",
+      wss: "wss://api-testnet.substancex.io/",
+    },
+
+    executionFee: '500000000000000',
+    contract_address: addressMap[CHAINS_ID.iotxTest],
     epoch_duration: 1,
   }
 };

@@ -48,3 +48,10 @@ Check out our [Next.js deployment documentation](https://nextjs.org/docs/deploym
 
         - perpetural: /perpetural 路由
         - dashboard: /dashboard  路由
+
+
+
+### 上币
+* /public/tokens 增加images
+* /src/app/config/token-sort-tags.txt 更新tag 及排序, build 会直接生成对应的json 文档
+* /src/app/config/tokens base 中增加对应的token 即可

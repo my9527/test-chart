@@ -4,27 +4,24 @@ import styled from "styled-components"
 import ArrowDownIcon from "@/app/assets/stake/arrow-down.svg"
 import Image from "next/image"
 import { TwoTabs } from "@/app/components/TwoTabs"
-import BalanceInput from "@/app/components/BalanceInput"
+import BalanceInput from "../BalanceInput"
 import Button from '@/app/components/LinearGradientButton'
+import FlexBox from '@/app/components/FlexBox'
+
 enum TradeType {
   Buy = 'buy',
   Sell = 'sell'
 }
 
 const ImageWrapper = styled.div`
-  margin: 10px 0;
+  margin: 10px auto;
   text-align: center;
+  width: 40px;
+  height: 40px;
 `
 
 const Content = styled.div`
   padding: 20px 35px 15px;
-`
-
-
-const FlexBox = styled.div<{ justify?: string }>`
-  display: flex;
-  justify-content: ${props => props.justify || "flex-start"};
-  align-items: center;
 `
 
 const Label = styled.div`
@@ -42,7 +39,7 @@ const Form = styled.div`
   display: flex;
   flex-direction: column;
   gap: 12px;
-  margin: 20px 0;
+  margin: 18px 0;
 `
 
 const token = 'QLP'
@@ -90,16 +87,16 @@ export function BuySellContent() {
         />
         <Form>
           <Label>{`1 ${token} = 1.00 USDX`}</Label>
-          <FlexBox justify="space-between">
+          <FlexBox justifyContent="space-between">
             <Label>Fees</Label>
             <Value>-</Value>
           </FlexBox>
-          <FlexBox justify="space-between">
+          <FlexBox justifyContent="space-between">
             <Label>{`Est. ${token} received`}</Label>
             <Value>123,123.00</Value>
           </FlexBox>
         </Form>
-        <FlexBox justify="center"><Button>{type === TradeType.Sell ? 'Sell' : 'Buy'}</Button></FlexBox>
+        <FlexBox justifyContent="center"><Button>{type === TradeType.Sell ? 'Sell' : 'Buy'}</Button></FlexBox>
       </Content>
     </>
   )

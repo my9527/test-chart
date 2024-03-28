@@ -11,12 +11,15 @@ import { recoilPositions } from "@/app/models";
 import BigNumber from "bignumber.js";
 import useGraphqlFetch from "@/app/hooks/useGraphqlFetch";
 import { useTokens, useTokensIdMap, useTokensMap } from "@/app/hooks/useTokens";
-import { NUMBER_READABLE_DECIMAL } from "@/app/config/common";
+import { FutureType, NUMBER_READABLE_DECIMAL } from "@/app/config/common";
 import { useAppConfig } from "@/app/hooks/useAppConfig";
 import { AbiItem, createPublicClient, decodeEventLog, fallback, http, webSocket } from "viem";
 import { useContractParams } from "@/app/hooks/useContractParams";
 import { queryAbiEventByName } from "@/app/lib/queryAbiEventByName";
 import { compareAddress } from "@/app/lib/compareAddress";
+import { useMessage } from "../Message";
+import OrderMessage from "../Message/OrderMessage";
+import { useUpdateOrders } from "@/app/hooks/useUpdateOrders";
 
 
 
@@ -28,17 +31,17 @@ import { compareAddress } from "@/app/lib/compareAddress";
  */
 const _resolvePosition = (i: any, tokens: any) => {
 
-        const collateralReadable = BigNumber(i?.collateral || '0').div(NUMBER_READABLE_DECIMAL).toString();
-        const openCostReadable = BigNumber(i?.openCost || '0').div(NUMBER_READABLE_DECIMAL).toString();
-        const entryBorrowingFeePerTokenReadable = BigNumber(i?.entryBorrowingFeePerToken || '0').div(NUMBER_READABLE_DECIMAL).toString();
-        const entryFundingFeePerTokenReadable = BigNumber(i?.entryFundingFeePerToken || '0').div(NUMBER_READABLE_DECIMAL).toString();
+    const collateralReadable = BigNumber(i?.collateral || '0').div(NUMBER_READABLE_DECIMAL).toString();
+    const openCostReadable = BigNumber(i?.openCost || '0').div(NUMBER_READABLE_DECIMAL).toString();
+    const entryBorrowingFeePerTokenReadable = BigNumber(i?.entryBorrowingFeePerToken || '0').div(NUMBER_READABLE_DECIMAL).toString();
+    const entryFundingFeePerTokenReadable = BigNumber(i?.entryFundingFeePerToken || '0').div(NUMBER_READABLE_DECIMAL).toString();
 
-        const cumulativeFundingFeeReadable = BigNumber(i.cumulativeFundingFee || '0').div(NUMBER_READABLE_DECIMAL).toString();
-        const cumulativeBorrowingFeeReadable = BigNumber(i.cumulativeBorrowingFee || '0').div(NUMBER_READABLE_DECIMAL).toString();
-        const cumulativeTeamFeeReadable = BigNumber(i.cumulativeTeamFee || '0').div(NUMBER_READABLE_DECIMAL).toString();
-        const positionReadable = BigNumber(i?.tokenSize || '0').multipliedBy(tokens[i.futureId].pars).toString();
-        const entryPriceReadable = BigNumber(openCostReadable).div(positionReadable).toString();
-        const maxProfitReadable = BigNumber(collateralReadable).multipliedBy(i.maxProfitRatio).toFixed(6, BigNumber.ROUND_DOWN);
+    const cumulativeFundingFeeReadable = BigNumber(i.cumulativeFundingFee || '0').div(NUMBER_READABLE_DECIMAL).toString();
+    const cumulativeBorrowingFeeReadable = BigNumber(i.cumulativeBorrowingFee || '0').div(NUMBER_READABLE_DECIMAL).toString();
+    const cumulativeTeamFeeReadable = BigNumber(i.cumulativeTeamFee || '0').div(NUMBER_READABLE_DECIMAL).toString();
+    const positionReadable = BigNumber(i?.tokenSize || '0').multipliedBy(tokens[i.futureId].pars).toString();
+    const entryPriceReadable = BigNumber(openCostReadable).div(positionReadable).toString();
+    const maxProfitReadable = BigNumber(collateralReadable).multipliedBy(i.maxProfitRatio).toFixed(6, BigNumber.ROUND_DOWN);
     return {
         ...i,
         collateralReadable,
@@ -51,27 +54,27 @@ const _resolvePosition = (i: any, tokens: any) => {
         positionReadable,
         entryPriceReadable,
         maxProfitReadable,
-                    // isLong,
+        // isLong,
     }
 }
 
 
 const _replaceOrPush = (preList: any[], data: AnyObjec, targetKey: string) => {
-        let newList: any[] = [];
-        let isPosExist = false;
-        for(let po of preList) {
-            // 这里一般进行字符串比较，所以转一下小写，避免出现大小写不匹配的问题
-            if(po[targetKey].toLowerCase() !== data[targetKey].toLowerCase()) {
-                newList.push(po);
-            } else {
-                isPosExist = true;
-                newList.push(data);
-            }
-        }
-        if(!isPosExist){
+    let newList: any[] = [];
+    let isPosExist = false;
+    for (let po of preList) {
+        // 这里一般进行字符串比较，所以转一下小写，避免出现大小写不匹配的问题
+        if (po[targetKey].toLowerCase() !== data[targetKey].toLowerCase()) {
+            newList.push(po);
+        } else {
+            isPosExist = true;
             newList.push(data);
         }
-        return newList;
+    }
+    if (!isPosExist) {
+        newList.push(data);
+    }
+    return newList;
 }
 
 
@@ -83,9 +86,14 @@ export const OpenPostionsEffects = memo(() => {
     // const [,updatePositionList] = useRecoilState(recoilPositions);
     const updatePositionList = useSetRecoilState(recoilPositions);
 
+
     const getFuturesPositions = useGraphqlFetch('perpetual', futurePositionsGql);
     const tokens = useTokensIdMap();
     const appConfig = useAppConfig();
+
+    const { preResolveOrder, updateOrders } = useUpdateOrders();
+
+    const msg = useMessage();
 
 
 
@@ -96,31 +104,31 @@ export const OpenPostionsEffects = memo(() => {
 
         async function _run() {
 
-            const data = await getFuturesPositions({address: user_});
+            const data = await getFuturesPositions({ address: user_ });
 
-            if(!data) {
+            if (!data) {
                 updatePositionList([]);
-                return ;
+                return;
             }
 
 
             const result = Object.values(data)
-            ?.flat(Infinity)
-            .filter((i) => BigNumber(i.collateral).gt(0))
-            .map((i: any) => {
-                
+                ?.flat(Infinity)
+                .filter((i) => BigNumber(i.collateral).gt(0))
+                .map((i: any) => {
 
-                const isLong = i.future.toLowerCase() === appConfig.contract_address.LongAddress.toLowerCase();
 
-                const resolvedPos = _resolvePosition(i, tokens);
+                    const isLong = i.future.toLowerCase() === appConfig.contract_address.LongAddress.toLowerCase();
 
-                return {
-                    ...resolvedPos,
-                    isLong,
+                    const resolvedPos = _resolvePosition(i, tokens);
 
-                }
-                // const positionReadable = BigNumber(i?.tokenSize || '0').multipliedBy(par).toString();
-            });
+                    return {
+                        ...resolvedPos,
+                        isLong,
+
+                    }
+                    // const positionReadable = BigNumber(i?.tokenSize || '0').multipliedBy(par).toString();
+                });
 
             updatePositionList(result);
         }
@@ -133,14 +141,14 @@ export const OpenPostionsEffects = memo(() => {
     // fetch position from graphql
     const { run, error } = useRequest(queryPositions, {
         manual: true,
-        pollingInterval: 15000,
+        pollingInterval: 1000 * 10, // 由于使用socket 监听，这里的轮训时间将拉长，以防止数据冲突的问题，轮训时间将超过graph 收录时间
         // defaultParams: [address],
         refreshDeps: [queryPositions],
     });
 
     // 地址变更之后重新获取数据
     useEffect(() => {
-        if(address) {
+        if (address) {
             run(address);
         }
 
@@ -152,7 +160,7 @@ export const OpenPostionsEffects = memo(() => {
 
     const txPublicClient = useMemo(() => {
         const transports = [];
-        if(appConfig.rpc.wss) {
+        if (appConfig.rpc.wss) {
             transports.push(webSocket(appConfig.rpc.wss))
         }
         transports.push(http(appConfig.rpc.http));
@@ -160,21 +168,26 @@ export const OpenPostionsEffects = memo(() => {
             batch: {
                 multicall: {
                     batchSize: 2048,
-                  },
+                },
             },
+            chain: appConfig.chain,
             transport: fallback(transports),
         });
         return client;
-    }, []);
+    }, [appConfig]);
 
     const LongContractParams = useContractParams(appConfig.contract_address.LongAddress);
     const ShortContractParams = useContractParams(appConfig.contract_address.ShortAddress);
     const LimitOrderContractParams = useContractParams(appConfig.contract_address.LimitOrderImplementationAddress);
+    const MarketOrderContractParams = useContractParams(appConfig.contract_address.MarketOrderImplementationAddress);
+    const StopOrderContractParams = useContractParams(appConfig.contract_address.StopOrderImplementationAddress)
 
+    const UpdateCollateralContractParams = useContractParams(appConfig.contract_address.UpdateCollateralOrderImplementationAddress);
 
     const listenEvents = useCallback(() => {
 
 
+        /**************************  Create  **************************/
         // const UpdatePositionEvent = LongContractParams.abi.filter(i => i.name === 'UpdatePosition')[0];
         const UpdatePositionLongEvent = queryAbiEventByName('UpdatePosition', LongContractParams.abi as AbiItem[]);
         // watch UpdatePosition
@@ -187,9 +200,9 @@ export const OpenPostionsEffects = memo(() => {
                     data: logs?.[0]?.data,
                     topics: logs?.[0]?.topics,
                 });
-                
+
                 const args = evt.args as any;
-                if(evt.eventName !== 'UpdatePosition' || compareAddress(args.user, address)){
+                if (evt.eventName !== 'UpdatePosition' || compareAddress(args.user, address)) {
                     return
                 }
                 const {
@@ -225,9 +238,12 @@ export const OpenPostionsEffects = memo(() => {
                     isLong: LongContractParams.address === appConfig.contract_address.LongAddress,
                 }, tokens);
 
+
+
                 updatePositionList((preList) => {
                     return _replaceOrPush(preList, pos, 'id');
                 });
+
 
             }
         });
@@ -244,9 +260,9 @@ export const OpenPostionsEffects = memo(() => {
                     data: logs?.[0]?.data,
                     topics: logs?.[0]?.topics,
                 });
-                
+
                 const args = evt.args as any;
-                if(evt.eventName !== 'UpdatePosition' || compareAddress(args.user, address)){
+                if (evt.eventName !== 'UpdatePosition' || compareAddress(args.user, address)) {
                     return
                 }
                 const {
@@ -293,21 +309,458 @@ export const OpenPostionsEffects = memo(() => {
         const IncreaseLimitOrder = queryAbiEventByName('CreateIncreaseLimitOrder', LimitOrderContractParams.abi as AbiItem[]);
         const DecreaseLimitOrder = queryAbiEventByName('CreateDecreaseLimitOrder', LimitOrderContractParams.abi as AbiItem[]);
 
-        const unwatchCreateIncreaseLimitOrder = txPublicClient.watchEvent({
+        console.log("watch event", IncreaseLimitOrder.name, DecreaseLimitOrder.name);
+        // CreateIncreaseLimitOrder CreateDecreaseLimitOrder 一起处理，部分逻辑一致，除了两个参数外
+        const unwatchIncreaseLimitOrder = txPublicClient.watchEvent({
             address: LimitOrderContractParams.address as Addr,
-            events: [IncreaseLimitOrder, DecreaseLimitOrder],
+            // events: [IncreaseLimitOrder, DecreaseLimitOrder],
+            event: IncreaseLimitOrder,
             onLogs: (logs) => {
+                const props = decodeEventLog({
+                    abi: LimitOrderContractParams.abi,
+                    data: logs?.[0]?.data,
+                    topics: logs?.[0]?.topics,
+                });
+                console.log("event ", props);
 
-                console.log("watched limited orders change", logs);
+                // 校验事件名称
+                if ([IncreaseLimitOrder, DecreaseLimitOrder].every(v => props.eventName != v.name)) {
+                    return;
+                }
+                const {
+                    user,
+                    nonce,
+                    future,
+                    futureId,
+                    price,
+                    executionFee,
+                    decreaseTokenSize,  // 减仓 CreateDecreaseLimitOrder
+                    offset,             // 减仓 CreateDecreaseLimitOrder
+                    increaseCollateral, // 开多 CreateIncreaseLimitOrder
+                    increaseTokenSize,  // 开多 CreateIncreaseLimitOrder
+                } = props?.args as any;
+                const { blockNumber, transactionHash } = logs?.[0];
+                const createHash = transactionHash;
+                const createBlock = blockNumber;
+                if (user?.toLowerCase() !== address?.toLowerCase()) return;
+                const id = `${user.toLowerCase()}-${nonce.toString()}`;
+                const isLong = compareAddress(LongContractParams.address, future);
+
+                const paramInGraph: AnyObjec = {
+                    id: id.toString(),
+                    future: future.toString(),
+                    user: user.toString(),
+                    nonce: nonce.toString(),
+                    futureId: futureId.toString(),
+                    price: price?.toString(),
+                    executionFee: executionFee.toString(),
+                    createHash: createHash.toString(),
+                    createBlock: createBlock.toString(),
+                    isLong: isLong,
+                };
+
+                if (props.eventName === DecreaseLimitOrder.name) {
+                    paramInGraph.decreaseTokenSize = decreaseTokenSize.toString();
+                    paramInGraph.offset = offset.toString();
+                } else if (props.eventName === DecreaseMarketOrder.name) {
+                    paramInGraph.increaseCollateral = increaseCollateral.toString();
+                    paramInGraph.increaseTokenSize = increaseTokenSize.toString();
+                }
+
+                const curToken = tokens[futureId];
+
+                console.log("event: ", props.eventName, curToken.symbolName, createHash);
+
+                // OrderMessage
+                msg({
+                    content: (index: number) => {
+                        return (
+                            <OrderMessage
+                                position="bottom_right"
+                                index={index}
+                                orderType="limit_open"
+                                orderStatus="Created"
+                                symbolName={curToken.symbolName}
+                                isLong={isLong}
+                            />
+                        );
+                    },
+                });
+                updateOrders(paramInGraph, props.eventName, false);
+            }
+
+        });
+        const unwatchDecreaseLimitOrder = txPublicClient.watchEvent({
+            address: LimitOrderContractParams.address as Addr,
+            // events: [IncreaseLimitOrder, DecreaseLimitOrder],
+            event: DecreaseLimitOrder,
+            onLogs: (logs) => {
+                const props = decodeEventLog({
+                    abi: LimitOrderContractParams.abi,
+                    data: logs?.[0]?.data,
+                    topics: logs?.[0]?.topics,
+                });
+                console.log("event ", props);
+
+                // 校验事件名称
+                if ([DecreaseLimitOrder].every(v => props.eventName != v.name)) {
+                    return;
+                }
+                const {
+                    user,
+                    nonce,
+                    future,
+                    futureId,
+                    price,
+                    executionFee,
+                    decreaseTokenSize,  // 减仓 CreateDecreaseLimitOrder
+                    offset,             // 减仓 CreateDecreaseLimitOrder
+                    increaseCollateral, // 开多 CreateIncreaseLimitOrder
+                    increaseTokenSize,  // 开多 CreateIncreaseLimitOrder
+                } = props?.args as any;
+                const { blockNumber, transactionHash } = logs?.[0];
+                const createHash = transactionHash;
+                const createBlock = blockNumber;
+                if (user?.toLowerCase() !== address?.toLowerCase()) return;
+                const id = `${user.toLowerCase()}-${nonce.toString()}`;
+                const isLong = compareAddress(LongContractParams.address, future);
+
+                const paramInGraph: AnyObjec = {
+                    id: id.toString(),
+                    future: future.toString(),
+                    user: user.toString(),
+                    nonce: nonce.toString(),
+                    futureId: futureId.toString(),
+                    price: price?.toString(),
+                    executionFee: executionFee.toString(),
+                    createHash: createHash.toString(),
+                    createBlock: createBlock.toString(),
+                    isLong: isLong,
+                };
+
+                if (props.eventName === DecreaseLimitOrder.name) {
+                    paramInGraph.decreaseTokenSize = decreaseTokenSize.toString();
+                    paramInGraph.offset = offset.toString();
+                } else if (props.eventName === DecreaseMarketOrder.name) {
+                    paramInGraph.increaseCollateral = increaseCollateral.toString();
+                    paramInGraph.increaseTokenSize = increaseTokenSize.toString();
+                }
+
+                const curToken = tokens[futureId];
+
+                console.log("event: ", props.eventName, curToken.symbolName, createHash);
+
+                // OrderMessage
+                msg({
+                    content: (index: number) => {
+                        return (
+                            <OrderMessage
+                                position="bottom_right"
+                                index={index}
+                                orderType="limit_open"
+                                orderStatus="Created"
+                                symbolName={curToken.symbolName}
+                                isLong={isLong}
+                            />
+                        );
+                    },
+                });
+                updateOrders(paramInGraph, props.eventName, false);
             }
 
         });
 
 
+        const IncreaseMarketOrder = queryAbiEventByName('CreateIncreaseMarketOrder', MarketOrderContractParams.abi);
+        const DecreaseMarketOrder = queryAbiEventByName('CreateDecreaseMarketOrder', MarketOrderContractParams.abi);
+        console.log("IncreaseMarketOrder", IncreaseMarketOrder);
+        // CreateIncreaseLimitOrder CreateDecreaseLimitOrder 一起处理，部分逻辑一致，除了两个参数外
+        const unwatchChangeMarketOrder = txPublicClient.watchEvent({
+            address: MarketOrderContractParams.address as Addr,
+            events: [IncreaseMarketOrder, DecreaseMarketOrder],
+            onLogs: (logs) => {
+                const props = decodeEventLog({
+                    abi: MarketOrderContractParams.abi,
+                    data: logs?.[0]?.data,
+                    topics: logs?.[0]?.topics,
+                });
+
+                // 校验事件名称
+                if ([IncreaseMarketOrder, DecreaseMarketOrder].every(v => props.eventName != v.name)) {
+                    return;
+                }
+                // const { user, nonce, future, futureId, decreaseTokenSize, executePrice, executionFee, deadline } = props?.args;
+                const {
+                    user,
+                    nonce,
+                    future,
+                    futureId,
+                    price,
+                    executionFee,
+                    deadline,
+                    executePrice,
+                    decreaseTokenSize,  // 减仓 CreateDecrease
+                    offset,             // 减仓 CreateDecrease
+                    increaseCollateral, // 开多 CreateIncrease
+                    increaseTokenSize,  // 开多 CreateIncrease
+                } = props?.args as any;
+                const { blockNumber, transactionHash } = logs?.[0];
+                const createHash = transactionHash;
+                const createBlock = blockNumber;
+                if (user?.toLowerCase() !== address?.toLowerCase()) return;
+                const id = `${user.toLowerCase()}-${nonce.toString()}`;
+                const isLong = compareAddress(LongContractParams.address, future);
+                const futureType = compareAddress(LongContractParams.address, future) ? FutureType.LONG : FutureType.SHORT;
+
+                const paramInGraph: AnyObjec = {
+                    id: id.toString(),
+                    future: future.toString(),
+                    user: user.toString(),
+                    nonce: nonce.toString(),
+                    futureId: futureId.toString(),
+                    price: price?.toString(),
+                    executionFee: executionFee.toString(),
+                    createHash: createHash.toString(),
+                    createBlock: createBlock.toString(),
+                    deadline: deadline.toString(),
+                    isLong: isLong,
+                    executePrice: executePrice.toString(),
+                    status: 0,
+                };
+
+                if (props.eventName === DecreaseMarketOrder.name) {
+                    paramInGraph.decreaseTokenSize = decreaseTokenSize.toString();
+                    paramInGraph.offset = offset.toString();
+                } else if (props.eventName === IncreaseMarketOrder.name) {
+                    paramInGraph.increaseCollateral = increaseCollateral.toString();
+                    paramInGraph.increaseTokenSize = increaseTokenSize.toString();
+                }
+
+                const curToken = tokens[futureId];
+
+                console.log("event: ", props.eventName, curToken.symbolName, createHash);
+                msg({
+                    content: (index: number) => {
+                        return (
+                            <OrderMessage
+                                position="bottom_right"
+                                index={index}
+                                orderType="limit_open"
+                                orderStatus="Created"
+                                symbolName={curToken.symbolName}
+                                isLong={isLong}
+                            />
+                        );
+                    },
+                });
+                // const _order = preResolveOrder(paramInGraph, )
+                updateOrders(paramInGraph, props.eventName, false);
+                
+            }
+
+        });
+
+
+        const CreateStopOrder = queryAbiEventByName('CreateFutureStopOrder', StopOrderContractParams.abi);
+
+        const unwatchCreateFutureStopOrder = txPublicClient.watchEvent({
+            address: StopOrderContractParams.address,
+            event: CreateStopOrder,
+            onLogs: (logs) => {
+                const props: AnyObjec = decodeEventLog({
+                    abi: StopOrderContractParams.abi,
+                    data: logs?.[0]?.data,
+                    topics: logs?.[0]?.topics,
+                });
+
+                if (props.eventName !== CreateStopOrder.name) return;
+                const { user, nonce, offset, future, futureId, decreaseTokenSize, triggerPrice, isStopLoss, executionFee } = props?.args;
+                const { blockNumber, transactionHash } = logs?.[0];
+                const createHash = transactionHash;
+                const createBlock = blockNumber;
+                if (user?.toLowerCase() !== address?.toLowerCase()) return;
+                const id = `${user.toLowerCase()}-${nonce.toString()}`;
+                const isLong = compareAddress(LongContractParams.address, future);
+                const futureType = compareAddress(LongContractParams.address, future) ? FutureType.LONG : FutureType.SHORT;
+                const paramInGraph = {
+                    id: id.toString(),
+                    offset: offset.toString(),
+                    future: future.toString(),
+                    user: user.toString(),
+                    nonce: nonce.toString(),
+                    futureId: futureId.toString(),
+                    decreaseTokenSize: decreaseTokenSize.toString(),
+                    triggerPrice: triggerPrice.toString(),
+                    isStopLoss: isStopLoss,
+                    executionFee: executionFee.toString(),
+                    // cancelReason: // cancelReason.toString(),
+                    // status: // status.toString(),
+                    // createTime: '/',
+                    createHash: createHash.toString(),
+                    createBlock: createBlock.toString(),
+                    isLong: futureType === FutureType.LONG,
+                    status: 0,
+                };
+
+                const curToken = tokens[futureId];
+                msg({
+                    content: (index: number) => {
+                        return (
+                            <OrderMessage
+                                position="bottom_right"
+                                index={index}
+                                orderType="stop"
+                                orderStatus="Created"
+                                symbolName={curToken.symbolName}
+                                isLong={isLong}
+                            />
+                        );
+                    },
+                });
+
+
+
+
+            }
+        });
+
+
+        const UpdateColloteral = queryAbiEventByName('CreateUpdateCollateralOrder', UpdateCollateralContractParams.abi);
+
+
+        const unwatchCreateUpdateCollateralOrder = txPublicClient.watchEvent({
+            address: UpdateCollateralContractParams.address,
+            event: UpdateColloteral,
+            onLogs: (logs) => {
+                const props: AnyObjec = decodeEventLog({
+                    abi: UpdateCollateralContractParams.abi,
+                    data: logs?.[0]?.data,
+                    topics: logs?.[0]?.topics,
+                });
+                if (props.eventName !== UpdateColloteral.name) return;
+                const { user, nonce, offset, future, futureId, deltaAmount, increase, executionFee } = props?.args;
+
+                const { blockNumber, transactionHash } = logs?.[0];
+
+                const createHash = transactionHash;
+                const createBlock = blockNumber;
+
+                if (user?.toLowerCase() !== address?.toLowerCase()) return;
+                const id = `${user.toLowerCase()}-${nonce.toString()}`;
+                const isLong = compareAddress(LongContractParams.address, future);
+                const paramInGraph = {
+                    id: id.toString(),
+                    offset: offset.toString(),
+                    future: future.toString(),
+                    user: user.toString(),
+                    nonce: nonce.toString(),
+                    futureId: futureId.toString(),
+                    deltaAmount: deltaAmount.toString(),
+                    increase: increase.toString(),
+                    executionFee: executionFee.toString(),
+                    // cancelReason: // cancelReason.toString(),
+                    // status: // status.toString(),
+                    // createTime: '/',
+                    createHash: createHash.toString(),
+                    createBlock: createBlock.toString(),
+                    status: 0,
+                };
+                const curToken = tokens[futureId];
+                msg({
+                    content: (index: number) => {
+                        return (
+                            <OrderMessage
+                                position="bottom_right"
+                                index={index}
+                                orderType="margin_update"
+                                orderStatus="Updated"
+                                symbolName={curToken.symbolName}
+                                isLong={isLong}
+                            />
+                        );
+                    },
+                });
+
+            }
+        })
+
+
+
+
+        /**************************  Cancel  **************************/
+
+
+        const CancelIncreaseLimitOrder = queryAbiEventByName('CancelIncreaseLimitOrder', LimitOrderContractParams.abi);
+        const CancelDecreaseLimitOrder = queryAbiEventByName('CancelDecreaseLimitOrder', LimitOrderContractParams.abi);
+
+        const unwatchCancelChangeLimitOrder = txPublicClient.watchEvent({
+            address: LimitOrderContractParams.address,
+            events: [CancelIncreaseLimitOrder, CancelDecreaseLimitOrder],
+            onLogs: (logs) => {
+                const props: AnyObjec = decodeEventLog({
+                    abi: LimitOrderContractParams.abi,
+                    data: logs?.[0]?.data,
+                    topics: logs?.[0]?.topics,
+                });
+
+
+                console.log("unwatchCancelChangeLimitOrder: ", props);
+
+                const { user, nonce, reason } = props?.args;
+
+                const { blockNumber, transactionHash } = logs?.[0];
+
+                const createHash = transactionHash;
+                const createBlock = blockNumber;
+
+                if (user?.toLowerCase() !== address?.toLowerCase()) return;
+
+                const id = `${user.toLowerCase()}-${nonce.toString()}`;
+
+                const paramInGraph = {
+                    id: id.toString(),
+                    cancelReason: reason.toString(),
+                    status: '2',
+                    nonce: nonce.toString(),
+                    // createTime: '/',
+                    createHash: createHash.toString(),
+                    createBlock: createBlock.toString(),
+                };
+
+                msg({
+                    content: (index: number) => {
+                        return (
+                            <OrderMessage
+                                position="bottom_right"
+                                index={index}
+                                orderType="limit_cancel"
+                                orderStatus="Canceld"
+                                symbolName={""}
+                                isLong={false}
+                            />
+                        );
+                    },
+                });
+                
+            }
+        });
+
+
+
+        /**************************  Excute  **************************/
+
+
+
+
         return [
             unWatchLeverageLong,
             unWatchLeverageShort,
-            unwatchCreateIncreaseLimitOrder,
+            unwatchIncreaseLimitOrder,
+            unwatchDecreaseLimitOrder,
+            unwatchChangeMarketOrder,
+            unwatchCreateFutureStopOrder,
+            unwatchCreateUpdateCollateralOrder,
+            unwatchCancelChangeLimitOrder,
         ];
 
 
@@ -326,6 +779,8 @@ export const OpenPostionsEffects = memo(() => {
     useEffect(() => {
         const unwatches = listenEvents();
         return () => {
+
+            console.log("event unwatches");
             unwatches.forEach((unwatch) => {
                 unwatch();
             });
