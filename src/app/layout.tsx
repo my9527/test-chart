@@ -20,7 +20,7 @@ const Providers = dynamic(() => import("./providers"), {
 });
 
 
-export const runtime = 'nodejs';
+// export const runtime = 'nodejs';
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -50,5 +50,3 @@ export default function RootLayout({
     </html>
   );
 }
-
-export const runtime = "edge";
